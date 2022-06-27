@@ -1,0 +1,145 @@
+################################################
+# Theory
+# source: How to Create a DNA Superkit | GEDMATCH Tutorial - Genetic Genealogy ( https://www.youtube.com/watch?v=IJmAHNSODuw )
+################################################
+
+Step 1:
+Separate Chromosone into Tabs
+
+-------------------------
+
+Step 2:
+Merge data from various tests
+
+FTDNA and MyHeritage use the same chip
+
+ancestry has genotype in two columns, allele1 & allele2. These need to be combined to one column
+=concat(k2,l2)
+=concat(allele1, allele2)
+
+create COMPANY column
+
+merge sets, all sets should be in one position
+
+-------------------------
+
+Step 3:
+Sort by POSITION
+
+-------------------------
+
+Step 4:
+Remove duplicate position SNPs that are the same call
+
+Need to standardize call order
+
+replacement table:
+00 = --     ID = DI
+CA = AC     GA = AG
+TA = AT     GC = CG
+TC = CT     TG = GT
+
+remove duplicates
+
+=if(c2=c1,
+ if(d2=d1,1,0),
+    0)
+
+=if(POSITIONrow2=POSITIONrow1,
+ if(GENOTYPErow2=GENOTYPErow1,1,0),
+    0)
+
+If POSITION(below) are equal to POSITION(above)
+and
+IF GENOTYPE(below) are equal to GENOTYPE(above)
+MATCH
+
+else
+NO MATCH
+
+REMOVE MATCHES! (1)
+
+Expect half of SNPs to be duplicates
+
+-------------------------
+
+Step 5:
+Remove no calls with duplicate positions
+
+=if(c2=c1,
+ if(d2="--",1,0),
+    0)
+
+IF POSITION(below) are equal to POSITION(above)
+and
+IF GENOTYPE(below) are equal to --
+MATCH
+
+else
+NO MATCH
+
+REMOVE MATCHES! (1)
+
+-------------------------
+
+Step 6:
+Select a SNP for different call duplicates
+
+(23anMe is the first in row in this case)
+
+=if(c2=c1,1,0)
+
+IF POSITION(below) are equal to POSITION(above)
+MATCH
+
+else 
+NO MATCH
+
+a match means that there are same positions with different calls,
+since we deleted all duplicates and no calls with duplicate positions.
+
+-------------------------
+
+Step 7:
+Export chromosome data as tab separated file
+
+-------------------------
+
+Step 8:
+Create a master .txt file with all chromosomes
+
+======================================================================================
+======================================================================================
+
+
+################################################
+# FORMAT
+################################################
+
+Columns:
+RSID    CHROMOSOME  POSITION    GENOTYPE    COMPANY
+
+-------------------------
+
+Replacement table (GENOTYPE):
+
+00 = --     
+CA = AC     
+TA = AT     
+TC = CT     
+ID = DI
+GA = AG
+GC = CG
+TG = GT
+
+-------------------------
+
+Sort by (POSITION)
+
+-------------------------
+
+Company names:
+23andMe
+Living DNA
+MyHeritage
+ancestry
