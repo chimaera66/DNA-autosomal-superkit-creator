@@ -12,16 +12,16 @@ import pandas as pd
 #
 
 # Sorting order for company column
-companyPriorityList = ['23andMe', 'FamilyTreeDNA', 'Living DNA', 'MyHeritage', 'ancestry']
+companyPriorityList = [ '23andMe', 'FamilyTreeDNA', 'Living DNA', 'MyHeritage', 'ancestry' ]
 # Sorting order for chromosome column
-chromosomePriorityList = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', '13', '14', '15', '16', '17', '18', '19', '20', '21', '22', 'X', 'Y', 'MT']
+chromosomePriorityList = [ '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', '13', '14', '15', '16', '17', '18', '19', '20', '21', '22', 'X', 'Y', 'MT' ]
 
 # Input file
 #inputFile = 'LivingDNA2.csv'
-inputFile = '23andMe.csv'
+#inputFile = '23andMe.csv'
 #inputFile = 'LivingDNA.csv'
 #inputFile = 'MyHeritage.csv'
-#inputFile = 'FamilyTreeDNA.csv'
+inputFile = 'FamilyTreeDNA.csv'
 #inputFile = 'ancestry.csv'
 
 ##########################################
@@ -92,7 +92,7 @@ chromosome_table = {
 # Pre-screen file to determin DNA company
 #
 
-def prescreenDNAFile(inputDNAFile):
+def prescreenDNAFile( inputDNAFile ):
     ##############################
     #  n = max number of comment lines.
     #       23andMe = 19
@@ -104,8 +104,8 @@ def prescreenDNAFile(inputDNAFile):
     n = 19 
     mystring = ' '
 
-    with open(inputDNAFile) as myfile:
-        head = [next(myfile) for x in range(n)]
+    with open( inputDNAFile ) as myfile:
+        head = [ next( myfile ) for x in range( n ) ]
     #print(head)
 
     for x in head:
@@ -123,35 +123,35 @@ def prescreenDNAFile(inputDNAFile):
 #
 
 # 23andMe
-def prepare23andMe(inputFile):
+def prepare23andMe( inputFile ):
     print( inputFile + ' contains data from 23andMe' )
 
     # Load input file into pandas and create the proper columns
-    df = pd.read_csv(inputFile, dtype=str, sep='\t', comment='#', index_col=False, header=None, engine='python')
-    df.columns = ['rsid', 'chromosome', 'position', 'genotype']
-    df['company'] = '23andMe'
+    df = pd.read_csv( inputFile, dtype=str, sep='\t', comment='#', index_col=False, header=None, engine='python' )
+    df.columns = [ 'rsid', 'chromosome', 'position', 'genotype' ]
+    df[ 'company' ] = '23andMe'
 
     return df
 
 # LivingDNA
-def prepareLivingDNA(inputFile):
+def prepareLivingDNA( inputFile ):
     print( inputFile + ' contains data from Living DNA' )
 
     # Load input file into pandas and create the proper columns
-    df = pd.read_csv(inputFile, dtype=str, sep='\t', comment='#', index_col=False, header=None, engine='python')
-    df.columns = ['rsid', 'chromosome', 'position', 'genotype']
-    df['company'] = 'Living DNA'
+    df = pd.read_csv( inputFile, dtype=str, sep='\t', comment='#', index_col=False, header=None, engine='python' )
+    df.columns = [ 'rsid', 'chromosome', 'position', 'genotype' ]
+    df[ 'company' ] = 'Living DNA'
 
     return df
 
 # MyHeritage
-def prepareMyHeritage(inputFile):
+def prepareMyHeritage( inputFile ):
     print( inputFile + ' contains data from MyHeritage' )
 
     # Load input file into pandas and create the proper columns
     df = pd.read_csv( inputFile, dtype=str, comment='#' )
-    df.columns = ['rsid', 'chromosome', 'position', 'genotype']
-    df['company'] = 'MyHeritage'
+    df.columns = [ 'rsid', 'chromosome', 'position', 'genotype' ]
+    df[ 'company' ] = 'MyHeritage'
 
     return df
 
@@ -160,22 +160,22 @@ def prepareFamilyTreeDNA(inputFile):
     print( inputFile + ' contains data from FamilyTreeDNA' )
 
     # Load input file into pandas and create the proper columns
-    df = pd.read_csv(inputFile, dtype=str, comment='#')
-    df.columns = ['rsid', 'chromosome', 'position', 'genotype']
-    df['company'] = 'FamilyTreeDNA'
+    df = pd.read_csv( inputFile, dtype=str, comment='#' )
+    df.columns = [ 'rsid', 'chromosome', 'position', 'genotype' ]
+    df[ 'company' ] = 'FamilyTreeDNA'
 
     return df
 
 # Ancestry
-def prepareAncestry(inputFile):
+def prepareAncestry( inputFile ):
     print( inputFile + ' contains data from ancestry' )
 
     # Load input file into pandas and create the proper columns
-    data = pd.read_csv(inputFile, dtype=str, sep='\t', comment='#')
-    data['genotype'] = data['allele1'] + data['allele2']
-    del data['allele1']
-    del data['allele2']
-    df['company'] = 'ancestry'
+    data = pd.read_csv( inputFile, dtype=str, sep='\t', comment='#' )
+    data[ 'genotype' ] = data[ 'allele1' ] + data[ 'allele2' ]
+    del data[ 'allele1' ]
+    del data[ 'allele2' ]
+    df[ 'company' ] = 'ancestry'
 
     return df
 
@@ -194,12 +194,12 @@ def cleanDNAFile( inputFile ):
     inputFile[ 'chromosome' ].replace( to_replace=chromosome_table, inplace=True )
 
     # Drop nocalls
-    indexNames = inputFile[ inputFile['genotype'] == '--' ].index
-    inputFile.drop(indexNames, inplace = True)
+    indexNames = inputFile[ inputFile[ 'genotype' ] == '--' ].index
+    inputFile.drop( indexNames, inplace = True )
     #inputFile[ inputFile.genotype != '--' ] 
 
     # Drop duplicates
-    inputFile.drop_duplicates( subset=['chromosome','position', 'genotype'], keep='first', inplace=True )
+    inputFile.drop_duplicates( subset=[ 'chromosome','position', 'genotype'], keep='first', inplace=True )
 
     return inputFile
 
@@ -212,12 +212,13 @@ def cleanDNAFile( inputFile ):
 # order
 def sortDNAFile( inputFile ):
     # Custom sorting order on chromosome column. Modify at top of file.
-    df[ 'chromosome' ] = pd.Categorical(df[ 'chromosome' ], chromosomePriorityList )
+    #df[ 'chromosome' ] = pd.Categorical(df[ 'chromosome' ], chromosomePriorityList )
+    inputFile[ 'chromosome' ] = pd.Categorical( inputFile[ 'chromosome' ], chromosomePriorityList )
 
 
     # Custom sorting order on company column. Modify at top of file.
-    df[ 'company' ] = pd.Categorical( df[ 'company' ], companyPriorityList )
-    df.sort_values( [ 'chromosome', 'position', 'company' ] , ascending=(True, True, True), inplace=True )
+    inputFile[ 'company' ] = pd.Categorical( inputFile[ 'company' ], companyPriorityList )
+    inputFile.sort_values( [ 'chromosome', 'position', 'company' ] , ascending=(True, True, True), inplace=True )
 
     return inputFile
 
@@ -229,29 +230,60 @@ def sortDNAFile( inputFile ):
 # MAIN LOOP
 ####################################################################################
 
-DNAFileCompany = prescreenDNAFile(inputFile)
+fileScreening = prescreenDNAFile( inputFile )
 
-if '23andMe' in DNAFileCompany:
-    df = prepare23andMe(inputFile)
+resultFiles = []
 
-elif 'Living DNA' in DNAFileCompany:
-    df = prepareLivingDNA(inputFile)
+if '23andMe' in fileScreening:
+    DNAFile23andME = prepare23andMe( inputFile )
+    DNAFile23andME = cleanDNAFile( DNAFile23andME )
+    DNAFile23andME = sortDNAFile( DNAFile23andME )
 
-elif 'MyHeritage' in DNAFileCompany:
-    df = prepareMyHeritage(inputFile)
+    resultFiles.append( DNAFile23andME )
 
-elif 'RSID,CHROMOSOME,POSITION,RESULT' in DNAFileCompany:
-    df = prepareFamilyTreeDNA(inputFile)
+elif 'Living DNA' in fileScreening:
+    DNAFileLivingDNA = prepareLivingDNA( inputFile )
+    DNAFileLivingDNA = cleanDNAFile( DNAFileLivingDNA )
+    DNAFileLivingDNA = sortDNAFile( DNAFileLivingDNA )
 
-elif 'ancestry' in DNAFileCompany:
-    df = prepareAncestry(inputFile)
+    resultFiles.append( DNAFileLivingDNA )
+
+elif 'MyHeritage' in fileScreening:
+    DNAFileMyHeritage = prepareMyHeritage( inputFile )
+    DNAFileMyHeritage = cleanDNAFile( DNAFileMyHeritage )
+    DNAFileMyHeritage = sortDNAFile( DNAFileMyHeritage )
+
+    resultFiles.append( DNAFileMyHeritage )
+
+elif 'RSID,CHROMOSOME,POSITION,RESULT' in fileScreening:
+    DNAFileFamilyTreeDNA = prepareFamilyTreeDNA( inputFile )
+    DNAFileFamilyTreeDNA = cleanDNAFile( DNAFileFamilyTreeDNA )
+    DNAFileFamilyTreeDNA = sortDNAFile( DNAFileFamilyTreeDNA )
+
+    resultFiles.append( DNAFileFamilyTreeDNA )
+
+elif 'ancestry' in fileScreening:
+    DNAFileAncestry = prepareAncestry( inputFile )
+    DNAFileAncestry = cleanDNAFile( DNAFileAncestry )
+    DNAFileAncestry = sortDNAFile( DNAFileAncestry )
+
+    resultFiles.append( DNAFileAncestry )
 
 else:
     print( 'Source file is unknown' )
 
+for f in resultFiles:
+    df = f
+    #df.info()
+    #print( df )
+
+# TESTING
+df = resultFiles[0]
+print( df )
+
 # clean and sort Raw data file
-df = cleanDNAFile( df )
-df = sortDNAFile( df )
+#df = cleanDNAFile( df )
+#df = sortDNAFile( df )
 
 # Write results to file
 df.to_csv( 'test.csv', sep='\t', index=None )
@@ -268,7 +300,7 @@ df.to_csv( 'test.csv', sep='\t', index=None )
 # DEBUGGING
 
 #df.info()
-print( df )
+#print( df )
 
 ######################################
 
