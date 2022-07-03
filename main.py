@@ -3,6 +3,7 @@
 ##############################################################################################
 
 import os
+from typing import List
 import pandas as pd
 
 
@@ -16,13 +17,20 @@ companyPriorityList = [ '23andMe', 'FamilyTreeDNA', 'Living DNA', 'MyHeritage', 
 # Sorting order for chromosome column
 chromosomePriorityList = [ '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', '13', '14', '15', '16', '17', '18', '19', '20', '21', '22', 'X', 'Y', 'MT' ]
 
+# Input filetypes
+fileEndings = (
+    'txt',
+    'csv'
+)
+
 # Input file
 #inputFile = 'LivingDNA2.csv'
 #inputFile = '23andMe.csv'
 #inputFile = 'LivingDNA.csv'
 #inputFile = 'MyHeritage.csv'
-inputFile = 'FamilyTreeDNA.csv'
+#inputFile = 'FamilyTreeDNA.csv'
 #inputFile = 'ancestry.csv'
+inputFile = 'test.csv'
 
 ##########################################
 
@@ -53,7 +61,7 @@ inputFile = 'FamilyTreeDNA.csv'
 # Nocalls = 
 
 # Normalized chromosome numbering and order:
-# 1, 2, 3, 4, 5, 6, 7, 8, 9, 10,
+# 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10,
 # 11, 12, 13, 14, 15, 16, 17, 18
 # 19, 20, 21, 22
 # X, Y, MT
@@ -196,10 +204,18 @@ def cleanDNAFile( inputFile ):
     # Drop nocalls
     indexNames = inputFile[ inputFile[ 'genotype' ] == '--' ].index
     inputFile.drop( indexNames, inplace = True )
-    #inputFile[ inputFile.genotype != '--' ] 
 
-    # Drop duplicates
-    inputFile.drop_duplicates( subset=[ 'chromosome','position', 'genotype'], keep='first', inplace=True )
+    # Convert position to numerical
+    #inputFile.Col = df.Col.astype(float)
+    #inputFile[' position '] = inputFile[ 'position' ].astype( int, copy=False )
+    #inputFile[ 'position' ].astype( int, copy=False )
+    inputFile[ 'position' ] = pd.to_numeric( inputFile[ 'position' ] )
+    #inputFile[ 'rsid' ].astype( str, copy=False )
+    #inputFile[ 'rsid' ] = inputFile[ 'rsid' ].astype(str, copy=False )
+
+    # Drop duplicates (DO NOT BELONG HERE)
+#    inputFile.drop_duplicates( subset=[ 'chromosome','position', 'genotype'], keep='first', inplace=True )
+#    inputFile.drop_duplicates( subset=[ 'chromosome','position' ], keep='first', inplace=True )
 
     return inputFile
 
@@ -207,91 +223,202 @@ def cleanDNAFile( inputFile ):
 
 
 ##########################################
-# Sort file based on custom chromosome
-# order, position and custom genotype
-# order
+# Sort file based on custom chromosome order,
+# position and custom genotype order
+
 def sortDNAFile( inputFile ):
-    # Custom sorting order on chromosome column. Modify at top of file.
-    #df[ 'chromosome' ] = pd.Categorical(df[ 'chromosome' ], chromosomePriorityList )
+    # Custom sorting order on chromosome and company column. Modify at top of file.
     inputFile[ 'chromosome' ] = pd.Categorical( inputFile[ 'chromosome' ], chromosomePriorityList )
-
-
-    # Custom sorting order on company column. Modify at top of file.
     inputFile[ 'company' ] = pd.Categorical( inputFile[ 'company' ], companyPriorityList )
-    inputFile.sort_values( [ 'chromosome', 'position', 'company' ] , ascending=(True, True, True), inplace=True )
+
+    # Sort frame based on custom sorting orders and position
+    inputFile.sort_values( [ 'chromosome', 'position', 'company' ], ascending=( True, True, True ), inplace=True )
 
     return inputFile
 
 
 ##########################################
+
+
+##########################################
+# Sort file based on custom chromosome order,
+# position and custom genotype order
+
+def findDNAFiles( inputFiles ) -> List:
+    fileList = [ f for f in os.listdir( os.curdir ) if os.path.isfile( f ) ]
+    result = []
+    for f in fileList:
+        if f.lower().endswith( inputFiles ):
+            result.append( f )
+    return result
+
+##########################################
+
 
 
 ####################################################################################
 # MAIN LOOP
 ####################################################################################
 
-fileScreening = prescreenDNAFile( inputFile )
+#TEST
 
+# Find files in dir with the correct file endings
+rawDNAFiles = findDNAFiles( fileEndings )
+# empty array to put results in
 resultFiles = []
+for f in rawDNAFiles:
+    fileScreening = prescreenDNAFile( f )
+    #print( fileScreening )
+    if '23andMe' in fileScreening:
+        DNAFile23andME = prepare23andMe( f )
+        DNAFile23andME = cleanDNAFile( DNAFile23andME )
+        DNAFile23andME = sortDNAFile( DNAFile23andME )
 
-if '23andMe' in fileScreening:
-    DNAFile23andME = prepare23andMe( inputFile )
-    DNAFile23andME = cleanDNAFile( DNAFile23andME )
-    DNAFile23andME = sortDNAFile( DNAFile23andME )
+        resultFiles.append( DNAFile23andME )
 
-    resultFiles.append( DNAFile23andME )
+        # DEBUG
+#        print( DNAFile23andME )
 
-elif 'Living DNA' in fileScreening:
-    DNAFileLivingDNA = prepareLivingDNA( inputFile )
-    DNAFileLivingDNA = cleanDNAFile( DNAFileLivingDNA )
-    DNAFileLivingDNA = sortDNAFile( DNAFileLivingDNA )
+    elif 'Living DNA' in fileScreening:
+        DNAFileLivingDNA = prepareLivingDNA( f )
+        DNAFileLivingDNA = cleanDNAFile( DNAFileLivingDNA )
+        DNAFileLivingDNA = sortDNAFile( DNAFileLivingDNA )
 
-    resultFiles.append( DNAFileLivingDNA )
+        resultFiles.append( DNAFileLivingDNA )
 
-elif 'MyHeritage' in fileScreening:
-    DNAFileMyHeritage = prepareMyHeritage( inputFile )
-    DNAFileMyHeritage = cleanDNAFile( DNAFileMyHeritage )
-    DNAFileMyHeritage = sortDNAFile( DNAFileMyHeritage )
+        # DEBUG
+#        print( DNAFileLivingDNA )
 
-    resultFiles.append( DNAFileMyHeritage )
+    elif 'MyHeritage' in fileScreening:
+        DNAFileMyHeritage = prepareMyHeritage( f )
+        DNAFileMyHeritage = cleanDNAFile( DNAFileMyHeritage )
+        DNAFileMyHeritage = sortDNAFile( DNAFileMyHeritage )
 
-elif 'RSID,CHROMOSOME,POSITION,RESULT' in fileScreening:
-    DNAFileFamilyTreeDNA = prepareFamilyTreeDNA( inputFile )
-    DNAFileFamilyTreeDNA = cleanDNAFile( DNAFileFamilyTreeDNA )
-    DNAFileFamilyTreeDNA = sortDNAFile( DNAFileFamilyTreeDNA )
+        resultFiles.append( DNAFileMyHeritage )
 
-    resultFiles.append( DNAFileFamilyTreeDNA )
+        # DEBUG
+#        print( DNAFileMyHeritage )
 
-elif 'ancestry' in fileScreening:
-    DNAFileAncestry = prepareAncestry( inputFile )
-    DNAFileAncestry = cleanDNAFile( DNAFileAncestry )
-    DNAFileAncestry = sortDNAFile( DNAFileAncestry )
+    elif 'RSID,CHROMOSOME,POSITION,RESULT' in fileScreening:
+        DNAFileFamilyTreeDNA = prepareFamilyTreeDNA( f )
+        DNAFileFamilyTreeDNA = cleanDNAFile( DNAFileFamilyTreeDNA )
+        DNAFileFamilyTreeDNA = sortDNAFile( DNAFileFamilyTreeDNA )
 
-    resultFiles.append( DNAFileAncestry )
+        resultFiles.append( DNAFileFamilyTreeDNA )
 
-else:
-    print( 'Source file is unknown' )
+        # DEBUG
+#        print( DNAFileFamilyTreeDNA )
 
-for f in resultFiles:
-    df = f
-    #df.info()
-    #print( df )
+    elif 'ancestry' in fileScreening:
+        DNAFileAncestry = prepareAncestry( f )
+        DNAFileAncestry = cleanDNAFile( DNAFileAncestry )
+        DNAFileAncestry = sortDNAFile( DNAFileAncestry )
+
+        resultFiles.append( DNAFileAncestry )
+
+        # DEBUG
+#        print( DNAFileAncestry )
+
+    # Else file is unknown
+    else:
+        print( 'Source file is unknown' )
+
+#DNASuperKit = pd.concat(resultFiles, sort=False)
+DNASuperKit = pd.concat(resultFiles, sort=False, ignore_index=True)
+#DNASuperKit[ 'position' ].astype( int, copy=False )
+
+DNASuperKit = sortDNAFile( DNASuperKit )
+
+DNASuperKit.info()
+
+#print( DNASuperKit )
+
+#rawDNAFiles = findDNAFiles( fileEndings )
+#print( rawDNAFiles )
+
+# load file for brand screening
+#fileScreening = prescreenDNAFile( inputFile )
+
+
+
+
+# Screen for 23andMe
+#if '23andMe' in fileScreening:
+#    DNAFile23andME = prepare23andMe( inputFile )
+#    DNAFile23andME = cleanDNAFile( DNAFile23andME )
+#    DNAFile23andME = sortDNAFile( DNAFile23andME )
+
+#    resultFiles.append( DNAFile23andME )
+
+# Screen for Living DNA
+#elif 'Living DNA' in fileScreening:
+#    DNAFileLivingDNA = prepareLivingDNA( inputFile )
+#    DNAFileLivingDNA = cleanDNAFile( DNAFileLivingDNA )
+#    DNAFileLivingDNA = sortDNAFile( DNAFileLivingDNA )
+
+#    resultFiles.append( DNAFileLivingDNA )
+
+# Screen for MyHeritage
+#elif 'MyHeritage' in fileScreening:
+#    DNAFileMyHeritage = prepareMyHeritage( inputFile )
+#    DNAFileMyHeritage = cleanDNAFile( DNAFileMyHeritage )
+#    DNAFileMyHeritage = sortDNAFile( DNAFileMyHeritage )
+
+#    resultFiles.append( DNAFileMyHeritage )
+
+# Screen for FamilyTreeDNA
+#elif 'RSID,CHROMOSOME,POSITION,RESULT' in fileScreening:
+#    DNAFileFamilyTreeDNA = prepareFamilyTreeDNA( inputFile )
+#    DNAFileFamilyTreeDNA = cleanDNAFile( DNAFileFamilyTreeDNA )
+#    DNAFileFamilyTreeDNA = sortDNAFile( DNAFileFamilyTreeDNA )
+
+#    resultFiles.append( DNAFileFamilyTreeDNA )
+
+# Screen for Ancestry
+#elif 'ancestry' in fileScreening:
+#    DNAFileAncestry = prepareAncestry( inputFile )
+#    DNAFileAncestry = cleanDNAFile( DNAFileAncestry )
+#    DNAFileAncestry = sortDNAFile( DNAFileAncestry )
+
+#    resultFiles.append( DNAFileAncestry )
+
+# Else file is unknown
+#else:
+#    print( 'Source file is unknown' )
 
 # TESTING
-df = resultFiles[0]
-print( df )
+#for f in resultFiles:
+#    df = f
+    #df.info()
+#    print( df )
+
+# TESTING
+#df = resultFiles[0]
+#print( df )
 
 # clean and sort Raw data file
 #df = cleanDNAFile( df )
 #df = sortDNAFile( df )
 
 # Write results to file
-df.to_csv( 'test.csv', sep='\t', index=None )
+#df.to_csv( './output/test.csv', sep='\t', index=None )
+DNASuperKit.to_csv( './output/test.csv', sep='\t', index=None )
+
+#data = pd.read_csv('./output/test.csv', dtype=str, sep='\t', comment="#", index_col=False, engine='python')
+#data.columns = ['rsid', 'chromosome', 'position', 'result', 'company']
+
+#DNASuperKit = sortDNAFile( data )
+#DNASuperKit.to_csv( './output/test.csv', sep='\t', index=None )
 
 ####################################################################################
 ####################################################################################
 
-#print( df )
+
+# TODO:
+# * Loop for each file <-- DONE
+# * Concatenate frames <-- DONE
+# * Drop duplicates
+
 
 
 
@@ -361,3 +488,14 @@ df.to_csv( 'test.csv', sep='\t', index=None )
 #    'Ryan Bowen',
 #    'Cedric Hunter'
 #]
+
+
+
+# ---------------------------------------------------------------------
+# Concatenate several dataframes
+
+# = resultFiles
+#frames = [df_1, df_2]
+
+# Concatenate DataFrames
+#df = pd.concat(frames, sort=False)
