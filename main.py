@@ -166,12 +166,23 @@ def prescreenDNAFile( inputDNAFile ):
     #       FamilyTree DNA = 0
     #       ancestry = ?
 
-    n = 19 
+    n = 0
     mystring = ' '
 
+    # count lines in the file
+    with open( inputDNAFile, 'r') as fp:
+        for n, line in enumerate(fp):
+            pass
+
+    # cutoff at 19 lines
+    if n > 19:
+        n = 19
+
+    # look at the first n lines
     with open( inputDNAFile ) as myfile:
         head = [ next( myfile ) for x in range( n ) ]
 
+    # put all lines in a string
     for x in head:
        mystring += ' ' + x
 
@@ -316,6 +327,13 @@ def sortDNAFile( inputFile ):
 
 # Find files in dir with the correct file endings
 rawDNAFiles = findDNAFiles( fileEndings )
+
+# Check if there are any files in the directory
+if not rawDNAFiles:
+    print ("There is no files in the directory")
+
+    exit()
+
 # empty array to put results in
 resultFiles = []
 
@@ -365,7 +383,14 @@ for f in rawDNAFiles:
 
     # Else file is unknown
     else:
-        print( 'Source file is unknown' )
+        print( 'File ' + f + ' is unknown' )
+
+# Check if there are lists in DNASuperKit
+# if not, then quit script
+if not resultFiles:
+    print ("No compatible files has been found")
+
+    exit()
 
 # Concatenate all DNA files into one list
 DNASuperKit = pd.concat(resultFiles, sort=False, ignore_index=True)
