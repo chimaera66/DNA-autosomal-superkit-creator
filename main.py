@@ -139,9 +139,13 @@ chromosome_table = {
 #    return result
 
 def findDNAFiles( inputFiles ) -> List:
+    # Get script directory
     scriptDir = os.path.dirname( os.path.realpath( __file__ ) )
+    # Add inputFileDir to directory to get subdir
     scriptDir = scriptDir + inputFileDir
 
+    # List all files in subdir and add files with fileEndings
+    # and append to result list
     fileList = [ f for f in os.listdir( path=scriptDir ) ]
     result = []
     for f in fileList:
