@@ -7,6 +7,7 @@ from typing import List
 import pandas as pd
 
 
+
 ##########################################
 # Customizations
 # change to fit your need
@@ -54,6 +55,12 @@ fileEndings = (
     'txt',
     'csv'
 )
+
+# Input/output file directory
+inputFileDir = './input/'
+outputFileDir = './output/'
+
+outputFileName = 'DNASuperKit.csv'
 
 ##########################################
 
@@ -115,6 +122,32 @@ chromosome_table = {
 #    '26': 'MT',
 #    '24': 'Y'
 }
+
+##########################################
+
+
+##########################################
+# Find all files in directory with
+# the desired file ending from 'fileEndings'
+
+#def findDNAFiles( inputFiles ) -> List:
+#    fileList = [ f for f in os.listdir( os.curdir ) if os.path.isfile( f ) ]
+#    result = []
+#    for f in fileList:
+#        if f.lower().endswith( inputFiles ):
+#            result.append( f )
+#    return result
+
+def findDNAFiles( inputFiles ) -> List:
+    scriptDir = os.path.dirname( os.path.realpath( __file__ ) )
+    scriptDir = scriptDir + inputFileDir
+
+    fileList = [ f for f in os.listdir( path=scriptDir ) ]
+    result = []
+    for f in fileList:
+        if f.lower().endswith( inputFiles ):
+            result.append( inputFileDir + f )
+    return result
 
 ##########################################
 
@@ -275,22 +308,6 @@ def sortDNAFile( inputFile ):
 ##########################################
 
 
-##########################################
-# Sort file based on custom chromosome order,
-# position and custom genotype order
-
-def findDNAFiles( inputFiles ) -> List:
-    fileList = [ f for f in os.listdir( os.curdir ) if os.path.isfile( f ) ]
-    result = []
-    for f in fileList:
-        if f.lower().endswith( inputFiles ):
-            result.append( f )
-    return result
-
-##########################################
-
-
-
 ####################################################################################
 # MAIN LOOP
 ####################################################################################
@@ -360,14 +377,12 @@ DNASuperKit = sortDNAFile( DNASuperKit )
 DNASuperKit = dropDuplicatesDNAFile( DNASuperKit )
 
 # Write result to file
-DNASuperKit.to_csv( './output/test.csv', sep='\t', index=None )
-
+DNASuperKit.to_csv( outputFileDir + outputFileName, sep='\t', index=None )
 
 ####################################################################################
 ####################################################################################
 
 # TODO
-# * read files from ./input/ instead of root directory
 # * Add comments on top of superkit file
 
 ##########################################
