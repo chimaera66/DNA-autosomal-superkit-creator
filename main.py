@@ -22,8 +22,9 @@ companyPriorityList = [ '23andMe',
                         ]
 
 # Sorting order for chromosome column
-chromosomePriorityList = [ '0', # Only in FamilyTreeDNA, probably contains genotypes that could not be matched to a rsid.
-                           '1',
+#chromosomePriorityList = [ '0', # Only in FamilyTreeDNA, probably contains genotypes that could not be matched to a rsid.
+#                           '1',
+chromosomePriorityList = [ '1',
                            '2',
                            '3',
                            '4',
@@ -98,20 +99,22 @@ outputFileName = 'DNASuperKit.csv'
 # Alleles = paired
 # Nocalls = --
 
+# Most of these conversions are not really necessary
+# Still makes it easier to normalize noncalls to drop them
 # Table for normalizing genotype
 genotype_table = {
     '00': '--',
-    'CA': 'AC',
-    'TA': 'AT',
-    'TC': 'CT',
-    'ID': 'DI',
-    'GA': 'AG',
-    'GC': 'CG',
-    'TG': 'GT',
-    'A': 'AA',
-    'T': 'TT',
-    'D': 'DD',
-    'C': 'CC',
+#    'CA': 'AC',
+#    'TA': 'AT',
+#    'TC': 'CT',
+#    'ID': 'DI',
+#    'GA': 'AG',
+#    'GC': 'CG',
+#    'TG': 'GT',
+#    'A': 'AA',
+#    'T': 'TT',
+#    'D': 'DD',
+#    'C': 'CC',
 }
 
 # Table for normalizing chromosome names
@@ -129,14 +132,6 @@ chromosome_table = {
 ##########################################
 # Find all files in directory with
 # the desired file ending from 'fileEndings'
-
-#def findDNAFiles( inputFiles ) -> List:
-#    fileList = [ f for f in os.listdir( os.curdir ) if os.path.isfile( f ) ]
-#    result = []
-#    for f in fileList:
-#        if f.lower().endswith( inputFiles ):
-#            result.append( f )
-#    return result
 
 def findDNAFiles( inputFiles ) -> List:
     # Get script directory
@@ -272,6 +267,7 @@ def cleanDNAFile( inputFile ):
 
     # Normalize genotype with custom genotype_table
     inputFile[ 'genotype' ].replace( to_replace=genotype_table, inplace=True )
+
     # Normalize chromosome order with custom chromosome_table
     inputFile[ 'chromosome' ].replace( to_replace=chromosome_table, inplace=True )
 
@@ -294,9 +290,11 @@ def cleanDNAFile( inputFile ):
 
 def dropDuplicatesDNAFile( inputFile ):
 
+    # I guess this step isn't really necessary since we drop all duplicates except the first
+    # according to the order in 'companyPriorityList'. With or without this creates identical data and the same nr of rows
     # First drop genotype duplicates in the same position
-    # (Probably unecessary step, but included to follow the same procedure as in the Youtube video)
-    inputFile.drop_duplicates( subset=[ 'chromosome','position', 'genotype'], keep='first', inplace=True )
+    #inputFile.drop_duplicates( subset=[ 'chromosome','position', 'genotype'], keep='first', inplace=True )
+
     # If genotype is different on the same position, then only keep the genotype from the company according to the order in companyPriorityList
     inputFile.drop_duplicates( subset=[ 'chromosome','position' ], keep='first', inplace=True )
 
@@ -405,14 +403,19 @@ DNASuperKit = sortDNAFile( DNASuperKit )
 # Drop duplicates
 DNASuperKit = dropDuplicatesDNAFile( DNASuperKit )
 
+# Delete 'company' column
+del DNASuperKit[ 'company' ]
+
 # Write result to file
 DNASuperKit.to_csv( outputFileDir + outputFileName, sep='\t', index=None )
+print ("DNA SuperKit successfully created!")
 
 ####################################################################################
 ####################################################################################
 
 # TODO
 # * Add comments on top of superkit file
+# * Choosable output format (23andMe, FamilyTreeDNA, LivingDNA, MyHeritage, Ancestry)
 
 ##########################################
 # DEBUGGING
