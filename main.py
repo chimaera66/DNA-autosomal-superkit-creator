@@ -14,8 +14,8 @@ import pandas as pd
 #
 
 # Output format
-outputFormat = '23andMe'
-#outputFormat = 'FamilyTreeDNA'
+#outputFormat = '23andMe'
+outputFormat = 'FamilyTreeDNA'
 #outputFormat = 'Living DNA'
 #outputFormat = 'MyHeritage'
 #outputFormat = 'ancestry'
@@ -39,7 +39,8 @@ fileEndings = (
 )
 
 # Output File name
-outputFileName = 'DNASuperKit.csv'
+outputFileName = 'DNASuperKit'
+outputFileEnding = '.csv'
 
 ##########################################
 
@@ -58,7 +59,7 @@ outputFileName = 'DNASuperKit.csv'
 # Nocalls = --                                  Nocalls = not included
 # Tabulated                                     Tabulated
 
-# Alleles                                       Alleles
+# 23andMe Alleles                               Living DNA Alleles
 # ['DD' 'II' 'DI']
 # ['D' 'I']
 
@@ -80,7 +81,7 @@ outputFileName = 'DNASuperKit.csv'
 # comma                                         comma
 # "rsid"
 
-# Alleles                                       Alleles
+# MyHeritage Alleles                            FamilyTreeDNA Alleles
 #                                               ['AA' 'CC' 'GG' 'TT' 'CT' 'AG']
 #                                               ['AC' 'GT' 'CG' 'AT']
 #                                               ['-G' '-C' '-A' '-T']
@@ -117,6 +118,14 @@ chromosomeTable = { '23': 'X', '25': 'X', 'XY': 'X',
                     '24': 'Y'
 }
 
+# Normalized allele naming convention
+# ['DD' 'II' 'DI']
+# ['D' 'I']
+# ['AA' 'CC' 'GG' 'TT' 'CT' 'AG']
+# ['AC' 'GT' 'CG' 'AT']
+# ['A' 'C' 'G' 'T']
+# ['--']
+
 # Table for normalizing genotype
 genotypeTable = {
     '00': '--',
@@ -138,6 +147,37 @@ genotypeTable = {
     '-C': 'C',
     '-A': 'A',
     '-T': 'T'
+}
+
+# Nocall list
+noCalls = [ 'DD', 'II', 'DI', 'D', 'I', '--' ]
+
+##########################################
+
+
+##########################################
+# Company tables
+# 
+
+# Sorting order for FamilyTreeDNA chromosome column
+chromosomePriorityListFamilyTreeDNA = [ '1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', '13', '14', '15', '16', '17', '18', '19', '20', '21', '22', 'XY', 'MT', 'X' ]
+
+genotypeTableFamilyTreeDNA = {
+    'G': '-G',
+    'C': '-C',
+    'A': '-A',
+    'T': '-T'
+}
+
+noCallsFamilyTreeDNA = [ 'DD', 'II', 'DI', 'D', 'I' ]
+
+# Sorting order for ancestry chromosome column
+chromosomePriorityListAncestry =      [ '1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', '13', '14', '15', '16', '17', '18', '19', '20', '21', '22', '23', '24', '26' ]
+
+# Table for converting file to ancestry format
+chromosomeTableAncestry = { 'X':  '23',
+                            'MT': '26',
+                            'Y':  '24'
 }
 
 ##########################################
@@ -212,7 +252,7 @@ def prescreenDNAFile( inputDNAFile ):
 
 # 23andMe
 def prepare23andMe( inputFile ):
-    print( inputFile + ' contains data from 23andMe' )
+    #print( inputFile + ' contains data from 23andMe' )
 
     # Load input file into pandas and create the proper columns
     df = pd.read_csv( inputFile, dtype=str, sep='\t', comment='#', index_col=False, header=None, engine='python' )
@@ -223,7 +263,7 @@ def prepare23andMe( inputFile ):
 
 # LivingDNA
 def prepareLivingDNA( inputFile ):
-    print( inputFile + ' contains data from Living DNA' )
+    #print( inputFile + ' contains data from Living DNA' )
 
     # Load input file into pandas and create the proper columns
     df = pd.read_csv( inputFile, dtype=str, sep='\t', comment='#', index_col=False, header=None, engine='python' )
@@ -234,7 +274,7 @@ def prepareLivingDNA( inputFile ):
 
 # MyHeritage
 def prepareMyHeritage( inputFile ):
-    print( inputFile + ' contains data from MyHeritage' )
+    #print( inputFile + ' contains data from MyHeritage' )
 
     # Load input file into pandas and create the proper columns
     df = pd.read_csv( inputFile, dtype=str, comment='#' )
@@ -245,8 +285,6 @@ def prepareMyHeritage( inputFile ):
 
 # FamilyTreeDNA
 def prepareFamilyTreeDNA(inputFile):
-    print( inputFile + ' contains data from FamilyTreeDNA' )
-
     # Load input file into pandas and create the proper columns
     df = pd.read_csv( inputFile, dtype=str, comment='#' )
     df.columns = [ 'rsid', 'chromosome', 'position', 'genotype' ]
@@ -259,7 +297,7 @@ def prepareFamilyTreeDNA(inputFile):
 
 # Ancestry
 def prepareAncestry( inputFile ):
-    print( inputFile + ' contains data from ancestry' )
+    #print( inputFile + ' contains data from ancestry' )
 
     # Load input file into pandas and create the proper columns
     data = pd.read_csv( inputFile, dtype=str, sep='\t', comment='#' )
@@ -307,6 +345,17 @@ def dropDuplicatesDNAFile( inputFile ):
     # First drop genotype duplicates in the same position
     #inputFile.drop_duplicates( subset=[ 'chromosome','position', 'genotype'], keep='first', inplace=True )
 
+    # Drop nocalls only if there are duplicate with calls
+    # is the result not a "--"?
+    m = inputFile.loc[ :, 'genotype' ].ne( '--' )
+    # is there at least a non "--" in the group?
+    m2 = (m
+        .groupby([inputFile['chromosome'], inputFile['position']])
+        .transform('max')
+        )
+    # perform dropping
+    inputFile.loc[ m|~m2 ]
+
     # If genotype is different on the same position, then only keep the genotype from the company according to the order in companyPriorityList
     inputFile.drop_duplicates( subset=[ 'chromosome','position' ], keep='first', inplace=True )
 
@@ -329,7 +378,6 @@ def sortDNAFile( inputFile ):
 
     return inputFile
 
-
 ##########################################
 
 
@@ -346,6 +394,11 @@ def formatDNAFile23andMe( inputFile ):
 
 # LivingDNA format
 def formatDNAFileLivingDNA( inputFile ):
+    # Drop nocalls
+    for f in noCalls:
+        indexNames = inputFile[ inputFile[ 'genotype' ] == f ].index
+        inputFile.drop( indexNames, inplace = True )
+
     # Change column names according to LivingDNA format
     inputFile.rename( columns = { 'rsid':'# rsid' }, inplace = True )
 
@@ -360,6 +413,20 @@ def formatDNAFileMyHeritage( inputFile ):
 
 # FamilyTreeDNA format
 def formatDNAFileFamilyTreeDNA( inputFile ):
+    # Normalize genotype with custom genotypeTable
+    inputFile[ 'genotype' ].replace( to_replace=genotypeTableFamilyTreeDNA, inplace=True )
+
+    # Drop nocalls
+    for f in noCallsFamilyTreeDNA:
+        indexNames = inputFile[ inputFile[ 'genotype' ] == f ].index
+        inputFile.drop( indexNames, inplace = True )
+
+    # Custom sorting order on chromosome and company column. Modify at top of file.
+    inputFile[ 'chromosome' ] = pd.Categorical( inputFile[ 'chromosome' ], chromosomePriorityListFamilyTreeDNA )
+
+    # Sort frame based on custom sorting orders and position
+    inputFile.sort_values( [ 'chromosome', 'position', ], ascending=( True, True ), inplace=True )
+
     # Change column names according to FamilyTreeDNA format
     inputFile.rename( columns = { 'rsid':'RSID', 'chromosome':'CHROMOSOME', 'position':'POSITION', 'genotype':'RESULT' }, inplace = True )
 
@@ -367,7 +434,20 @@ def formatDNAFileFamilyTreeDNA( inputFile ):
 
 # Ancestry format
 def formatDNAFileAncestry( inputFile ):
-    
+    # Normalize chromosome order with custom chromosomeTable
+    #inputFile[ 'chromosome' ].replace( to_replace=chromosomeTableAncestry, inplace=True )
+
+    # Custom sorting order on chromosome and company column. Modify at top of file.
+    #inputFile[ 'chromosome' ] = pd.Categorical( inputFile[ 'chromosome' ], chromosomePriorityListAncestry )
+
+    # Sort frame based on custom sorting orders and position
+    #inputFile.sort_values( [ 'chromosome', 'position', ], ascending=( True, True ), inplace=True )
+
+    # Change column names according to Ancestry format
+    #inputFile.rename( columns = { 'rsid':'RSID', 'chromosome':'CHROMOSOME', 'position':'POSITION', 'genotype':'RESULT' }, inplace = True )
+
+
+
     return inputFile
 
 ##########################################
@@ -376,6 +456,8 @@ def formatDNAFileAncestry( inputFile ):
 ####################################################################################
 # MAIN LOOP
 ####################################################################################
+
+print()
 
 # Find files in dir with the correct file endings
 rawDNAFiles = findDNAFiles( fileEndings )
@@ -395,54 +477,82 @@ for f in rawDNAFiles:
 
     # Living DNA
     if '23andMe' in fileScreening:
+        print( 'Processing file:')
+        print( f.replace( inputFileDir, '' ) )
+        print( 'Which contains data from 23andMe' )
+
         DNAFile23andME = prepare23andMe( f )
         DNAFile23andME = cleanDNAFile( DNAFile23andME )
 
         # IF position contains genotype larger than two aleles, drop row (clean dirty information)
         DNAFile23andME = DNAFile23andME.drop( DNAFile23andME[ DNAFile23andME['genotype'].str.len() > 2 ].index )
 
-        print ( DNAFile23andME.genotype.unique() )
+        #print ( DNAFile23andME.genotype.unique() )
 
         resultFiles.append( DNAFile23andME )
+        print( 'Done!' )
+        print()
 
     # Living DNA
     elif 'Living DNA' in fileScreening:
+        print( 'Processing file:')
+        print( f.replace( inputFileDir, '' ) )
+        print( 'Which contains data from Living DNA' )
+
         DNAFileLivingDNA = prepareLivingDNA( f )
         DNAFileLivingDNA = cleanDNAFile( DNAFileLivingDNA )
 
         # IF position contains genotype larger than two aleles, drop row (clean dirty information)
         DNAFileLivingDNA = DNAFileLivingDNA.drop( DNAFileLivingDNA[ DNAFileLivingDNA['genotype'].str.len() > 2 ].index )
 
-        print ( DNAFileLivingDNA.genotype.unique() )
+        #print ( DNAFileLivingDNA.genotype.unique() )
 
         resultFiles.append( DNAFileLivingDNA )
+        print( 'Done!' )
+        print()
 
     # MyHeritage
     elif 'MyHeritage' in fileScreening:
+        print( 'Processing file:')
+        print( f.replace( inputFileDir, '' ) )
+        print( 'Which contains data from MyHeritage' )
+
         DNAFileMyHeritage = prepareMyHeritage( f )
         DNAFileMyHeritage = cleanDNAFile( DNAFileMyHeritage )
 
         # IF position contains genotype larger than two aleles, drop row (clean dirty information)
         DNAFileMyHeritage = DNAFileMyHeritage.drop( DNAFileMyHeritage[ DNAFileMyHeritage['genotype'].str.len() > 2 ].index )
 
-        print ( DNAFileMyHeritage.genotype.unique() )
+        #print ( DNAFileMyHeritage.genotype.unique() )
 
         resultFiles.append( DNAFileMyHeritage )
+        print( 'Done!' )
+        print()
 
     # FamilyTreeDNA
     elif 'RSID,CHROMOSOME,POSITION,RESULT' in fileScreening:
+        print( 'Processing file:')
+        print( f.replace( inputFileDir, '' ) )
+        print( 'Which contains data from FamilyTreeDNA' )
+
         DNAFileFamilyTreeDNA = prepareFamilyTreeDNA( f )
         DNAFileFamilyTreeDNA = cleanDNAFile( DNAFileFamilyTreeDNA )
 
         # IF position contains genotype larger than two aleles, drop row (clean dirty information)
         DNAFileFamilyTreeDNA = DNAFileFamilyTreeDNA.drop( DNAFileFamilyTreeDNA[ DNAFileFamilyTreeDNA['genotype'].str.len() > 2 ].index )
 
-        print ( DNAFileFamilyTreeDNA.genotype.unique() )
+        #print ( DNAFileFamilyTreeDNA.genotype.unique() )
 
         resultFiles.append( DNAFileFamilyTreeDNA )
+        print( 'Done!' )
+        print()
 
     # Ancestry
     elif 'ancestry' in fileScreening:
+        print( 'Processing file:')
+        print( f.replace( inputFileDir, '' ) )
+        print( 'Which contains data from Ancestry' )
+
         DNAFileAncestry = prepareAncestry( f )
         DNAFileAncestry = cleanDNAFile( DNAFileAncestry )
         #DNAFileAncestry = sortDNAFile( DNAFileAncestry )
@@ -450,11 +560,16 @@ for f in rawDNAFiles:
         # IF position contains genotype larger than two aleles, drop row (clean dirty information)
         DNAFileAncestry = DNAFileAncestry.drop( DNAFileAncestry[ DNAFileAncestry['genotype'].str.len() > 2 ].index )
 
+        print ( DNAFileAncestry.genotype.unique() )
+
         resultFiles.append( DNAFileAncestry )
+        print( 'Done!' )
+        print()
 
     # Else file is unknown
     else:
-        print( 'File ' + f + ' is unknown' )
+        print( 'File ' + f.replace( inputFileDir, '' ) + ' is unknown' )
+        print()
 
 
 # Check if there are objects in DNASuperKit
@@ -464,6 +579,10 @@ if not resultFiles:
 
     exit()
 
+print()
+print( 'Processing results' )
+print()
+
 # Concatenate all DNA files into one list
 DNASuperKit = pd.concat(resultFiles, sort=False, ignore_index=True)
 
@@ -471,7 +590,7 @@ DNASuperKit = pd.concat(resultFiles, sort=False, ignore_index=True)
 DNASuperKit = sortDNAFile( DNASuperKit )
 
 #DEBUG
-print ( DNASuperKit.genotype.unique() )
+#print ( DNASuperKit.genotype.unique() )
 
 # Drop duplicates
 DNASuperKit = dropDuplicatesDNAFile( DNASuperKit )
@@ -480,36 +599,42 @@ DNASuperKit = dropDuplicatesDNAFile( DNASuperKit )
 del DNASuperKit[ 'company' ]
 
 #Format .csv to a specific company format
+print( 'Correcting data to correspond with ' + outputFormat + ' format and saving to ' + outputFileEnding )
+# 23andMe
 if outputFormat == '23andMe':
     DNASuperKit = formatDNAFile23andMe( DNASuperKit )
+    DNASuperKit.to_csv( outputFileDir + outputFileName + '-23andMe' + outputFileEnding, sep='\t', index=None )
+
+# Living DNA
 elif outputFormat == 'Living DNA':
     DNASuperKit = formatDNAFileLivingDNA( DNASuperKit )
+    DNASuperKit.to_csv( outputFileDir + outputFileName + '-LivingDNA' + outputFileEnding, sep='\t', index=None )
+
+# FamilyTreeDNA
 elif outputFormat =='FamilyTreeDNA':
     DNASuperKit = formatDNAFileFamilyTreeDNA( DNASuperKit )
+    DNASuperKit.to_csv( outputFileDir + outputFileName + '-FamilyTreeDNA' + outputFileEnding, sep='\t', index=None )
+
+# MyHeritage
 elif outputFormat == 'MyHeritage':
     DNASuperKit = formatDNAFileMyHeritage( DNASuperKit )
+    DNASuperKit.to_csv( outputFileDir + outputFileName + '-MyHeritage' + outputFileEnding, sep='\t', index=None )
+
+# Ancestry
 elif outputFormat == 'Ancestry':
     print ( outputFormat )
 
-    
-
-# Write result to file
-# tabulated
-if outputFormat == '23andMe' or outputFormat == 'Living DNA':
-    DNASuperKit.to_csv( outputFileDir + outputFileName, sep='\t', index=None )
-# comma
-elif outputFormat == 'MyHeritage' or outputFormat == 'FamilyTreeDNA':
-    DNASuperKit.to_csv( outputFileDir + outputFileName, sep=',', index=None )
-
-print ( ' ' )
-print ( 'DNA SuperKit successfully created in ' + outputFormat + ' format!')
+# Success!   
+print()
+print( 'DNA SuperKit successfully created!' )
+print()
 
 ####################################################################################
 ####################################################################################
 
 # TODO
 # * Add comments on top of superkit file
-# * Choosable output format (23andMe, FamilyTreeDNA, LivingDNA, MyHeritage, Ancestry) // NOT ENTIRELY POSSIBLE
+# * Choosable output format (23andMe, FamilyTreeDNA, LivingDNA, MyHeritage, Ancestry) // NOT ENTIRELY POSSIBLE BECAUSE THE NEED TO NORMALIZE
 
 ##########################################
 # DEBUGGING
