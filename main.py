@@ -14,18 +14,20 @@ import pandas as pd
 #
 
 # Output format
-#outputFormat = '23andMe'
-outputFormat = 'FamilyTreeDNA'
-#outputFormat = 'Living DNA'
-#outputFormat = 'MyHeritage'
+outputFormat = '23andMe'
 #outputFormat = 'ancestry'
+#outputFormat = 'FamilyTreeDNA'
+#outputFormat = 'MyHeritage'
+#outputFormat = 'Living DNA'
+
 
 # Sorting order for company column
 companyPriorityList = [ '23andMe',
+                        'ancestry',
                         'FamilyTreeDNA',
-                        'Living DNA',
                         'MyHeritage',
-                        'ancestry'
+                        'Living DNA'
+                        'MyHeritage (OLD)',
                         ]
 
 # Input/output file directory
@@ -66,10 +68,13 @@ outputFileEnding = '.csv'
 # ['AA' 'CC' 'GG' 'TT' 'CT' 'AG']               ['AA' 'CC' 'GG' 'TT' 'CT' 'AG']
 # ['AC' 'GT' 'CG' 'AT']                         ['AC' 'GT' 'CG' 'AT']
 #                                               ['CA' 'TG' 'GC' 'TA' 'TC' 'GA']
+#
 # ['A' 'C' 'G' 'T']                             ['A' 'C' 'G' 'T']
-
+#
 # ['--']
 
+
+# BEFORE MARCH 1 2019
 # MyHeritage chromosome numbering and order:    FamilyTreeDNA chromosome numbering and order:
 #RSID,CHROMOSOME,POSITION,RESULT                RSID,CHROMOSOME,POSITION,RESULT
 # 1, 2, 3, 4, 5, 6, 7, 8, 9, 10,                0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10,
@@ -82,11 +87,14 @@ outputFileEnding = '.csv'
 # "rsid"
 
 # MyHeritage Alleles                            FamilyTreeDNA Alleles
-#                                               ['AA' 'CC' 'GG' 'TT' 'CT' 'AG']
-#                                               ['AC' 'GT' 'CG' 'AT']
-#                                               ['-G' '-C' '-A' '-T']
+# ['AA' 'CC' 'GG' 'TT' 'AG']                    ['AA' 'CC' 'GG' 'TT' 'CT' 'AG']
+# ['AC' 'CG' 'AT']                              ['AC' 'GT' 'CG' 'AT']
+# ['TG' 'GC' 'TA' 'TC']
+#
+# ['GG' 'CC' 'AA' 'TT']                         ['-G' '-C' '-A' '-T']
+#
+# ['--']                                        ['--']
 
-#                                               ['--']
 
 # ancestry chromosome numbering and order:
 #
@@ -147,6 +155,14 @@ genotypeTable = {
     '-C': 'C',
     '-A': 'A',
     '-T': 'T'
+}
+
+# Table for normalizing genotype on X Y MT
+genotypeTableXYMT = {
+    'GG': 'G',
+    'CC': 'C',
+    'AA': 'A',
+    'TT': 'T'
 }
 
 # Nocall list
@@ -215,7 +231,7 @@ def prescreenDNAFile( inputDNAFile ):
     #  n = number of comment lines.
     #       23andMe = 19
     #       Living DNA = 11
-    #       MyHeritage = 6
+    #       MyHeritageBef1March2019 = 6
     #       FamilyTree DNA = 0
     #       ancestry = ?
 
@@ -272,14 +288,14 @@ def prepareLivingDNA( inputFile ):
 
     return df
 
-# MyHeritage
-def prepareMyHeritage( inputFile ):
-    #print( inputFile + ' contains data from MyHeritage' )
+# MyHeritage (Before 1 March, 2019)
+def prepareMyHeritageBef1March2019( inputFile ):
+    #print( inputFile + ' contains data from MyHeritage (Before 1 March, 2019)' )
 
     # Load input file into pandas and create the proper columns
     df = pd.read_csv( inputFile, dtype=str, comment='#' )
     df.columns = [ 'rsid', 'chromosome', 'position', 'genotype' ]
-    df[ 'company' ] = 'MyHeritage'
+    df[ 'company' ] = 'MyHeritage (OLD)'
 
     return df
 
@@ -323,6 +339,12 @@ def cleanDNAFile( inputFile ):
     # Normalize chromosome order with custom chromosomeTable
     inputFile[ 'chromosome' ].replace( to_replace=chromosomeTable, inplace=True )
 
+    # Normalize genotypes on X, Y & MT where double char becomes single, eg. AA = A
+    rep = inputFile[ 'genotype' ].replace( genotypeTableXYMT )
+    inputFile[ 'genotype' ] = inputFile[ 'genotype' ].mask( inputFile[ 'chromosome' ].isin(['X','Y','MT']), rep)
+    print( inputFile )
+
+
     # Drop nocalls (-, --, 00, DD, II, I, D, DI)
     #indexNames = inputFile[ inputFile[ 'genotype' ] == '--' ].index
     #inputFile.drop( indexNames, inplace = True )
@@ -350,8 +372,8 @@ def dropDuplicatesDNAFile( inputFile ):
     m = inputFile.loc[ :, 'genotype' ].ne( '--' )
     # is there at least a non "--" in the group?
     m2 = (m
-        .groupby([inputFile['chromosome'], inputFile['position']])
-        .transform('max')
+        .groupby( [ inputFile[ 'chromosome' ], inputFile[ 'position' ] ] )
+        .transform( 'max' )
         )
     # perform dropping
     inputFile.loc[ m|~m2 ]
@@ -406,7 +428,7 @@ def formatDNAFileLivingDNA( inputFile ):
 
 # MyHeritage format
 def formatDNAFileMyHeritage( inputFile ):
-    # Change column names according to MyHeritage format
+    # Change column names according to  (Before 1 March, 2019) format
     inputFile.rename( columns = { 'rsid':'RSID', 'chromosome':'CHROMOSOME', 'position':'POSITION', 'genotype':'RESULT' }, inplace = True )
 
     return inputFile
@@ -511,21 +533,21 @@ for f in rawDNAFiles:
         print( 'Done!' )
         print()
 
-    # MyHeritage
+    # MyHeritage (Before 1 March, 2019)
     elif 'MyHeritage' in fileScreening:
         print( 'Processing file:')
         print( f.replace( inputFileDir, '' ) )
-        print( 'Which contains data from MyHeritage' )
+        print( 'Which contains data from MyHeritage (Before 1 March, 2019)' )
 
-        DNAFileMyHeritage = prepareMyHeritage( f )
-        DNAFileMyHeritage = cleanDNAFile( DNAFileMyHeritage )
+        DNAFileMyHeritageBef1March2019 = prepareMyHeritageBef1March2019( f )
+        DNAFileMyHeritageBef1March2019 = cleanDNAFile( DNAFileMyHeritageBef1March2019 )
 
         # IF position contains genotype larger than two aleles, drop row (clean dirty information)
-        DNAFileMyHeritage = DNAFileMyHeritage.drop( DNAFileMyHeritage[ DNAFileMyHeritage['genotype'].str.len() > 2 ].index )
+        DNAFileMyHeritageBef1March2019 = DNAFileMyHeritageBef1March2019.drop( DNAFileMyHeritageBef1March2019[ DNAFileMyHeritageBef1March2019['genotype'].str.len() > 2 ].index )
 
-        #print ( DNAFileMyHeritage.genotype.unique() )
+        #print ( DNAFileMyHeritageBef1March2019.genotype.unique() )
 
-        resultFiles.append( DNAFileMyHeritage )
+        resultFiles.append( DNAFileMyHeritageBef1March2019 )
         print( 'Done!' )
         print()
 
@@ -634,7 +656,8 @@ print()
 
 # TODO
 # * Add comments on top of superkit file
-# * Choosable output format (23andMe, FamilyTreeDNA, LivingDNA, MyHeritage, Ancestry) // NOT ENTIRELY POSSIBLE BECAUSE THE NEED TO NORMALIZE
+# * Choosable output format (23andMe, FamilyTreeDNA, LivingDNA, MyHeritage, Ancestry). Partially done, not entirely possible because of the need to normalize
+# * Improve code
 
 ##########################################
 # DEBUGGING
