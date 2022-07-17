@@ -14,8 +14,8 @@ import pandas as pd
 #
 
 # Output format
-outputFormat = 'SuperKit'
-#outputFormat = '23andMe'
+#outputFormat = 'SuperKit'
+outputFormat = '23andMe'
 #outputFormat = 'ancestry'
 #outputFormat = 'FamilyTreeDNA'
 #outputFormat = 'MyHeritage'
@@ -27,6 +27,7 @@ companyPriorityList = [ '23andMe',
                         'Ancestry',
                         'FamilyTreeDNA',
                         'MyHeritage',
+                        'LivingDNA v1.0.2',
                         'LivingDNA',
                         'MyHeritage (OLD)',
                         ]
@@ -301,16 +302,25 @@ def prescreenDNAFile( inputDNAFile ):
 
 def determinDNACompany( f ):
 
+    print( f )
     if '23andMe' in f:
         company = '23andMe'
+
+    elif '# Living DNA customer genotype data download file version: 1.0.2' in f:
+        company = 'LivingDNA v1.0.2'
+
     elif 'Living DNA' in f:
         company = 'LivingDNA'
+
     elif 'MyHeritage' in f:
         company = 'MyHeritage'
+
     elif 'RSID,CHROMOSOME,POSITION,RESULT' in f:
         company = 'FamilyTreeDNA'
+
     elif 'ancestry' in f:
         company = 'Ancestry'
+
     else:
         company = 'unknown'
 
@@ -329,7 +339,7 @@ def prepareDNAFile( f, c ):
 
 #    print ( c )
     # 23andMe and Living DNA
-    if c == '23andMe' or c == 'LivingDNA':
+    if c == '23andMe' or c == 'LivingDNA' or c == 'LivingDNA v1.0.2':
         # Load input file into pandas and create the proper columns
         df = pd.read_csv( f, dtype=str, sep='\t', comment='#', index_col=False, header=None, engine='python' )
 
@@ -443,7 +453,7 @@ def dropDuplicatesDNAFile( df ):
 # Sort file based on custom chromosome order,
 # position and custom genotype order
 
-def sortDNAFile( df, c ):
+def sortDNAFile( df ):
     # Custom sorting order on chromosome and company column. Modify at top of file.
     df[ 'chromosome' ] = pd.Categorical( df[ 'chromosome' ], chromosomePriorityList )
     df[ 'company' ] = pd.Categorical( df[ 'company' ], companyPriorityList )
@@ -591,6 +601,7 @@ for f in rawDNAFiles:
 
     # Get DNA company from file comment
     company = determinDNACompany( fileScreening )
+#    print( company )
 
     if company != 'unknown':
         print( 'Processing file:')
@@ -638,8 +649,16 @@ print()
 # Concatenate all DNA files into one list
 DNASuperKit = pd.concat(resultFiles, sort=False, ignore_index=True)
 
+print()
+print( 'Sorting results' )
+print()
+
 # Sort DNA according to order provided in customization
-DNASuperKit = sortDNAFile( DNASuperKit, company )
+DNASuperKit = sortDNAFile( DNASuperKit )
+
+print()
+print( 'Dropping duplicates' )
+print()
 
 # Drop duplicates
 DNASuperKit = dropDuplicatesDNAFile( DNASuperKit )
@@ -667,10 +686,18 @@ print()
 # 
 
 #Format .csv to a specific company format
-print( 'Correcting data to correspond with ' + outputFormat + ' format and saving to ' + outputFileEnding )
+
 
 DNASuperKit = formatDNAFile( DNASuperKit, outputFormat )
-DNASuperKit.to_csv( outputFileDir + outputFileName + '-' + outputFormat + outputFileEnding, sep='\t', index=None )
+
+if outputFormat == 'SuperKit' or outputFormat == '23andMe' or outputFormat == 'LivingDNA':
+    outputFileEnding = '.txt'
+    print( 'Correcting data to correspond with ' + outputFormat + ' format and saving to ' + outputFileEnding )
+    DNASuperKit.to_csv( outputFileDir + outputFileName + '-' + outputFormat + outputFileEnding, sep='\t', index=None )
+elif outputFormat == 'FamilyTreeDNA':
+    outputFileEnding = '.csv'
+    print( 'Correcting data to correspond with ' + outputFormat + ' format and saving to ' + outputFileEnding )
+    DNASuperKit.to_csv( outputFileDir + outputFileName + '-' + outputFormat + outputFileEnding, index=None )
 
 # Success!   
 print()
