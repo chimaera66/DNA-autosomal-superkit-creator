@@ -14,7 +14,8 @@ import pandas as pd
 #
 
 # Output format
-outputFormat = '23andMe'
+outputFormat = 'SuperKit'
+#outputFormat = '23andMe'
 #outputFormat = 'ancestry'
 #outputFormat = 'FamilyTreeDNA'
 #outputFormat = 'MyHeritage'
@@ -79,7 +80,7 @@ fileEndings = (
 # 1, 2, 3, 4, 5, 6, 7, 8, 9, 10,                0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10,
 # 11, 12, 13, 14, 15, 16, 17, 18                11, 12, 13, 14, 15, 16, 17, 18
 # 19, 20, 21, 22                                19, 20, 21, 22
-# X, Y                                          XY, MT, X (XY has a overlap with the top and bottom part of 23andMe X CHROMOSOME)
+# X, Y                                          XY, MT, X (XY has a overlap with the top and bottom part of 23andMe X CHROMOSOME) PAR
 #                                               XY = position 153977 - 2697868 & 8503715 - 155234707
 # Alleles = paired                              Alleles = paired
 # Nocalls = --                                  Nocalls = --
@@ -110,23 +111,15 @@ fileEndings = (
 
 
 # Normalized chromosome numbering and order:
-# 1, 2, 3, 4, 5, 6, 7, 8, 9, 10,
+# 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10,
 # 11, 12, 13, 14, 15, 16, 17, 18
 # 19, 20, 21, 22
-# X, Y, MT
+# X, Y, XY, MT
 # Alleles = paired
 # Nocalls = --
 
 # Sorting order for chromosome column
-chromosomePriorityList = [ '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', '13', '14', '15', '16', '17', '18', '19', '20', '21', '22', 'X', 'Y', 'MT', 'XY' ]
-
-# Table for normalizing chromosome names
-chromosomeTable = { '23': 'X',
-                    '24': 'Y',
-                    '25': 'XY',
-                    '26': 'MT',
-#                    'XY': 'X'
-}
+chromosomePriorityList = [ '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', '13', '14', '15', '16', '17', '18', '19', '20', '21', '22', 'X', 'Y', 'XY', 'MT' ]
 
 # Normalized allele naming convention
 # ['DD' 'II' 'DI']
@@ -169,6 +162,7 @@ genotypeTableXYMT = {
 
 # Nocall list
 noCalls = [ 'DD', 'II', 'DI', 'D', 'I', '--' ]
+noCallsHyphen = [ 'DD', 'II', 'DI', 'D', 'I' ]
 
 ##########################################
 
@@ -178,8 +172,13 @@ noCalls = [ 'DD', 'II', 'DI', 'D', 'I', '--' ]
 # 
 
 # ====================
-# Sorting order for FamilyTreeDNA chromosome column REDUNDANT?
-chromosomePriorityListFamilyTreeDNA = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', '13', '14', '15', '16', '17', '18', '19', '20', '21', '22', 'XY', 'MT', 'X', 'Y' ]
+chromosomePriorityList23andMe = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', '13', '14', '15', '16', '17', '18', '19', '20', '21', '22', 'X', 'Y', 'MT' ]
+# ====================
+
+
+# ====================
+# Sorting order for FamilyTreeDNA chromosome column
+chromosomePriorityListFamilyTreeDNA = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', '13', '14', '15', '16', '17', '18', '19', '20', '21', '22', 'XY', 'MT', 'X' ]
 
 # FamilyTreeDNA genotypes for Y, X, MT
 genotypeTableFamilyTreeDNA = {
@@ -188,14 +187,15 @@ genotypeTableFamilyTreeDNA = {
     'A': '-A',
     'T': '-T'
 }
-
-noCallsFamilyTreeDNA = [ 'DD', 'II', 'DI', 'D', 'I' ]
 # ====================
 
 
 # ====================
+# Sorting order for MyHeritage (Before 1 March, 2019) chromosome column
+chromosomePriorityListMyHeritage = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', '13', '14', '15', '16', '17', '18', '19', '20', '21', '22', 'X', 'Y' ]
+
 # MyHeritage (Before 1 March, 2019) genotypes for Y, X, MT
-genotypeTableMyHeritageOld = {
+genotypeTableMyHeritage = {
     'G': 'GG',
     'C': 'CC',
     'A': 'AA',
@@ -205,14 +205,28 @@ genotypeTableMyHeritageOld = {
 
 
 # ====================
+
+# ====================
+# Sorting order for LivingDNA chromosome column
+chromosomePriorityListLivingDNA = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', '13', '14', '15', '16', '17', '18', '19', '20', '21', '22', 'X' ]
+# ====================
+
+# ====================
 # Sorting order for ancestry chromosome column
 chromosomePriorityListAncestry =  [ '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', '13', '14', '15', '16', '17', '18', '19', '20', '21', '22', '23', '24', '26' ]
 
+# Table for normalizing chromosome names
+chromosomeTableAncestryIn = { '23': 'X',
+                              '24': 'Y',
+                              '25': 'XY',
+                              '26': 'MT',
+}
+
 # Table for converting file to ancestry format
-chromosomeTableAncestry = { 'X':  '23',
-                            'Y':  '24',
-                            'XY': '25',
-                            'MT': '26',
+chromosomeTableAncestryOut = { 'X':  '23',
+                               'Y':  '24',
+                               'XY': '25',
+                               'MT': '26',
 }
 # ====================
 
@@ -313,7 +327,7 @@ def determinDNACompany( f ):
 
 def prepareDNAFile( f, c ):
 
-    print ( c )
+#    print ( c )
     # 23andMe and Living DNA
     if c == '23andMe' or c == 'LivingDNA':
         # Load input file into pandas and create the proper columns
@@ -329,6 +343,9 @@ def prepareDNAFile( f, c ):
         # Load input file into pandas and create the proper columns
         df = pd.read_csv( f, dtype=str, sep='\t', comment='#' )
 
+        # Normalize chromosome order with custom chromosomeTable
+        df[ 'chromosome' ].replace( to_replace=chromosomeTableAncestryIn, inplace=True )
+
         # Merge allele1 and allele2 to genotype column
         df[ 'genotype' ] = df[ 'allele1' ] + df[ 'allele2' ]
         del df[ 'allele1' ]
@@ -339,19 +356,18 @@ def prepareDNAFile( f, c ):
 
     # and add company column
     df[ 'company' ] = c
+
+# DEBUG
 #    print ( c )
 #    print ( df )
+    print()
+    print( 'Unique chromosomes:' )
+    print( df.chromosome.unique() )
+    print()
+    print( 'Unique genotypes:')
+    print( df.genotype.unique() )
+    print()
 
-    # FamilyTreeDNA, additional preparations
-    if c == 'FamilyTreeDNA':
-        # Drop chromosome 0 rows, likely nocalls or incomplete information
-        df = df.drop( df[ df[ 'chromosome' ] == '0' ].index )
-
-#    print( c )
-#    print( df )
-    print ( df.genotype.unique() )
-
-    # Return dataframe
     return df
 
 
@@ -362,26 +378,34 @@ def prepareDNAFile( f, c ):
 # Clean file and normalize chromosome
 # and genotype
 
-def cleanDNAFile( inputFile ):
+def cleanDNAFile( df, c):
 
     # Normalize genotype with custom genotypeTable
-    inputFile[ 'genotype' ].replace( to_replace=genotypeTable, inplace=True )
+    df[ 'genotype' ].replace( to_replace=genotypeTable, inplace=True )
 
     # Normalize chromosome order with custom chromosomeTable
-    inputFile[ 'chromosome' ].replace( to_replace=chromosomeTable, inplace=True )
+    #df[ 'chromosome' ].replace( to_replace=chromosomeTable, inplace=True )
 
     # Normalize genotypes on X, Y & MT where double char becomes single, eg. AA = A
-    rep = inputFile[ 'genotype' ].replace( genotypeTableXYMT )
-    inputFile[ 'genotype' ] = inputFile[ 'genotype' ].mask( inputFile[ 'chromosome' ].isin( [ 'X','Y','XY','MT' ] ), rep )
+    rep = df[ 'genotype' ].replace( genotypeTableXYMT )
+    df[ 'genotype' ] = df[ 'genotype' ].mask( df[ 'chromosome' ].isin( [ 'X','Y','XY','MT' ] ), rep )
 
     # Drop nocalls (-, --, 00, DD, II, I, D, DI)
-    #indexNames = inputFile[ inputFile[ 'genotype' ] == '--' ].index
-    #inputFile.drop( indexNames, inplace = True )
+    #indexNames = df[ df[ 'genotype' ] == '--' ].index
+    #df.drop( indexNames, inplace = True )
 
     # Convert position to numerical
-    inputFile[ 'position' ] = pd.to_numeric( inputFile[ 'position' ] )
+    df[ 'position' ] = pd.to_numeric( df[ 'position' ] )
 
-    return inputFile
+    # FamilyTreeDNA, additional preparations
+    if c == 'FamilyTreeDNA':
+        # Drop chromosome 0 rows, likely nocalls or incomplete information
+        df = df.drop( df[ df[ 'chromosome' ] == '0' ].index )
+
+    # IF position contains genotype larger than two aleles, drop row (clean dirty information from LivingDNA and more?)
+    df = df.drop( df[ df['genotype'].str.len() > 2 ].index )
+
+    return df
 
 ##########################################
 
@@ -391,26 +415,26 @@ def cleanDNAFile( inputFile ):
 # only genotype according to priority list
 # in companyPriorityList
 
-def dropDuplicatesDNAFile( inputFile ):
+def dropDuplicatesDNAFile( df ):
 
     # First drop genotype duplicates in the same position
-    #inputFile.drop_duplicates( subset=[ 'chromosome','position', 'genotype'], keep='first', inplace=True )
+    #df.drop_duplicates( subset=[ 'chromosome','position', 'genotype'], keep='first', inplace=True )
 
     # Drop nocalls only if there are duplicate with calls
     # is the result not a "--"?
-    m = inputFile.loc[ :, 'genotype' ].ne( '--' )
+    m = df.loc[ :, 'genotype' ].ne( '--' )
     # is there at least a non "--" in the group?
     m2 = (m
-        .groupby( [ inputFile[ 'chromosome' ], inputFile[ 'position' ] ] )
+        .groupby( [ df[ 'chromosome' ], df[ 'position' ] ] )
         .transform( 'max' )
         )
     # perform dropping
-    inputFile.loc[ m|~m2 ]
+    df.loc[ m|~m2 ]
 
     # If genotype is different on the same position, then only keep the genotype from the company according to the order in companyPriorityList
-    inputFile.drop_duplicates( subset=[ 'chromosome','position' ], keep='first', inplace=True )
+    df.drop_duplicates( subset=[ 'chromosome','position' ], keep='first', inplace=True )
 
-    return inputFile
+    return df
 
 ##########################################
 
@@ -419,15 +443,15 @@ def dropDuplicatesDNAFile( inputFile ):
 # Sort file based on custom chromosome order,
 # position and custom genotype order
 
-def sortDNAFile( inputFile ):
+def sortDNAFile( df, c ):
     # Custom sorting order on chromosome and company column. Modify at top of file.
-    inputFile[ 'chromosome' ] = pd.Categorical( inputFile[ 'chromosome' ], chromosomePriorityList )
-    inputFile[ 'company' ] = pd.Categorical( inputFile[ 'company' ], companyPriorityList )
+    df[ 'chromosome' ] = pd.Categorical( df[ 'chromosome' ], chromosomePriorityList )
+    df[ 'company' ] = pd.Categorical( df[ 'company' ], companyPriorityList )
 
     # Sort frame based on custom sorting orders and position
-    inputFile.sort_values( [ 'chromosome', 'position', 'company' ], ascending=( True, True, True ), inplace=True )
+    df.sort_values( [ 'chromosome', 'position', 'company' ], ascending=( True, True, True ), inplace=True )
 
-    return inputFile
+    return df
 
 ##########################################
 
@@ -438,37 +462,81 @@ def sortDNAFile( inputFile ):
 
 def formatDNAFile( df, c ):
 
+    # Extra operations for 23andMe format
+    if c == '23andMe':
+        # Drop chromosomes that arent used
+        df = df.drop( df[ df[ 'chromosome' ] == 'XY' ].index )
+
+        # Custom sorting order on chromosome and company column.
+        df[ 'chromosome' ] = pd.Categorical( df[ 'chromosome' ], chromosomePriorityList23andMe )
+        # Sort frame based on custom sorting orders and position
+        df.sort_values( [ 'chromosome', 'position' ], ascending=( True, True ), inplace=True )
+
+
     # Extra operations for FamilyTreeDNA format
     if c == 'FamilyTreeDNA':
+        # Drop chromosomes that arent used
+        df = df.drop( df[ df[ 'chromosome' ] == 'Y' ].index )
+
         #Replace genotypes for X, Y, MT( A = -A )
         df[ 'genotype' ].replace( to_replace=genotypeTableFamilyTreeDNA, inplace=True )
 
-        # Drop nocalls according to noCallsFamilyTreeDNA
-        for f in noCallsFamilyTreeDNA:
+        # Drop nocalls according to noCallsHyphen
+        for f in noCallsHyphen:
             indexNames = df[ df[ 'genotype' ] == f ].index
             df.drop( indexNames, inplace = True )
 
-        # Custom sorting order on chromosome and company column. Modify at top of file.
-    #    inputFile[ 'chromosome' ] = pd.Categorical( inputFile[ 'chromosome' ], chromosomePriorityListFamilyTreeDNA )
+        # Concat dataframe with previously dropped chromosome 0
+        df = pd.concat( [df, chromosomeZero] , sort=False, ignore_index=True)
 
+        # Custom sorting order on chromosome and company column.
+        df[ 'chromosome' ] = pd.Categorical( df[ 'chromosome' ], chromosomePriorityListFamilyTreeDNA )
         # Sort frame based on custom sorting orders and position
-    #    inputFile.sort_values( [ 'chromosome', 'position', ], ascending=( True, True ), inplace=True )
+        df.sort_values( [ 'chromosome', 'position' ], ascending=( True, True ), inplace=True )
+
 
     # Extra operations for MyHeritage (Before 1 March, 2019) format
     if c == 'MyHeritage':
+        # Drop chromosomes that arent used
+        df = df.drop( df[ df[ 'chromosome' ] == 'XY' ].index )
+        df = df.drop( df[ df[ 'chromosome' ] == 'MT' ].index )
+
         #Replace genotypes for X, Y, MT( A = AA )
-        df[ 'genotype' ].replace( to_replace=genotypeTableMyHeritageOld, inplace=True )
+        df[ 'genotype' ].replace( to_replace=genotypeTableMyHeritage, inplace=True )
+
+        # Drop nocalls according to noCallsHyphen
+        for f in noCallsHyphen:
+            indexNames = df[ df[ 'genotype' ] == f ].index
+            df.drop( indexNames, inplace = True )
+
+        # Custom sorting order on chromosome and company column.
+        df[ 'chromosome' ] = pd.Categorical( df[ 'chromosome' ], chromosomePriorityListMyHeritage )
+        # Sort frame based on custom sorting orders and position
+        df.sort_values( [ 'chromosome', 'position' ], ascending=( True, True ), inplace=True )
+
 
     # Extra operations for Living DNA format
     if c == 'LivingDNA':
+        # Drop chromosomes that arent used
+        df = df.drop( df[ df[ 'chromosome' ] == 'XY' ].index )
+        df = df.drop( df[ df[ 'chromosome' ] == 'MT' ].index )
+        df = df.drop( df[ df[ 'chromosome' ] == 'Y' ].index )
+        
+        # Drop nocalls according to noCalls
         for f in noCalls:
             indexNames = df[ df[ 'genotype' ] == f ].index
             df.drop( indexNames, inplace = True )
+
+        # Custom sorting order on chromosome and company column.
+        df[ 'chromosome' ] = pd.Categorical( df[ 'chromosome' ], chromosomePriorityListLivingDNA )
+        # Sort frame based on custom sorting orders and position
+        df.sort_values( [ 'chromosome', 'position' ], ascending=( True, True ), inplace=True )
 
 
     # 23andMe and Living DNA
     if c == '23andMe' or c == 'LivingDNA':
         df.rename( columns = { 'rsid':'# rsid' }, inplace = True )
+
     # FamilyTreeDNA and MyHeritage (Before 1 March, 2019)
     elif c == 'FamilyTreeDNA' or c == 'MyHeritage':
         # Change column names according to  (Before 1 March, 2019) format
@@ -476,7 +544,7 @@ def formatDNAFile( df, c ):
 
     elif c == 'Ancestry':
         # Normalize chromosome order with custom chromosomeTable
-        #df[ 'chromosome' ].replace( to_replace=chromosomeTableAncestry, inplace=True )
+        #df[ 'chromosome' ].replace( to_replace=chromosomeTableAncestryOut, inplace=True )
 
         # Custom sorting order on chromosome and company column. Modify at top of file.
         #df[ 'chromosome' ] = pd.Categorical( df[ 'chromosome' ], chromosomePriorityListAncestry )
@@ -487,6 +555,7 @@ def formatDNAFile( df, c ):
         # Change column names according to Ancestry format
         #df.rename( columns = { 'rsid':'RSID', 'chromosome':'CHROMOSOME', 'position':'POSITION', 'genotype':'RESULT' }, inplace = True )
         print( 'Ancestry')
+
 
     return df
 
@@ -514,6 +583,7 @@ if not rawDNAFiles:
 
 # empty array to put results in
 resultFiles = []
+chromosomeZero = pd.DataFrame()
 
 for f in rawDNAFiles:
     # Screening file to determin company
@@ -529,10 +599,12 @@ for f in rawDNAFiles:
         
         # Normalize and clean DNA file in preparation for concatenation
         df = prepareDNAFile( f, company )
-        df = cleanDNAFile( df )
-        
-        # IF position contains genotype larger than two aleles, drop row (clean dirty information)
-        df = df.drop( df[ df['genotype'].str.len() > 2 ].index )
+
+        if company == 'FamilyTreeDNA':
+            chromosomeZero = df.loc[ df[ 'chromosome' ] == '0' ]
+#            print( chromosomeZero )
+
+        df = cleanDNAFile( df, company )
         
         # Append dataframe
         resultFiles.append( df )
@@ -567,7 +639,7 @@ print()
 DNASuperKit = pd.concat(resultFiles, sort=False, ignore_index=True)
 
 # Sort DNA according to order provided in customization
-DNASuperKit = sortDNAFile( DNASuperKit )
+DNASuperKit = sortDNAFile( DNASuperKit, company )
 
 # Drop duplicates
 DNASuperKit = dropDuplicatesDNAFile( DNASuperKit )
@@ -576,14 +648,16 @@ DNASuperKit = dropDuplicatesDNAFile( DNASuperKit )
 #del DNASuperKit[ 'company' ]
 
 # DEBUG
-#print ( DNASuperKit.value_counts() )
 print()
+print( 'Unique chromosomes:' )
+print( DNASuperKit.chromosome.unique() )
+print()
+print( 'Unique genotypes:')
 print( DNASuperKit.genotype.unique() )
 print()
 print( 'Total count for each company:' )
 for f in companyPriorityList:
-    print( f + ':' )
-    print( DNASuperKit['company'].value_counts()[f] )
+    print( f + ': ' + DNASuperKit['company'].value_counts()[f].astype(str))
 print()
 
 ########################
@@ -608,8 +682,8 @@ print()
 
 # TODO
 # * Add comments on top of superkit file
-# * Choosable output format (23andMe, FamilyTreeDNA, LivingDNA, MyHeritage, Ancestry). Partially done, not entirely possible because of the need to normalize
 # * Improve company detection "algorithm"
+# * Improve genotype count output
 
 ##########################################
 # DEBUGGING
