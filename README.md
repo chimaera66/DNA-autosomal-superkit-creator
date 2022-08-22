@@ -1,4 +1,4 @@
-# DNA-autosomal-superkit-creator
+# DNA autosomal "Super Kit" creator
 
 This is a autosomal DNA super kit creator, based on this video:
 https://www.youtube.com/watch?v=IJmAHNSODuw
