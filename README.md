@@ -48,3 +48,4 @@ TODO list
 * Add comments on top of superkit file
 * Improve company detection "algorithm"
 * Improve the genotype count produced in the end
+* Improve README!
