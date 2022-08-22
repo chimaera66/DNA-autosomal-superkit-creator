@@ -760,7 +760,6 @@ print()
 # * Add comments on top of superkit file
 # * Improve company detection "algorithm"
 # * Improve genotype count output
-# * Formatting for Ancestry file format output (split column genotype to allele1/allele2)
 
 ##########################################
 # DEBUGGING
