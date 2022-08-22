@@ -46,6 +46,7 @@ Decides which company genome that are preferred if several companies has called 
 
 TODO list
 * Add comments on top of superkit file
+* Add support for the latest MyHeritage file format
 * Improve company detection "algorithm"
 * Improve the genotype count produced in the end
 * Improve README!
