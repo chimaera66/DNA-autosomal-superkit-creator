@@ -53,8 +53,8 @@ Currently, the only things you can change are the following:
 
 
 ## TODO list
-[ ] Add comments on top of superkit file
-[ ] Add support for the latest MyHeritage file format
-[ ] Improve company detection "algorithm"
-[ ] Improve the genotype count produced in the end
-[ ] Improve README!
+- [ ] Add comments on top of superkit file
+- [ ] Add support for the latest MyHeritage file format
+- [ ] Improve company detection "algorithm"
+- [ ] Improve the genotype count produced in the end
+- [ ] Improve README!
