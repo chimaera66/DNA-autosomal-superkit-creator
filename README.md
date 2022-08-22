@@ -1,6 +1,6 @@
 # DNA autosomal "Super Kit" creator
 
-This is a autosomal DNA super kit creator, based on this video:
+This is a autosomal DNA super kit creator, based on this video by Family History Fanatics & Genealogists:
 https://www.youtube.com/watch?v=IJmAHNSODuw
 
 This program will merge your DNA raw datafiles from different companies to one "super kit".
