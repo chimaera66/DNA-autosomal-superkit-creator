@@ -15,7 +15,7 @@ import pandas as pd
 # Output format
 outputFormat = 'SuperKit'
 #outputFormat = '23andMe V5'
-#outputFormat = 'ancestry'
+#outputFormat = 'Ancestry'
 #outputFormat = 'FamilyTreeDNA'
 #outputFormat = 'MyHeritage (Old)'
 #outputFormat = 'LivingDNA v1.0.2'
@@ -98,10 +98,27 @@ fileEndings = (
 # ['--']                                        ['--']
 
 
-# ancestry chromosome numbering and order:
+# Ancestry chromosome numbering and order:
+# rsid	chromosome	position	allele1	allele2
+# 1, 2, 3, 4, 5, 6, 7, 8, 9, 10,
+# 11, 12, 13, 14, 15, 16, 17, 18,
+# 19, 20, 21, 22
+# 23, 24, 25, 26
 #
-# Alleles = 
-# Nocalls = 
+# Alleles = not paired
+# Nocalls = 00
+# Tabulated
+
+# Ancestry Alleles
+# ['DD' 'II' 'DI' 'ID']
+#
+# ['AA' 'CC' 'GG' 'TT' 'AG']
+# ['AC' 'CG' 'AT']
+# ['CA' 'TG' 'GC' 'TA' 'TC' 'GA']
+#
+# ['GG' 'CC' 'AA' 'TT']
+#
+# ['00']
 
 #    Its normal. 23 is the X, 24 is Y, 25 is the PAR region, and 26 is mtDNA.
 
@@ -229,6 +246,12 @@ chromosomeTableAncestryOut = { 'X':  '23',
                                'XY': '25',
                                'MT': '26',
 }
+
+# Ancestry genotypes for 00
+genotypeTableAncestry = {
+    '--': '00'
+}
+
 # ====================
 
 ##########################################
@@ -268,7 +291,7 @@ def prescreenDNAFile( inputDNAFile ):
     #       Living DNA = 11
     #       MyHeritageBef1March2019 = 6
     #       FamilyTree DNA = 0
-    #       ancestry = ?
+    #       ancestry = 18
 
     #n = 0
     n = 1
@@ -324,7 +347,7 @@ def determinDNACompany( t, f ):
     elif 'RSID,CHROMOSOME,POSITION,RESULT' in t:
         company = 'FamilyTreeDNA'
 
-    elif 'ancestry' in t:
+    elif 'AncestryDNA' in t:
         company = 'Ancestry'
 
     else:
@@ -569,17 +592,24 @@ def formatDNAFile( df, c ):
 
     elif c == 'Ancestry':
         # Normalize chromosome order with custom chromosomeTable
-        #df[ 'chromosome' ].replace( to_replace=chromosomeTableAncestryOut, inplace=True )
+        df[ 'chromosome' ].replace( to_replace=chromosomeTableAncestryOut, inplace=True )
 
         # Custom sorting order on chromosome and company column. Modify at top of file.
-        #df[ 'chromosome' ] = pd.Categorical( df[ 'chromosome' ], chromosomePriorityListAncestry )
+        df[ 'chromosome' ] = pd.Categorical( df[ 'chromosome' ], chromosomePriorityListAncestry )
 
         # Sort frame based on custom sorting orders and position
-        #df.sort_values( [ 'chromosome', 'position', ], ascending=( True, True ), inplace=True )
+        df.sort_values( [ 'chromosome', 'position', ], ascending=( True, True ), inplace=True )
+
+        # Changed nocalls from -- to 00
+        df[ 'genotype' ].replace( to_replace=genotypeTableAncestry, inplace=True )
+
+        # Split genotype into allele1 and allele2
+        df[ 'allele1' ] = df[ 'genotype' ].str[ :1 ]
+        df[ 'allele2' ] = df[ 'genotype' ].str[ -1: ]
+        del df[ 'genotype' ]
 
         # Change column names according to Ancestry format
         #df.rename( columns = { 'rsid':'RSID', 'chromosome':'CHROMOSOME', 'position':'POSITION', 'genotype':'RESULT' }, inplace = True )
-        print( 'Ancestry')
 
 
     return df
@@ -628,6 +658,7 @@ for f in rawDNAFiles:
 
         if company == 'FamilyTreeDNA':
             chromosomeZero = df.loc[ df[ 'chromosome' ] == '0' ]
+            del chromosomeZero[ 'company' ]
 #            print( chromosomeZero )
 
         df = cleanDNAFile( df, company )
@@ -678,9 +709,6 @@ print()
 # Drop duplicates
 DNASuperKit = dropDuplicatesDNAFile( DNASuperKit )
 
-# Delete 'company' column
-#del DNASuperKit[ 'company' ]
-
 # DEBUG
 print()
 print( 'Unique chromosomes:' )
@@ -694,6 +722,9 @@ for f in companyPriorityList:
     print( f + ': ' + DNASuperKit['company'].value_counts()[f].astype(str))
 print()
 
+# Delete 'company' column
+del DNASuperKit[ 'company' ]
+
 ########################
 
 
@@ -705,7 +736,7 @@ print()
 
 DNASuperKit = formatDNAFile( DNASuperKit, outputFormat )
 
-if outputFormat == 'SuperKit' or outputFormat == '23andMe V5' or outputFormat == 'LivingDNA v1.0.2':
+if outputFormat == 'SuperKit' or outputFormat == '23andMe V5' or outputFormat == 'LivingDNA v1.0.2' or outputFormat == 'Ancestry':
     outputFileEnding = '.txt'
     print( 'Correcting data to correspond with ' + outputFormat + ' format and saving to ' + outputFileEnding )
     DNASuperKit.to_csv( outputFileDir + outputFileName + '-' + outputFormat + outputFileEnding, sep='\t', index=None )
@@ -729,6 +760,7 @@ print()
 # * Add comments on top of superkit file
 # * Improve company detection "algorithm"
 # * Improve genotype count output
+# * Formatting for Ancestry file format output (split column genotype to allele1/allele2)
 
 ##########################################
 # DEBUGGING
