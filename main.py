@@ -32,6 +32,14 @@ companyPriorityList = [ '23andMe V5',
                         'MyHeritage (Old)',
                         ]
 
+
+##########################################
+##########################################
+
+
+
+##########################################
+
 # Input/output file directory
 inputFileDir = './input/'
 outputFileDir = './output/'
@@ -328,28 +336,37 @@ def determinDNACompany( t, f ):
 
     #print( f )
     #print( t )
+
+    # 23andMe V5
     if '_v5_Full_' in f:
         company = '23andMe V5'
 
+    # 23andMe
     elif '23andMe' in t:
         company = '23andMe'
 
+    # Living DNA v1.0.2
     elif '# Living DNA customer genotype data download file version: 1.0.2' in t:
         company = 'LivingDNA v1.0.2'
 
+    # Living DNA
     elif 'Living DNA' in t:
         company = 'LivingDNA'
 
+    # MyHeritage (Old Version)
 #    elif 'MyHeritage' in t:
     elif '# MyHeritage DNA raw data.' in t:
         company = 'MyHeritage (Old)'
 
+    # FamilyTreeDNA
     elif 'RSID,CHROMOSOME,POSITION,RESULT' in t:
         company = 'FamilyTreeDNA'
 
+    # Ancestry
     elif 'AncestryDNA' in t:
         company = 'Ancestry'
 
+    # Unknown company
     else:
         company = 'unknown'
 
@@ -396,7 +413,7 @@ def prepareDNAFile( f, c ):
     # and add company column
     df[ 'company' ] = c
 
-# DEBUG
+# DEBUG ?
 #    print ( c )
 #    print ( df )
     print()
@@ -590,6 +607,7 @@ def formatDNAFile( df, c ):
         # Change column names according to  (Before 1 March, 2019) format
         df.rename( columns = { 'rsid':'RSID', 'chromosome':'CHROMOSOME', 'position':'POSITION', 'genotype':'RESULT' }, inplace = True )
 
+    # Ancestry
     elif c == 'Ancestry':
         # Normalize chromosome order with custom chromosomeTable
         df[ 'chromosome' ].replace( to_replace=chromosomeTableAncestryOut, inplace=True )
@@ -608,6 +626,7 @@ def formatDNAFile( df, c ):
         df[ 'allele2' ] = df[ 'genotype' ].str[ -1: ]
         del df[ 'genotype' ]
 
+        # Not needed?
         # Change column names according to Ancestry format
         #df.rename( columns = { 'rsid':'RSID', 'chromosome':'CHROMOSOME', 'position':'POSITION', 'genotype':'RESULT' }, inplace = True )
 
@@ -629,7 +648,6 @@ rawDNAFiles = findDNAFiles( fileEndings )
 # Check if there are any files in the directory
 if not rawDNAFiles:
     print ("There is no files in the directory")
-
     exit()
 
 
@@ -656,11 +674,13 @@ for f in rawDNAFiles:
         # Normalize and clean DNA file in preparation for concatenation
         df = prepareDNAFile( f, company )
 
+        # Handle FamilyTreeDNA a bit differently
+        # delete all data in chromosome 0 (nocalls? bad data?)
         if company == 'FamilyTreeDNA':
             chromosomeZero = df.loc[ df[ 'chromosome' ] == '0' ]
             del chromosomeZero[ 'company' ]
-#            print( chromosomeZero )
 
+        # Clean dataframe
         df = cleanDNAFile( df, company )
         
         # Append dataframe
@@ -686,7 +706,7 @@ if not resultFiles:
 
 
 ########################
-# Concat and remove duplicates
+# Concatenate and remove duplicates
 
 print()
 print( 'Processing results' )
@@ -695,12 +715,14 @@ print()
 # Concatenate all DNA files into one list
 DNASuperKit = pd.concat(resultFiles, sort=False, ignore_index=True)
 
+
 print()
 print( 'Sorting results' )
 print()
 
 # Sort DNA according to order provided in customization
 DNASuperKit = sortDNAFile( DNASuperKit )
+
 
 print()
 print( 'Dropping duplicates' )
@@ -709,7 +731,8 @@ print()
 # Drop duplicates
 DNASuperKit = dropDuplicatesDNAFile( DNASuperKit )
 
-# DEBUG
+
+# Information about the results
 print()
 print( 'Unique chromosomes:' )
 print( DNASuperKit.chromosome.unique() )
@@ -729,10 +752,7 @@ del DNASuperKit[ 'company' ]
 
 
 ########################
-# 
-
 #Format .csv to a specific company format
-
 
 DNASuperKit = formatDNAFile( DNASuperKit, outputFormat )
 
@@ -754,17 +774,5 @@ print( 'DNA SuperKit successfully created!' )
 print()
 
 ####################################################################################
+# EOF #
 ####################################################################################
-
-# TODO
-# * Add comments on top of superkit file
-# * Improve company detection "algorithm"
-# * Improve genotype count output
-
-##########################################
-# DEBUGGING
-
-#df.info()
-#print( df )
-
-######################################
