@@ -15,11 +15,11 @@ The data are then saved to the `./output/` folder for you to use.
 
 
 ## Currently supported companies:
-23andMe (V5)
-Ancestry
-FamilyTreeDNA
-MyHeritage (Old format)
-LivingDNA (v1.0.2)
+* 23andMe (V5)
+* Ancestry
+* FamilyTreeDNA
+* MyHeritage (Old format)
+* LivingDNA (v1.0.2)
 
 
 
