@@ -4,7 +4,7 @@
 This is a autosomal DNA super kit creator, based on this video by [Family History Fanatics & Genealogists](https://www.youtube.com/watch?v=IJmAHNSODuw).
 
 This program will merge your DNA raw datafiles from different companies to one "super kit".
-A super kit will supposedly increase overlap in matches in DNA matching sites like [GEDMatch](https://www.gedmatch.com).
+A super kit will supposedly increase overlap in matches and reduce false matches in DNA matching sites like [GEDMatch](https://www.gedmatch.com).
 
 This script does this by searching `./input/` for `.csv` or `.txt` files and then screen the files for information about what test company that produced the file.
 If the testing company is known, then the script cleans and standardizes and finally concatenates the data.
@@ -57,4 +57,5 @@ Currently, the only things you can change are the following:
 - [ ] Add support for the latest MyHeritage file format
 - [ ] Improve company detection "algorithm"
 - [ ] Improve the genotype count per company produced in the end
+- [ ] Add algorithm to decide which duplicate is more correct by "majority count"
 - [ ] Improve README!
