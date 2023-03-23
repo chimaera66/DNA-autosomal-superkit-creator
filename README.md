@@ -15,11 +15,11 @@ The data are then saved to the `./output/` folder for you to use.
 
 
 ## Currently supported companies:
-* 23andMe (V5)
-* Ancestry
-* FamilyTreeDNA
-* MyHeritage (Old format)
-* LivingDNA (v1.0.2)
+* 23andMe v5 (since 08/2017)
+* Ancestry v2 (since 05/2016)
+* FamilyTreeDNA v3 (since 04/2019)
+* MyHeritage v1 (since 03/2019)
+* LivingDNA v1.0.2 (since 10/2018)
 
 
 
@@ -38,12 +38,12 @@ Currently, the only things you can change are the following:
 
     * Output format
         - Changes the format to fit the format used by one of these companies:
-        - Superkit (a kind of standardized format, close to 23andMe format)
-        - 23andMe (V5)
-        - Ancestry
-        - FamilyTreeDNA
-        - MyHeritage (Old format)
-        - LivingDNA v1.0.2
+            - Superkit (a kind of standardized format, close to 23andMe format)
+            - 23andMe v5 (since 08/2017)
+            - Ancestry v2 (since 05/2016)
+            - FamilyTreeDNA v3 (since 04/2019)
+            - MyHeritage v1 (since 03/2019)
+            - LivingDNA v1.0.2 (since 10/2018)
 
     * Company priority
         - Decides which company genome that are preferred if several companies has called the same position in the same chromosome (calls get priority over nocalls by default
@@ -55,7 +55,9 @@ Currently, the only things you can change are the following:
 ## TODO list
 - [ ] Add comments on top of superkit file
 - [ ] Add support for the latest MyHeritage file format
+- [ ] Add support for command line arguments
 - [ ] Improve company detection "algorithm"
 - [ ] Improve the genotype count per company produced in the end
 - [ ] Add algorithm to decide which duplicate is more correct by "majority count"
+- [ ] Add information about what SNP span on each chromosome each company tests
 - [ ] Improve README!
