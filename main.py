@@ -18,19 +18,19 @@ import re                   # For determineDNACompany
 outputFormat = 'SuperKit'
 #outputFormat = '23andMe v5'
 #outputFormat = 'AncestryDNA v2'
-#outputFormat = 'FamilyTreeDNA'
+#outputFormat = 'FamilyTreeDNA v3'
 #outputFormat = 'MyHeritage v1'
 #outputFormat = 'LivingDNA v1.0.2'
 
 
 # Sorting order for company column
 companyPriorityList = [ '23andMe v5',
-                        '23andMe',
+#                        '23andMe',
                         'AncestryDNA v2',
-                        'FamilyTreeDNA',
-                        'MyHeritage',
+                        'FamilyTreeDNA v3',
+#                        'MyHeritage',
                         'LivingDNA v1.0.2',
-                        'LivingDNA',
+#                        'LivingDNA',
                         'MyHeritage v1',
                         ]
 
@@ -340,11 +340,11 @@ def determineDNACompany(text, filename):
 
     company_patterns = {
         '23andMe V5': r'_v5_Full_',
-        '23andMe': r'23andme',
+#        '23andMe': r'23andme',
         'LivingDNA v1.0.2': r'# living dna customer genotype data download file version: 1\.0\.2',
-        'LivingDNA': r'living dna',
+#        'LivingDNA': r'living dna',
         'MyHeritage v1': r'# myheritage dna raw data\.',
-        'FamilyTreeDNA': r'rsid,chromosome,position,result',
+        'FamilyTreeDNA v3': r'rsid,chromosome,position,result',
         'AncestryDNA v2': r'ancestrydna'
     }
 
@@ -383,9 +383,9 @@ def determineDNACompany(text, filename):
 #    elif '# MyHeritage DNA raw data.' in t:
 #        company = 'MyHeritage v1'
 #
-#    # FamilyTreeDNA
+#    # FamilyTreeDNA v3
 #    elif 'RSID,CHROMOSOME,POSITION,RESULT' in t:
-#        company = 'FamilyTreeDNA'
+#        company = 'FamilyTreeDNA v3'
 #
 #    # AncestryDNA v2
 #    elif 'AncestryDNA' in t:
@@ -410,12 +410,12 @@ def prepareDNAFile( f, c ):
 
 #    print ( c )
     # 23andMe and Living DNA
-    if c == '23andMe v5' or c == '23andMe' or c == 'LivingDNA' or c == 'LivingDNA v1.0.2':
+    if c == '23andMe v5' or c == 'LivingDNA v1.0.2':
         # Load input file into pandas and create the proper columns
         df = pd.read_csv( f, dtype=str, sep='\t', comment='#', index_col=False, header=None, engine='python' )
 
-    # MyHeritage (Before 1 March, 2019) and FamilyTreeDNA
-    elif c == 'MyHeritage v1' or c == 'FamilyTreeDNA':
+    # MyHeritage (Before 1 March, 2019) and FamilyTreeDNA v3
+    elif c == 'MyHeritage v1' or c == 'FamilyTreeDNA v3':
         # Load input file into pandas and create the proper columns
         df = pd.read_csv( f, dtype=str, comment='#' )
 
@@ -478,8 +478,8 @@ def cleanDNAFile( df, c):
     # Convert position to numerical
     df[ 'position' ] = pd.to_numeric( df[ 'position' ] )
 
-    # FamilyTreeDNA, additional preparations
-    if c == 'FamilyTreeDNA':
+    # FamilyTreeDNA v3, additional preparations
+    if c == 'FamilyTreeDNA v3':
         # Drop chromosome 0 rows, likely nocalls or incomplete information
         df = df.drop( df[ df[ 'chromosome' ] == '0' ].index )
 
@@ -554,8 +554,8 @@ def formatDNAFile( df, c ):
         df.sort_values( [ 'chromosome', 'position' ], ascending=( True, True ), inplace=True )
 
 
-    # Extra operations for FamilyTreeDNA format
-    if c == 'FamilyTreeDNA':
+    # Extra operations for FamilyTreeDNA v3 format
+    if c == 'FamilyTreeDNA v3':
         # Drop chromosomes that arent used
         df = df.drop( df[ df[ 'chromosome' ] == 'Y' ].index )
 
@@ -627,9 +627,9 @@ def formatDNAFile( df, c ):
     if c == '23andMe v5' or c == 'LivingDNA v1.0.2':
         df.rename( columns = { 'rsid':'# rsid' }, inplace = True )
 
-    # FamilyTreeDNA and MyHeritage (Before 1 March, 2019)
-    elif c == 'FamilyTreeDNA' or c == 'MyHeritage v1':
-        # Change column names according to  (Before 1 March, 2019) format
+    # FamilyTreeDNA v3 and MyHeritage v1
+    elif c == 'FamilyTreeDNA v3' or c == 'MyHeritage v1':
+        # Change column names according to MyHeritage v1 format
         df.rename( columns = { 'rsid':'RSID', 'chromosome':'CHROMOSOME', 'position':'POSITION', 'genotype':'RESULT' }, inplace = True )
 
     # AncestryDNA v2
@@ -699,9 +699,9 @@ for f in rawDNAFiles:
         # Normalize and clean DNA file in preparation for concatenation
         df = prepareDNAFile( f, company )
 
-        # Handle FamilyTreeDNA a bit differently
+        # Handle FamilyTreeDNA v3 a bit differently
         # delete all data in chromosome 0 (nocalls? bad data?)
-        if company == 'FamilyTreeDNA':
+        if company == 'FamilyTreeDNA v3':
             chromosomeZero = df.loc[ df[ 'chromosome' ] == '0' ]
             del chromosomeZero[ 'company' ]
 
@@ -785,11 +785,14 @@ if outputFormat == 'SuperKit' or outputFormat == '23andMe v5' or outputFormat ==
     outputFileEnding = '.txt'
     print( 'Correcting data to correspond with ' + outputFormat + ' format and saving to ' + outputFileEnding )
     DNASuperKit.to_csv( outputFileDir + outputFileName + '-' + outputFormat + outputFileEnding, sep='\t', index=None )
-elif outputFormat == 'FamilyTreeDNA' or outputFormat == 'MyHeritage v1':
+
+elif outputFormat == 'FamilyTreeDNA v3' or outputFormat == 'MyHeritage v1':
     outputFileEnding = '.csv'
     print( 'Correcting data to correspond with ' + outputFormat + ' format and saving to ' + outputFileEnding )
+
     if outputFormat == 'MyHeritage v1':
         DNASuperKit.to_csv( outputFileDir + outputFileName + '-' + outputFormat + outputFileEnding, index=None, quoting=2 )
+
     else:
         DNASuperKit.to_csv( outputFileDir + outputFileName + '-' + outputFormat + outputFileEnding, index=None )
 
