@@ -2,7 +2,7 @@
 
 ## Description:
 This is a autosomal DNA super kit creator, based on this video by [Family History Fanatics & Genealogists](https://www.youtube.com/watch?v=IJmAHNSODuw).
-More information can be found at [Do GEDmatch Superkits Give You More DNA Matches Than Non-Superkits?] (https://www.familyhistoryfanatics.com/gedmatch-superkits)
+More information can be found at[Do GEDmatch Superkits Give You More DNA Matches Than Non-Superkits?](https://www.familyhistoryfanatics.com/gedmatch-superkits)
 
 This program will merge your DNA raw datafiles from different companies to one "super kit".
 A super kit will supposedly increase overlap in matches and reduce false matches in DNA matching sites like [GEDMatch](https://www.gedmatch.com).
