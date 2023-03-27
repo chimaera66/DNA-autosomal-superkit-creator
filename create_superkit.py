@@ -1,8 +1,8 @@
-#########################################################################################MyHeritage \(Old\)#####
-# 
 ##############################################################################################
+# Create DNA superkit
+#
 
-import os
+import os                   # For findDNAFiles
 from typing import List
 import pandas as pd
 
