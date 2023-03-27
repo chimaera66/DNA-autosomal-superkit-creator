@@ -2,6 +2,7 @@
 
 ## Description:
 This is a autosomal DNA super kit creator, based on this video by [Family History Fanatics & Genealogists](https://www.youtube.com/watch?v=IJmAHNSODuw).
+More information can be found at [Do GEDmatch Superkits Give You More DNA Matches Than Non-Superkits?](https://www.familyhistoryfanatics.com/gedmatch-superkits)
 
 This program will merge your DNA raw datafiles from different companies to one "super kit".
 A super kit will supposedly increase overlap in matches and reduce false matches in DNA matching sites like [GEDMatch](https://www.gedmatch.com).
@@ -18,7 +19,7 @@ The data are then saved to the `./output/` folder for you to use.
 * 23andMe v5 (since 08/2017)
 * Ancestry v2 (since 05/2016)
 * FamilyTreeDNA v3 (since 04/2019)
-* MyHeritage v1 (since 03/2019)
+* MyHeritage v1 (before 03/2019)
 * LivingDNA v1.0.2 (since 10/2018)
 
 
@@ -42,7 +43,7 @@ Currently, the only things you can change are the following:
             - 23andMe v5 (since 08/2017)
             - Ancestry v2 (since 05/2016)
             - FamilyTreeDNA v3 (since 04/2019)
-            - MyHeritage v1 (since 03/2019)
+            - MyHeritage v1 (before 03/2019)
             - LivingDNA v1.0.2 (since 10/2018)
 
     * Company priority
