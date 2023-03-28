@@ -238,8 +238,8 @@ for file in rawDNAFiles:
         print ( unique_genotypes )
 
         print()
-        print( 'Unique genotypes on chromosome X' )
-        filtered_df = df[df['chromosome'] == 'X']
+        print( 'Unique genotypes on chromosome X (23)' )
+        filtered_df = df[df['chromosome'] == 'X'] | (df['chromosome'] == '23')]
         unique_genotypes = filtered_df['genotype'].unique()
         print( unique_genotypes )
 
