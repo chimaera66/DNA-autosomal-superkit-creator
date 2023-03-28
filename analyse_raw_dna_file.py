@@ -94,7 +94,7 @@ def prescreenDNAFile( inputDNAFile ):
 # company the file originates from
 #
 
-def determineDNACompany(text, filename):
+def determineDNACompany(text: str, filename: str) -> str:
 
     company_patterns = {
         '23andMe v5': r'_v5_Full_',
@@ -110,6 +110,9 @@ def determineDNACompany(text, filename):
     for company, pattern in company_patterns.items():
         if re.search(pattern, filename) or re.search(pattern, text):
             return company
+
+    if '_v5_full_' in filename.lower():
+        return '23andMe v5'
 
     return 'unknown'
 
@@ -155,9 +158,9 @@ def normalizeDNAFile(df: pd.DataFrame, company: str) -> pd.DataFrame:
     if company == 'AncestryDNA v2':
         # Merge allele1 and allele2 to genotype column
         df[ 'genotype' ] = df[ 'allele1' ] + df[ 'allele2' ]
-        #df.drop(['allele1', 'allele2'], axis=1, inplace=True)
-        del df[ 'allele1' ]
-        del df[ 'allele2' ]
+        df.drop(['allele1', 'allele2'], axis=1, inplace=True)
+#        del df[ 'allele1' ]
+#        del df[ 'allele2' ]
 
     # Normalize column names
     df.columns = [ 'rsid', 'chromosome', 'position', 'genotype' ]
@@ -172,10 +175,13 @@ def normalizeDNAFile(df: pd.DataFrame, company: str) -> pd.DataFrame:
 # Guesses the gender based on the genotype data in chromosome X/23.
 #
 
-def guessGenderFromDataframe(df: pd.DataFrame) -> str:
+def guessGenderFromDataframe(df: pd.DataFrame, company: str) -> str:
 
     # Filter the DataFrame to include only chromosome X/23
-    df_chr23 = df[df['chromosome'] == 'X'] | df[df['chromosome'] == '23']
+    if company == 'AncestryDNA v2':
+        df_chr23 = df[df['chromosome'] == '23']
+    else:
+        df_chr23 = df[df['chromosome'] == 'X']
     
     # Count the number of heterozygous SNPs on chromosome 23
     hetero_count = df_chr23['genotype'].str.contains('/').sum()
@@ -254,38 +260,60 @@ for file in rawDNAFiles:
 
         print()
         print( 'Unique genotypes on chromosomes 1 - 22' )
-        excluded_chromosomes = ['0', 'X', 'Y', 'MT', 'XY']
+#        filtered_df = df[df['chromosome'] == 'X']
+        if company == 'AncestryDNA v2':
+            excluded_chromosomes = ['0', '23', '24', '25', '26']
+        else:
+            excluded_chromosomes = ['0', 'X', 'Y', 'XY', 'MT']
+#        excluded_chromosomes = ['0', 'X', 'Y', 'MT', 'XY']
         filtered_df = df[~df['chromosome'].isin(excluded_chromosomes)]
         unique_genotypes = filtered_df['genotype'].unique()
         print ( unique_genotypes )
 
         print()
         print( 'Unique genotypes on chromosome X (23)' )
-        filtered_df = df[df['chromosome'] == 'X'] | (df['chromosome'] == '23')]
+#        filtered_df = df[df['chromosome'] == 'X']
+        if company == 'AncestryDNA v2':
+            filtered_df = df[df['chromosome'] == '23']
+        else:
+            filtered_df = df[df['chromosome'] == 'X']
         unique_genotypes = filtered_df['genotype'].unique()
         print( unique_genotypes )
 
         print()
         print( 'Unique genotypes on chromosome Y (24)' )
-        filtered_df = df[df['chromosome'] == 'Y'] | (df['chromosome'] == '24')]
+#        filtered_df = df[df['chromosome'] == 'Y']
+        if company == 'AncestryDNA v2':
+            filtered_df = df[df['chromosome'] == '24']
+        else:
+            filtered_df = df[df['chromosome'] == 'Y']
         unique_genotypes = filtered_df['genotype'].unique()
         print( unique_genotypes )
 
         print()
         print( 'Unique genotypes on chromosome XY (25)' )
-        filtered_df = df[df['chromosome'] == 'XY'] | (df['chromosome'] == '25')]
+#        filtered_df = df[df['chromosome'] == 'XY']
+        if company == 'AncestryDNA v2':
+            filtered_df = df[df['chromosome'] == '25']
+        else:
+            filtered_df = df[df['chromosome'] == 'XY']
         unique_genotypes = filtered_df['genotype'].unique()
         print( unique_genotypes )
         
         print()
         print( 'Unique genotypes on chromosome MT (26)' )
-        filtered_df = df[df['chromosome'] == 'MT'] | (df['chromosome'] == '26')]
+#        filtered_df = df[df['chromosome'] == 'MT']
+        if company == 'AncestryDNA v2':
+            filtered_df = df[df['chromosome'] == '26']
+        else:
+            filtered_df = df[df['chromosome'] == 'MT']
         unique_genotypes = filtered_df['genotype'].unique()
         print( unique_genotypes )
 
         print()
-        print( 'Guess the gender of the kit' )
-        print( guessGenderFromDataframe( df ) )
+        print( 'Guessing the gender of the kit' )
+        guessGender = guessGenderFromDataframe( df, company )
+        print( guessGender )
         
         print()
         # Let user know processing is completed successfully

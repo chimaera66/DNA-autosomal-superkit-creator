@@ -355,6 +355,11 @@ def determineDNACompany(text, filename):
         if re.search(pattern, filename) or re.search(pattern, text):
             return company
 
+    # 23andMe v5
+    if '_v5_Full_' in filename:
+        company = '23andMe v5'
+        return company
+
     return 'unknown'
 
 #def determineDNACompany( t, f ):
