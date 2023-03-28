@@ -237,9 +237,9 @@ for file in rawDNAFiles:
         # Load the DNA file into pandas and get columns
         df = loadDNAFile( file, company )
 
-        print()
-        print( 'Columns:')
-        print( df.columns.tolist() )
+#        print()
+#        print( 'Columns:')
+#        print( df.columns.tolist() )
 
         # Normalize the DNA file
         df = normalizeDNAFile( df, company )
