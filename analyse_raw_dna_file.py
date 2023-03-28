@@ -244,20 +244,20 @@ for file in rawDNAFiles:
         print( unique_genotypes )
 
         print()
-        print( 'Unique genotypes on chromosome Y' )
-        filtered_df = df[df['chromosome'] == 'Y']
+        print( 'Unique genotypes on chromosome Y (24)' )
+        filtered_df = df[df['chromosome'] == 'Y'] | (df['chromosome'] == '24')]
         unique_genotypes = filtered_df['genotype'].unique()
         print( unique_genotypes )
 
         print()
-        print( 'Unique genotypes on chromosome MT' )
-        filtered_df = df[df['chromosome'] == 'MT']
+        print( 'Unique genotypes on chromosome XY (25)' )
+        filtered_df = df[df['chromosome'] == 'XY'] | (df['chromosome'] == '25')]
         unique_genotypes = filtered_df['genotype'].unique()
         print( unique_genotypes )
-
+        
         print()
-        print( 'Unique genotypes on chromosome XY' )
-        filtered_df = df[df['chromosome'] == 'XY']
+        print( 'Unique genotypes on chromosome MT (26)' )
+        filtered_df = df[df['chromosome'] == 'MT'] | (df['chromosome'] == '26')]
         unique_genotypes = filtered_df['genotype'].unique()
         print( unique_genotypes )
 
