@@ -339,7 +339,7 @@ def determineDNACompany(text, filename):
     #print( t )
 
     company_patterns = {
-        '23andMe V5': r'_v5_Full_',
+        '23andMe v5': r'_v5_Full_',
 #        '23andMe': r'23andme',
         'LivingDNA v1.0.2': r'# living dna customer genotype data download file version: 1\.0\.2',
 #        'LivingDNA': r'living dna',
@@ -467,6 +467,7 @@ def cleanDNAFile( df, c):
     # Normalize chromosome order with custom chromosomeTable
     #df[ 'chromosome' ].replace( to_replace=chromosomeTable, inplace=True )
 
+    #Only true for male on X and Y?
     # Normalize genotypes on X, Y & MT where double char becomes single, eg. AA = A
     rep = df[ 'genotype' ].replace( genotypeTableXYMT )
     df[ 'genotype' ] = df[ 'genotype' ].mask( df[ 'chromosome' ].isin( [ 'X','Y','XY','MT' ] ), rep )
