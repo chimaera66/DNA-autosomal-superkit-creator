@@ -155,6 +155,7 @@ def normalizeDNAFile(df: pd.DataFrame, company: str) -> pd.DataFrame:
     if company == 'AncestryDNA v2':
         # Merge allele1 and allele2 to genotype column
         df[ 'genotype' ] = df[ 'allele1' ] + df[ 'allele2' ]
+        #df.drop(['allele1', 'allele2'], axis=1, inplace=True)
         del df[ 'allele1' ]
         del df[ 'allele2' ]
 
