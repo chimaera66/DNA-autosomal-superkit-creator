@@ -284,6 +284,7 @@ for file in rawDNAFiles:
         print( unique_genotypes )
 
         print()
+        print( 'Guess the gender of the kit' )
         print( guessGenderFromDataframe( df ) )
         
         print()
