@@ -219,40 +219,48 @@ for file in rawDNAFiles:
         print()
         print( 'Chromosomes:' )
         print( df.chromosome.unique() )
-        print()
-        print( 'Unique genotypes (on all chromosomes):')
-        print( df.genotype.unique() )
+
+#        print()
+#        print( 'Unique genotypes (on all chromosomes):')
+#        print( df.genotype.unique() )
+
         print()
         print( 'Unique genotypes on chromosome 0' )
         filtered_df = df[df['chromosome'] == '0']
         unique_genotypes = filtered_df['genotype'].unique()
         print( unique_genotypes )
+
         print()
         print( 'Unique genotypes on chromosomes 1 - 22' )
         excluded_chromosomes = ['0', 'X', 'Y', 'MT', 'XY']
         filtered_df = df[~df['chromosome'].isin(excluded_chromosomes)]
         unique_genotypes = filtered_df['genotype'].unique()
         print ( unique_genotypes )
+
         print()
         print( 'Unique genotypes on chromosome X' )
         filtered_df = df[df['chromosome'] == 'X']
         unique_genotypes = filtered_df['genotype'].unique()
         print( unique_genotypes )
+
         print()
         print( 'Unique genotypes on chromosome Y' )
         filtered_df = df[df['chromosome'] == 'Y']
         unique_genotypes = filtered_df['genotype'].unique()
         print( unique_genotypes )
+
         print()
         print( 'Unique genotypes on chromosome MT' )
         filtered_df = df[df['chromosome'] == 'MT']
         unique_genotypes = filtered_df['genotype'].unique()
         print( unique_genotypes )
+
         print()
         print( 'Unique genotypes on chromosome XY' )
         filtered_df = df[df['chromosome'] == 'XY']
         unique_genotypes = filtered_df['genotype'].unique()
         print( unique_genotypes )
+
         print()
         # Let user know processing is completed successfully
         print( 'Done analyzing the file: ' + file.replace( inputFileDir, '' ) )
