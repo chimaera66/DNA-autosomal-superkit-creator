@@ -168,6 +168,27 @@ def normalizeDNAFile(df: pd.DataFrame, company: str) -> pd.DataFrame:
 ##########################################
 
 
+##########################################
+# Guesses the gender based on the genotype data in chromosome X/23.
+#
+
+def guessGenderFromDataframe(df: pd.DataFrame) -> str:
+
+    # Filter the DataFrame to include only chromosome X/23
+    df_chr23 = df[df['chromosome'] == 'X'] | df[df['chromosome'] == '23']
+    
+    # Count the number of heterozygous SNPs on chromosome 23
+    hetero_count = df_chr23['genotype'].str.contains('/').sum()
+    
+    # Guess the gender based on the proportion of homozygous SNPs on chromosome 23
+    if hetero_count / len(df_chr23) < 0.05:
+        gender = 'M'
+    else:
+        gender = 'F'
+        
+    return gender
+
+
 ####################################################################################
 ####################################################################################
 
@@ -262,6 +283,9 @@ for file in rawDNAFiles:
         unique_genotypes = filtered_df['genotype'].unique()
         print( unique_genotypes )
 
+        print()
+        print( guessGenderFromDataframe( df ) )
+        
         print()
         # Let user know processing is completed successfully
         print( 'Done analyzing the file: ' + file.replace( inputFileDir, '' ) )
