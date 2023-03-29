@@ -191,9 +191,9 @@ def guessGenderFromDataframe(df: pd.DataFrame, company: str) -> str:
     
     # Guess the gender based on the proportion of homozygous SNPs on chromosome 23
     if hetero_count / len(df_chr23) < 0.05:
-        gender = 'M'
+        gender = 'Male'
     else:
-        gender = 'F'
+        gender = 'Female'
         
     return gender
 
@@ -233,127 +233,112 @@ for file in rawDNAFiles:
     company = determineDNACompany( fileScreening , file)
 
     if company != 'unknown':
-        print( 'Analyzing file:')
-        print( file.replace( inputFileDir, '' ) )
-        print( 'Which contains data from: ' + company )
-        
         # Load the DNA file into pandas and get columns
         df = loadDNAFile( file, company )
-
-#        print()
-#        print( 'Columns:')
-#        print( df.columns.tolist() )
-
         # Normalize the DNA file
         df = normalizeDNAFile( df, company )
+        # Guess gender in kit
+        guessGender = guessGenderFromDataframe( df, company )
 
+        # Presenting results
+        print( '######################################################################')
+        print( f"# Testcompany:            {company}" )
+        print( f"#" )
+        print( f"# File:                   {file.replace( inputFileDir, '' )}")
+        print( f"# SNPs tested in kit:     {len(df)}")
+        print( f"# Assumed gender in kit:  {guessGender}" )
+        print( '######################################################################')
         print()
-        print( 'Chromosomes:' )
-        print( df.chromosome.unique() )
+        print( f"Chromosomes: {df.chromosome.unique().tolist()}" )
 
-#        print()
-#        print( 'Unique genotypes (on all chromosomes):')
-#        print( df.genotype.unique() )
-
-
-        print()
-        print( 'Unique genotypes on chromosome 0' )
+        # Chromosome 0 data
         filtered_df = df[df['chromosome'] == '0']
         unique_genotypes = filtered_df['genotype'].unique()
-        print( unique_genotypes )
-        
-        snp_min = filtered_df['position'].min()
-        snp_max = filtered_df['position'].max()
-        print( f"SNP range is between {snp_min} and {snp_max}" )
+        if len(unique_genotypes) > 0:
+            print()
+            print( "Chromosome 0")
+            print( f"Unique genotypes: {unique_genotypes}")
+            snp_min = filtered_df['position'].min()
+            snp_max = filtered_df['position'].max()
+            print( f"SNP range is between {snp_min} and {snp_max}" )
 
-        
-        print()
-        print( 'Unique genotypes on chromosomes 1 - 22' )
-#        filtered_df = df[df['chromosome'] == 'X']
+        # Chromosome 1-22 data
         if company == 'AncestryDNA v2':
             excluded_chromosomes = ['0', '23', '24', '25', '26']
         else:
             excluded_chromosomes = ['0', 'X', 'Y', 'XY', 'MT']
-#        excluded_chromosomes = ['0', 'X', 'Y', 'MT', 'XY']
         filtered_df = df[~df['chromosome'].isin(excluded_chromosomes)]
         unique_genotypes = filtered_df['genotype'].unique()
-        print ( unique_genotypes )
-
+        print()
+        print( "Chromosomes 1 - 22" )
+        print( f"Unique genotypes: {unique_genotypes}" )
         for chromosome in range(1, 23):
             filtered_df = df[df['chromosome'] == str(chromosome)]
             snp_min = filtered_df['position'].min()
             snp_max = filtered_df['position'].max()
             print( f"SNP range for chromosome {chromosome} is between {snp_min} and {snp_max}" )
         
-        
-        print()
-        print( 'Unique genotypes on chromosome X (23)' )
-#        filtered_df = df[df['chromosome'] == 'X']
+        # Chromosome X (23) data
         if company == 'AncestryDNA v2':
             filtered_df = df[df['chromosome'] == '23']
         else:
             filtered_df = df[df['chromosome'] == 'X']
         unique_genotypes = filtered_df['genotype'].unique()
-        print( unique_genotypes )
-
-        snp_min = filtered_df['position'].min()
-        snp_max = filtered_df['position'].max()
-        print( f"SNP range is between {snp_min} and {snp_max}" )
+        if len(unique_genotypes) > 0:
+            print()
+            print( "Chromosome X (23)")
+            print( f"Unique genotypes: {unique_genotypes}" )
+            snp_min = filtered_df['position'].min()
+            snp_max = filtered_df['position'].max()
+            print( f"SNP range is between {snp_min} and {snp_max}" )
         
-        
-        print()
-        print( 'Unique genotypes on chromosome Y (24)' )
-#        filtered_df = df[df['chromosome'] == 'Y']
+        # Chromosome Y (24) data
         if company == 'AncestryDNA v2':
             filtered_df = df[df['chromosome'] == '24']
         else:
             filtered_df = df[df['chromosome'] == 'Y']
         unique_genotypes = filtered_df['genotype'].unique()
-        print( unique_genotypes )
-
-        snp_min = filtered_df['position'].min()
-        snp_max = filtered_df['position'].max()
-        print( f"SNP range is between {snp_min} and {snp_max}" )
+        if len(unique_genotypes) > 0:
+            print()
+            print( "Chromosome Y (24)")
+            print( f"Unique genotypes: {unique_genotypes}" )
+            snp_min = filtered_df['position'].min()
+            snp_max = filtered_df['position'].max()
+            print( f"SNP range is between {snp_min} and {snp_max}" )
         
-        
-        print()
-        print( 'Unique genotypes on chromosome XY (25)' )
-#        filtered_df = df[df['chromosome'] == 'XY']
+        # Chromosome XY (25) data
         if company == 'AncestryDNA v2':
             filtered_df = df[df['chromosome'] == '25']
         else:
             filtered_df = df[df['chromosome'] == 'XY']
         unique_genotypes = filtered_df['genotype'].unique()
-        print( unique_genotypes )
-
-        snp_min = filtered_df['position'].min()
-        snp_max = filtered_df['position'].max()
-        print( f"SNP range is between {snp_min} and {snp_max}" )
+        if len(unique_genotypes) > 0:
+            print()
+            print( "Chromosome XY (25)")
+            print( f"Unique genotypes: {unique_genotypes}" )
+            snp_min = filtered_df['position'].min()
+            snp_max = filtered_df['position'].max()
+            print( f"SNP range is between {snp_min} and {snp_max}" )
         
-        
-        print()
-        print( 'Unique genotypes on chromosome MT (26)' )
-#        filtered_df = df[df['chromosome'] == 'MT']
+        # Chromosome MT (26) data
         if company == 'AncestryDNA v2':
             filtered_df = df[df['chromosome'] == '26']
         else:
             filtered_df = df[df['chromosome'] == 'MT']
         unique_genotypes = filtered_df['genotype'].unique()
-        print( unique_genotypes )
-
-        snp_min = filtered_df['position'].min()
-        snp_max = filtered_df['position'].max()
-        print( f"SNP range is between {snp_min} and {snp_max}" )
-        
-        
-        print()
-        print( 'Guessing the gender of the kit' )
-        guessGender = guessGenderFromDataframe( df, company )
-        print( guessGender )
+        if len(unique_genotypes) > 0:
+            print()
+            print( "Chromosome MT (25)")
+            print( f"Unique genotypes: {unique_genotypes}" )
+            snp_min = filtered_df['position'].min()
+            snp_max = filtered_df['position'].max()
+            print( f"SNP range is between {snp_min} and {snp_max}" )
         
         print()
         # Let user know processing is completed successfully
         print( 'Done analyzing the file: ' + file.replace( inputFileDir, '' ) )
+        print()
+        print()
         print()
 
     # If file is unknown
