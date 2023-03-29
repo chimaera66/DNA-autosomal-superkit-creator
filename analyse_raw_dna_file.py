@@ -276,6 +276,10 @@ for file in rawDNAFiles:
         unique_genotypes = filtered_df['genotype'].unique()
         print ( unique_genotypes )
 
+        for chromosome in range(1, 23):
+            filtered_df = df[df['chromosome'] == str(chromosome)]
+            print( f"SNP range for chromosome {chromosome} is between {snp_min} and {snp_max}" )
+        
         
         print()
         print( 'Unique genotypes on chromosome X (23)' )
