@@ -31,6 +31,7 @@ The data are then saved to the `./output/` folder for you to use.
 
 
 ## How to use create_superkit.py:
+This script will combine kits from compatible versions described above to a superkit
 
 1. Put your raw autosomal DNA files into the ./input/ folder and make sure they are unpacked (in .txt or .csv format)
 
@@ -53,6 +54,13 @@ Currently, the only things you can change are the following:
 
 
 ## How to use analyse_dna_file.py:
+This script will analyse kits from compatible versions described above.
+It will present the following data:
+* Total SNPs
+* Assumed gender of kit
+* Unique chromosomes
+* Unique genotypes
+* SNP ranges
 
 1. Put your raw autosomal DNA files into the ./input/ folder and make sure they are unpacked (in .txt or .csv format)
 
