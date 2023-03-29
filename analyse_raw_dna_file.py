@@ -165,6 +165,9 @@ def normalizeDNAFile(df: pd.DataFrame, company: str) -> pd.DataFrame:
     # Normalize column names
     df.columns = [ 'rsid', 'chromosome', 'position', 'genotype' ]
 
+    df['chromosome'] = df['chromosome'].astype(str)
+    df['position'] = df['position'].astype(int)
+
     return df
 
 
@@ -278,6 +281,8 @@ for file in rawDNAFiles:
 
         for chromosome in range(1, 23):
             filtered_df = df[df['chromosome'] == str(chromosome)]
+            snp_min = filtered_df['position'].min()
+            snp_max = filtered_df['position'].max()
             print( f"SNP range for chromosome {chromosome} is between {snp_min} and {snp_max}" )
         
         
