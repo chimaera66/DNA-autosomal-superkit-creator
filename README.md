@@ -15,7 +15,7 @@ The data are then saved to the `./output/` folder for you to use.
 
 
 
-## Currently supported companies:
+## Currently supported companies (for both the creator and the analyser script):
 * 23andMe v5 (since 08/2017)
 * Ancestry v2 (since 05/2016)
 * FamilyTreeDNA v3 (since 04/2019)
@@ -30,11 +30,11 @@ The data are then saved to the `./output/` folder for you to use.
 
 
 
-## How to use:
+## How to use create_superkit.py:
 
 1. Put your raw autosomal DNA files into the ./input/ folder and make sure they are unpacked (in .txt or .csv format)
 
-2. Open main.py with a text editor and change your prefered options under "Customizations"
+2. Open create_superkit.py with a text editor and change your prefered options under "Customizations"
 Currently, the only things you can change are the following:
 
     * Output format
@@ -49,8 +49,14 @@ Currently, the only things you can change are the following:
     * Company priority
         - Decides which company genome that are preferred if several companies has called the same position in the same chromosome (calls get priority over nocalls by default
 
-3. run python main.py and the program will parse the DNA files in the default directory ./input/ and merge them together to a "SuperKit"
+3. run python create_superkit.py and the program will parse the DNA files in the default directory ./input/ and merge them together to a "SuperKit"
 
+
+## How to use analyse_dna_file.py:
+
+1. Put your raw autosomal DNA files into the ./input/ folder and make sure they are unpacked (in .txt or .csv format)
+
+2. run python analyse_dna_file.py and the program will parse the DNA files in the default directory ./input/ and merge them together to a "SuperKit"
 
 
 ## TODO list
