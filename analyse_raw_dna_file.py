@@ -252,12 +252,18 @@ for file in rawDNAFiles:
 #        print( 'Unique genotypes (on all chromosomes):')
 #        print( df.genotype.unique() )
 
+
         print()
         print( 'Unique genotypes on chromosome 0' )
         filtered_df = df[df['chromosome'] == '0']
         unique_genotypes = filtered_df['genotype'].unique()
         print( unique_genotypes )
+        
+        snp_min = filtered_df['position'].min()
+        snp_max = filtered_df['position'].max()
+        print( f"SNP range is between {snp_min} and {snp_max}" )
 
+        
         print()
         print( 'Unique genotypes on chromosomes 1 - 22' )
 #        filtered_df = df[df['chromosome'] == 'X']
@@ -270,6 +276,7 @@ for file in rawDNAFiles:
         unique_genotypes = filtered_df['genotype'].unique()
         print ( unique_genotypes )
 
+        
         print()
         print( 'Unique genotypes on chromosome X (23)' )
 #        filtered_df = df[df['chromosome'] == 'X']
@@ -280,6 +287,11 @@ for file in rawDNAFiles:
         unique_genotypes = filtered_df['genotype'].unique()
         print( unique_genotypes )
 
+        snp_min = filtered_df['position'].min()
+        snp_max = filtered_df['position'].max()
+        print( f"SNP range is between {snp_min} and {snp_max}" )
+        
+        
         print()
         print( 'Unique genotypes on chromosome Y (24)' )
 #        filtered_df = df[df['chromosome'] == 'Y']
@@ -290,6 +302,11 @@ for file in rawDNAFiles:
         unique_genotypes = filtered_df['genotype'].unique()
         print( unique_genotypes )
 
+        snp_min = filtered_df['position'].min()
+        snp_max = filtered_df['position'].max()
+        print( f"SNP range is between {snp_min} and {snp_max}" )
+        
+        
         print()
         print( 'Unique genotypes on chromosome XY (25)' )
 #        filtered_df = df[df['chromosome'] == 'XY']
@@ -299,6 +316,11 @@ for file in rawDNAFiles:
             filtered_df = df[df['chromosome'] == 'XY']
         unique_genotypes = filtered_df['genotype'].unique()
         print( unique_genotypes )
+
+        snp_min = filtered_df['position'].min()
+        snp_max = filtered_df['position'].max()
+        print( f"SNP range is between {snp_min} and {snp_max}" )
+        
         
         print()
         print( 'Unique genotypes on chromosome MT (26)' )
@@ -310,6 +332,11 @@ for file in rawDNAFiles:
         unique_genotypes = filtered_df['genotype'].unique()
         print( unique_genotypes )
 
+        snp_min = filtered_df['position'].min()
+        snp_max = filtered_df['position'].max()
+        print( f"SNP range is between {snp_min} and {snp_max}" )
+        
+        
         print()
         print( 'Guessing the gender of the kit' )
         guessGender = guessGenderFromDataframe( df, company )
