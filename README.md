@@ -70,9 +70,9 @@ It will present the following data:
 ## TODO list
 - [ ] Add comments on top of superkit file
 - [ ] Add support for the latest MyHeritage file format
-- [ ] Add support for command line arguments
+- [ ] Add support for command line arguments?
 - [ ] Improve company detection "algorithm"
-- [ ] Improve the genotype count per company produced in the end
+- [X] Improve the genotype count per company produced in the end
 - [ ] Add algorithm to decide which duplicate is more correct by "majority count"
-- [ ] Add information about what SNP span on each chromosome each company tests
-- [ ] Improve README!
+- [X] Add information about what SNP span on each chromosome each company tests
+- [X] Improve README!
