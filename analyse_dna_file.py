@@ -235,11 +235,6 @@ for file in rawDNAFiles:
     if company != 'unknown':
         # Load the DNA file into pandas and get columns
         df = loadDNAFile( file, company )
-
-#        print( f"File: {file.replace( inputFileDir, '' )}")
-#        print( f"Line terminator:  {df._metadata['line_terminator']}")
-#        print()
-#        print()
         # Normalize the DNA file
         df = normalizeDNAFile( df, company )
         # Guess gender in kit
