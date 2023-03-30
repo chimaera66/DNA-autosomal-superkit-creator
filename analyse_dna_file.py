@@ -249,11 +249,11 @@ for file in rawDNAFiles:
         print( f"# File:                   {file.replace( inputFileDir, '' )}")
         print( f"# SNPs tested in kit:     {len(df)}")
         print( f"# Assumed gender in kit:  {guessGender}" )
-#        print( f"# Line terminator {print(df._engine.data.dialect.lineterminator)}")
         print( f"#")
         print( '######################################################################')
         print()
         print( f"Chromosomes: {df.chromosome.unique().tolist()}" )
+
 
         # Chromosome 0 data
         filtered_df = df[df['chromosome'] == '0']
@@ -264,7 +264,10 @@ for file in rawDNAFiles:
             print( f"Unique genotypes: {unique_genotypes}")
             snp_min = filtered_df['position'].min()
             snp_max = filtered_df['position'].max()
+            snp_count = filtered_df['position'].count()
             print( f"SNP range is between {snp_min} and {snp_max}" )
+            print( f"Total tested SNPs: {snp_count}")
+
 
         # Chromosome 1-22 data
         if company == 'AncestryDNA v2':
@@ -280,8 +283,11 @@ for file in rawDNAFiles:
             filtered_df = df[df['chromosome'] == str(chromosome)]
             snp_min = filtered_df['position'].min()
             snp_max = filtered_df['position'].max()
-            print( f"SNP range for chromosome {chromosome} is between {snp_min} and {snp_max}" )
+            snp_count = filtered_df['position'].count()
+            print( f"SNP range is between {snp_min} and {snp_max}" )
+            print( f"Total tested SNPs: {snp_count}")
         
+
         # Chromosome X (23) data
         if company == 'AncestryDNA v2':
             filtered_df = df[df['chromosome'] == '23']
@@ -294,8 +300,11 @@ for file in rawDNAFiles:
             print( f"Unique genotypes: {unique_genotypes}" )
             snp_min = filtered_df['position'].min()
             snp_max = filtered_df['position'].max()
+            snp_count = filtered_df['position'].count()
             print( f"SNP range is between {snp_min} and {snp_max}" )
+            print( f"Total tested SNPs: {snp_count}")
         
+
         # Chromosome Y (24) data
         if company == 'AncestryDNA v2':
             filtered_df = df[df['chromosome'] == '24']
@@ -308,8 +317,11 @@ for file in rawDNAFiles:
             print( f"Unique genotypes: {unique_genotypes}" )
             snp_min = filtered_df['position'].min()
             snp_max = filtered_df['position'].max()
+            snp_count = filtered_df['position'].count()
             print( f"SNP range is between {snp_min} and {snp_max}" )
+            print( f"Total tested SNPs: {snp_count}")
         
+
         # Chromosome XY (25) data
         if company == 'AncestryDNA v2':
             filtered_df = df[df['chromosome'] == '25']
@@ -322,8 +334,11 @@ for file in rawDNAFiles:
             print( f"Unique genotypes: {unique_genotypes}" )
             snp_min = filtered_df['position'].min()
             snp_max = filtered_df['position'].max()
+            snp_count = filtered_df['position'].count()
             print( f"SNP range is between {snp_min} and {snp_max}" )
+            print( f"Total tested SNPs: {snp_count}")
         
+
         # Chromosome MT (26) data
         if company == 'AncestryDNA v2':
             filtered_df = df[df['chromosome'] == '26']
@@ -336,8 +351,11 @@ for file in rawDNAFiles:
             print( f"Unique genotypes: {unique_genotypes}" )
             snp_min = filtered_df['position'].min()
             snp_max = filtered_df['position'].max()
+            snp_count = filtered_df['position'].count()
             print( f"SNP range is between {snp_min} and {snp_max}" )
-        
+            print( f"Total tested SNPs: {snp_count}")
+
+
         print()
         # Let user know processing is completed successfully
         print( 'Done analyzing the file: ' + file.replace( inputFileDir, '' ) )
