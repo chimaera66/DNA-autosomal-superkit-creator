@@ -235,18 +235,27 @@ for file in rawDNAFiles:
     if company != 'unknown':
         # Load the DNA file into pandas and get columns
         df = loadDNAFile( file, company )
+
+#        print( f"File: {file.replace( inputFileDir, '' )}")
+#        print( f"Line terminator:  {df._metadata['line_terminator']}")
+#        print()
+#        print()
         # Normalize the DNA file
         df = normalizeDNAFile( df, company )
         # Guess gender in kit
         guessGender = guessGenderFromDataframe( df, company )
 
         # Presenting results
+        print()
         print( '######################################################################')
+        print( f"#")
         print( f"# Testcompany:            {company}" )
         print( f"#" )
         print( f"# File:                   {file.replace( inputFileDir, '' )}")
         print( f"# SNPs tested in kit:     {len(df)}")
         print( f"# Assumed gender in kit:  {guessGender}" )
+#        print( f"# Line terminator {print(df._engine.data.dialect.lineterminator)}")
+        print( f"#")
         print( '######################################################################')
         print()
         print( f"Chromosomes: {df.chromosome.unique().tolist()}" )
