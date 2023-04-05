@@ -12,7 +12,7 @@ import re                   # For determineDNACompany
 # VARIABLES
 ####################################################################################
 
-
+# Input/output file directory
 inputFileDir = './input/'
 outputFileDir = './output/'
 
@@ -89,6 +89,7 @@ def prescreenDNAFile( inputDNAFile ):
 
 ##########################################
 
+
 ##########################################
 # Try to determine what DNA testing
 # company the file originates from
@@ -111,6 +112,7 @@ def determineDNACompany(text: str, filename: str) -> str:
         if re.search(pattern, filename) or re.search(pattern, text):
             return company
 
+    # 23andMe v5
     if '_v5_full_' in filename.lower():
         return '23andMe v5'
 
@@ -159,8 +161,6 @@ def normalizeDNAFile(df: pd.DataFrame, company: str) -> pd.DataFrame:
         # Merge allele1 and allele2 to genotype column
         df[ 'genotype' ] = df[ 'allele1' ] + df[ 'allele2' ]
         df.drop(['allele1', 'allele2'], axis=1, inplace=True)
-#        del df[ 'allele1' ]
-#        del df[ 'allele2' ]
 
     # Normalize column names
     df.columns = [ 'rsid', 'chromosome', 'position', 'genotype' ]

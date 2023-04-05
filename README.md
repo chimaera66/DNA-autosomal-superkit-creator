@@ -68,11 +68,20 @@ It will present the following data:
 
 
 ## TODO list
+### Superkit Creator
 - [ ] Add comments on top of superkit file
 - [ ] Add support for the latest MyHeritage file format
+- [ ] Add support for the latest TellMeGen file format
 - [ ] Add support for command line arguments?
 - [ ] Improve company detection "algorithm"
-- [X] Improve the genotype count per company produced in the end
+- [ ] Improve the genotype count per company produced in the end
+- [ ] Improve each ouput format to more closely be like the originals
 - [ ] Add algorithm to decide which duplicate is more correct by "majority count"
+
+### DNA File Analyzer
 - [X] Add information about what SNP span on each chromosome each company tests
+- [ ] Add support for the latest MyHeritage file format
+- [ ] Add support for the latest TellMeGen file format
+
+### Other
 - [X] Improve README!

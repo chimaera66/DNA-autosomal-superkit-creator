@@ -5,14 +5,34 @@
 import os                   # For findDNAFiles
 from typing import List
 import pandas as pd
-
 import re                   # For determineDNACompany
 
 
-##########################################
-# Customizations
-# change to fit your need
-#
+####################################################################################
+# VARIABLES
+####################################################################################
+
+# Input/output file directory
+inputFileDir = './input/'
+outputFileDir = './output/'
+
+# Input filetypes
+fileEndings = (
+    'txt',
+    'csv'
+)
+
+# Output File name and file ending
+outputFileName = 'DNASuperKit'
+outputFileEnding = '.csv'
+
+# Sorting order for company column
+companyPriorityList = [ '23andMe v5',
+                        'AncestryDNA v2',
+                        'FamilyTreeDNA v3',
+                        'LivingDNA v1.0.2',
+                        'MyHeritage v1',
+                        ]
 
 # Output format
 outputFormat = 'SuperKit'
@@ -23,37 +43,10 @@ outputFormat = 'SuperKit'
 #outputFormat = 'LivingDNA v1.0.2'
 
 
-# Sorting order for company column
-companyPriorityList = [ '23andMe v5',
-#                        '23andMe',
-                        'AncestryDNA v2',
-                        'FamilyTreeDNA v3',
-#                        'MyHeritage',
-                        'LivingDNA v1.0.2',
-#                        'LivingDNA',
-                        'MyHeritage v1',
-                        ]
+####################################################################################
+####################################################################################
 
 
-##########################################
-##########################################
-
-
-
-##########################################
-
-# Input/output file directory
-inputFileDir = './input/'
-outputFileDir = './output/'
-# Output File name and file ending
-outputFileName = 'DNASuperKit'
-outputFileEnding = '.csv'
-
-# Input filetypes
-fileEndings = (
-    'txt',
-    'csv'
-)
 
 ##########################################
 
@@ -145,6 +138,11 @@ fileEndings = (
 # Alleles = paired
 # Nocalls = --
 
+
+####################################################################################
+# Normalization tables
+####################################################################################
+
 # Sorting order for chromosome column
 chromosomePriorityList = [ '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', '13', '14', '15', '16', '17', '18', '19', '20', '21', '22', 'X', 'Y', 'XY', 'MT' ]
 
@@ -156,7 +154,7 @@ chromosomePriorityList = [ '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10
 # ['A' 'C' 'G' 'T']
 # ['--']
 
-# Table for normalizing genotype
+# Table for normalizing genotypes
 genotypeTable = {
     '00': '--',
     'CA': 'AC',
@@ -168,24 +166,43 @@ genotypeTable = {
 
     'ID': 'DI',
 
-#    'A': 'AA',
-#    'T': 'TT',
-#    'D': 'DD',
-#    'C': 'CC',
-
     '-G': 'G',
     '-C': 'C',
     '-A': 'A',
     '-T': 'T'
 }
 
-# Table for normalizing genotype on X Y MT
-genotypeTableXYMT = {
+# Table for normalizing genotype on X and Y chromosome (Males)
+genotypeTableXYMales = {
     'GG': 'G',
     'CC': 'C',
     'AA': 'A',
-    'TT': 'T'
+    'TT': 'T',
+
+    'DD': 'D',
+    'II': 'I',
+
+    'AC': '--',
+    'GT': '--',
+    'CG': '--',
+    'AT': '--',
+    'CT': '--',
+    'AG': '--'
 }
+
+
+####################################################################################
+####################################################################################
+
+
+
+# Table for normalizing genotype on X Y MT
+#genotypeTableXYMT = {
+#    'GG': 'G',
+#    'CC': 'C',
+#    'AA': 'A',
+#    'TT': 'T'
+#}
 
 # Nocall list
 noCalls = [ 'DD', 'II', 'DI', 'D', 'I', '--' ]
@@ -194,16 +211,23 @@ noCallsHyphen = [ 'DD', 'II', 'DI', 'D', 'I' ]
 ##########################################
 
 
+####################################################################################
+# Output format tables
+####################################################################################
+
+
 ##########################################
-# Company tables
-# 
+# 23AndMe
 
-# ====================
 chromosomePriorityList23andMe = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', '13', '14', '15', '16', '17', '18', '19', '20', '21', '22', 'X', 'Y', 'MT' ]
-# ====================
 
 
-# ====================
+##########################################
+
+
+##########################################
+# FamilyTreeDNA
+
 # Sorting order for FamilyTreeDNA chromosome column
 chromosomePriorityListFamilyTreeDNA = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', '13', '14', '15', '16', '17', '18', '19', '20', '21', '22', 'XY', 'MT', 'X' ]
 
@@ -214,10 +238,14 @@ genotypeTableFamilyTreeDNA = {
     'A': '-A',
     'T': '-T'
 }
-# ====================
 
 
-# ====================
+##########################################
+
+
+##########################################
+# MyHeritage
+
 # Sorting order for MyHeritage v1 chromosome column
 chromosomePriorityListMyHeritage = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', '13', '14', '15', '16', '17', '18', '19', '20', '21', '22', 'X', 'Y' ]
 
@@ -228,17 +256,24 @@ genotypeTableMyHeritage = {
     'A': 'AA',
     'T': 'TT'
 }
-# ====================
 
 
-# ====================
+##########################################
 
-# ====================
+
+##########################################
+# LivingDNA
+
 # Sorting order for LivingDNA chromosome column
 chromosomePriorityListLivingDNA = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', '13', '14', '15', '16', '17', '18', '19', '20', '21', '22', 'X' ]
-# ====================
 
-# ====================
+
+##########################################
+
+
+##########################################
+# AncestryDNA
+
 # Sorting order for ancestry chromosome column
 chromosomePriorityListAncestry =  [ '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', '13', '14', '15', '16', '17', '18', '19', '20', '21', '22', '23', '24', '26' ]
 
@@ -261,16 +296,20 @@ genotypeTableAncestry = {
     '--': '00'
 }
 
-# ====================
 
 ##########################################
 
+
+
+####################################################################################
+# FUNCTIONS
+####################################################################################
 
 ##########################################
 # Find all files in directory with
 # the desired file ending from 'fileEndings'
 
-def findDNAFiles( inputFiles ) -> List:
+def findDNAFiles( fileEndings ) -> List:
     # Get script directory
     scriptDir = os.path.dirname( os.path.realpath( __file__ ) )
     # Add inputFileDir to directory to get subdir
@@ -281,7 +320,7 @@ def findDNAFiles( inputFiles ) -> List:
     fileList = [ f for f in os.listdir( path=scriptDir ) ]
     result = []
     for f in fileList:
-        if f.lower().endswith( inputFiles ):
+        if f.lower().endswith( fileEndings ):
             result.append( inputFileDir + f )
     return result
 
@@ -292,31 +331,27 @@ def findDNAFiles( inputFiles ) -> List:
 # Pre-screen file to determine DNA company
 #
 
-def prescreenDNAFile( inputDNAFile ):
+def prescreenDNAFile( file ):
 
     ##############################
     #  n = number of comment lines.
-    #       23andMe = 19
-    #       Living DNA = 11
-    #       MyHeritageBef1March2019 = 6
-    #       FamilyTree DNA = 0
-    #       ancestry = 18
+    #       23andMe v5 = 19
+    #       Living DNA v1.0.2 = 11
+    #       MyHeritage v1 = 6
+    #       FamilyTreeDNA v3 = 0
+    #       AncestryDNA v2 = 18
 
     #n = 0
     n = 1
     mystring = ' '
 
     # count lines in the file
-    with open( inputDNAFile, 'r') as fp:
+    with open( file, 'r') as fp:
         for n, line in enumerate(fp):
             pass
 
-    # cutoff at 19 lines
-#    if n > 19:
-#        n = 19
-
     # look at the first n lines
-    with open( inputDNAFile ) as myfile:
+    with open( file ) as myfile:
         head = [ next( myfile ) for x in range( n ) ]
 
     # put all lines in a string
@@ -333,16 +368,11 @@ def prescreenDNAFile( inputDNAFile ):
 # company the file originates from
 #
 
-def determineDNACompany(text, filename):
-
-    #print( f )
-    #print( t )
+def determineDNACompany( text: str, filename: str ) -> str:
 
     company_patterns = {
         '23andMe v5': r'_v5_Full_',
-#        '23andMe': r'23andme',
         'LivingDNA v1.0.2': r'# living dna customer genotype data download file version: 1\.0\.2',
-#        'LivingDNA': r'living dna',
         'MyHeritage v1': r'# myheritage dna raw data\.',
         'FamilyTreeDNA v3': r'rsid,chromosome,position,result',
         'AncestryDNA v2': r'ancestrydna'
@@ -356,105 +386,95 @@ def determineDNACompany(text, filename):
             return company
 
     # 23andMe v5
-    if '_v5_Full_' in filename:
-        company = '23andMe v5'
-        return company
+    if '_v5_full_' in filename.lower():
+        return '23andMe v5'
 
     return 'unknown'
 
-#def determineDNACompany( t, f ):
-#
-#    #print( f )
-#    #print( t )
-#
-#    # 23andMe v5
-#    if '_v5_Full_' in f:
-#        company = '23andMe v5'
-#
-#    # 23andMe
-#    elif '23andMe' in t:
-#        company = '23andMe'
-#
-#    # Living DNA v1.0.2
-#    elif '# Living DNA customer genotype data download file version: 1.0.2' in t:
-#        company = 'LivingDNA v1.0.2'
-#
-#    # Living DNA
-#    elif 'Living DNA' in t:
-#        company = 'LivingDNA'
-#
-#    # MyHeritage v1
-##    elif 'MyHeritage' in t:
-#    elif '# MyHeritage DNA raw data.' in t:
-#        company = 'MyHeritage v1'
-#
-#    # FamilyTreeDNA v3
-#    elif 'RSID,CHROMOSOME,POSITION,RESULT' in t:
-#        company = 'FamilyTreeDNA v3'
-#
-#    # AncestryDNA v2
-#    elif 'AncestryDNA' in t:
-#        company = 'AncestryDNA v2'
-#
-#    # Unknown company
-#    else:
-#        company = 'unknown'
-#
-#    return company
 
 ##########################################
 
 
 ##########################################
-# Prepare DNA file differently depending
-# on which DNA testing company the file
-# comes from
+# Load DNA file into pandas dataframe
 #
 
-def prepareDNAFile( f, c ):
+def loadDNAFile( file, company: str ) -> pd.DataFrame:
 
-#    print ( c )
-    # 23andMe and Living DNA
-    if c == '23andMe v5' or c == 'LivingDNA v1.0.2':
-        # Load input file into pandas and create the proper columns
-        df = pd.read_csv( f, dtype=str, sep='\t', comment='#', index_col=False, header=None, engine='python' )
-
-    # MyHeritage (Before 1 March, 2019) and FamilyTreeDNA v3
-    elif c == 'MyHeritage v1' or c == 'FamilyTreeDNA v3':
-        # Load input file into pandas and create the proper columns
-        df = pd.read_csv( f, dtype=str, comment='#' )
-
-    # AncestryDNA v2
-    elif c == 'AncestryDNA v2':
-        # Load input file into pandas and create the proper columns
-        df = pd.read_csv( f, dtype=str, sep='\t', comment='#' )
-
-        # Normalize chromosome order with custom chromosomeTable
-        df[ 'chromosome' ].replace( to_replace=chromosomeTableAncestryIn, inplace=True )
-
-        # Merge allele1 and allele2 to genotype column
-        df[ 'genotype' ] = df[ 'allele1' ] + df[ 'allele2' ]
-        del df[ 'allele1' ]
-        del df[ 'allele2' ]
-
-    # Normalize columnnames
-    df.columns = [ 'rsid', 'chromosome', 'position', 'genotype' ]
-
-    # and add company column
-    df[ 'company' ] = c
-
-# DEBUG ?
-#    print ( c )
-#    print ( df )
-    print()
-    print( 'Unique chromosomes:' )
-    print( df.chromosome.unique() )
-    print()
-    print( 'Unique genotypes:')
-    print( df.genotype.unique() )
-    print()
+    # Create a dictionary with the file reading options for each company
+    company_options = {
+        '23andMe v5': {'dtype': str, 'sep': '\t', 'comment': '#', 'index_col': False, 'header': None, 'engine': 'python'},
+        'LivingDNA v1.0.2': {'dtype': str, 'sep': '\t', 'comment': '#', 'index_col': False, 'header': None, 'engine': 'python'},
+        'MyHeritage v1': {'dtype': str, 'comment': '#'},
+        'FamilyTreeDNA v3': {'dtype': str, 'comment': '#'},
+        'AncestryDNA v2': {'dtype': str, 'sep': '\t', 'comment': '#'}
+    }
+    
+    # Check if the company name is valid
+    if company not in company_options:
+        raise ValueError(f"Invalid company name: {company}")
+    
+    # Load input file into pandas using the company-specific options
+    df = pd.read_csv(file, **company_options[company])
 
     return df
+
+
+##########################################
+
+
+##########################################
+# Normalize the  DNA file
+#
+
+def normalizeDNAFile( df: pd.DataFrame, company: str ) -> pd.DataFrame:
+
+    # AncestryDNA v2
+    if company == 'AncestryDNA v2':
+        # Merge allele1 and allele2 to genotype column
+        df[ 'genotype' ] = df[ 'allele1' ] + df[ 'allele2' ]
+        df = df.drop( [ 'allele1', 'allele2' ], axis=1 )
+
+    # Normalize column names
+    df.columns = [ 'rsid', 'chromosome', 'position', 'genotype' ]
+
+    # Add company column to kit
+    df[ 'company' ] = company
+
+    # Normalize chromosome order with custom chromosomeTable
+    df[ 'chromosome' ] = df[ 'chromosome' ].replace( to_replace=chromosomeTableAncestryIn )
+
+    # Normalize genotype with custom genotypeTable
+    df[ 'genotype' ] = df[ 'genotype' ].replace( to_replace=genotypeTable )
+
+    df = df.astype( {'rsid': str, 'chromosome': str, 'position': int, 'genotype': str, 'company': str} )
+
+
+    return df
+
+
+##########################################
+
+
+##########################################
+# Guesses the gender based on the genotype data in chromosome X/23.
+#
+
+def guessGenderFromDataframe( df: pd.DataFrame, company: str ) -> str:
+
+    # Filter the DataFrame to include only chromosome X/23
+    df_chr23 = df[df['chromosome'] == 'X']
+    
+    # Count the number of heterozygous SNPs on chromosome 23
+    hetero_count = df_chr23['genotype'].str.contains('/').sum()
+    
+    # Guess the gender based on the proportion of homozygous SNPs on chromosome 23
+    if hetero_count / len(df_chr23) < 0.05:
+        gender = 'Male'
+    else:
+        gender = 'Female'
+        
+    return gender
 
 
 ##########################################
@@ -464,37 +484,31 @@ def prepareDNAFile( f, c ):
 # Clean file and normalize chromosome
 # and genotype
 
-def cleanDNAFile( df, c):
+def cleanDNAFile( df: pd.DataFrame, company: str, gender: str ) -> pd.DataFrame:
 
-    # Normalize genotype with custom genotypeTable
-    df[ 'genotype' ].replace( to_replace=genotypeTable, inplace=True )
+    # IF position contains genotype larger than two alleles, replace with nocall '--' (clean dirty information from LivingDNA and more?)
+    df.loc[ df[ 'genotype' ].str.len() > 2, 'genotype' ] = '--'
 
-    # Normalize chromosome order with custom chromosomeTable
-    #df[ 'chromosome' ].replace( to_replace=chromosomeTable, inplace=True )
-
-    #Only true for male on X and Y?
-    # Normalize genotypes on X, Y & MT where double char becomes single, eg. AA = A
-    rep = df[ 'genotype' ].replace( genotypeTableXYMT )
-    df[ 'genotype' ] = df[ 'genotype' ].mask( df[ 'chromosome' ].isin( [ 'X','Y','XY','MT' ] ), rep )
-
-    # Drop nocalls (-, --, 00, DD, II, I, D, DI)
-    #indexNames = df[ df[ 'genotype' ] == '--' ].index
-    #df.drop( indexNames, inplace = True )
-
-    # Convert position to numerical
-    df[ 'position' ] = pd.to_numeric( df[ 'position' ] )
-
-    # FamilyTreeDNA v3, additional preparations
-    if c == 'FamilyTreeDNA v3':
+    # FamilyTreeDNA v3, additional step to keep chromosome 0
+    if company == 'FamilyTreeDNA v3':
         # Drop chromosome 0 rows, likely nocalls or incomplete information
         df = df.drop( df[ df[ 'chromosome' ] == '0' ].index )
 
-    # IF position contains genotype larger than two aleles, drop row (clean dirty information from LivingDNA and more?)
-    df = df.drop( df[ df['genotype'].str.len() > 2 ].index )
-
     return df
 
+
 ##########################################
+
+
+
+####################################################################################
+####################################################################################
+
+
+
+
+
+
 
 
 ##########################################
@@ -502,7 +516,8 @@ def cleanDNAFile( df, c):
 # only genotype according to priority list
 # in companyPriorityList
 
-def dropDuplicatesDNAFile( df ):
+#def dropDuplicatesDNAFile( df ):
+def dropDuplicatesDNAFile( df: pd.DataFrame ) -> pd.DataFrame:
 
     # First drop genotype duplicates in the same position
     #df.drop_duplicates( subset=[ 'chromosome','position', 'genotype'], keep='first', inplace=True )
@@ -530,7 +545,8 @@ def dropDuplicatesDNAFile( df ):
 # Sort file based on custom chromosome order,
 # position and custom genotype order
 
-def sortDNAFile( df ):
+#def sortDNAFile( df ):
+def sortDNAFile( df: pd.DataFrame ) -> pd.DataFrame:
     # Custom sorting order on chromosome and company column. Modify at top of file.
     df[ 'chromosome' ] = pd.Categorical( df[ 'chromosome' ], chromosomePriorityList )
     df[ 'company' ] = pd.Categorical( df[ 'company' ], companyPriorityList )
@@ -547,10 +563,11 @@ def sortDNAFile( df ):
 # prepare database for company specific
 # output format
 
-def formatDNAFile( df, c ):
+#def formatDNAFile( df, company ):
+def formatDNAFile( df: pd.DataFrame, company: str ) -> pd.DataFrame:
 
     # Extra operations for 23andMe format
-    if c == '23andMe v5':
+    if company == '23andMe v5':
         # Drop chromosomes that arent used
         df = df.drop( df[ df[ 'chromosome' ] == 'XY' ].index )
 
@@ -561,7 +578,7 @@ def formatDNAFile( df, c ):
 
 
     # Extra operations for FamilyTreeDNA v3 format
-    if c == 'FamilyTreeDNA v3':
+    if company == 'FamilyTreeDNA v3':
         # Drop chromosomes that arent used
         df = df.drop( df[ df[ 'chromosome' ] == 'Y' ].index )
 
@@ -583,7 +600,7 @@ def formatDNAFile( df, c ):
 
 
     # Extra operations for MyHeritage (Before 1 March, 2019) format
-    if c == 'MyHeritage v1':
+    if company == 'MyHeritage v1':
         # Drop chromosomes that arent used
         df = df.drop( df[ df[ 'chromosome' ] == 'XY' ].index )
         df = df.drop( df[ df[ 'chromosome' ] == 'MT' ].index )
@@ -603,7 +620,7 @@ def formatDNAFile( df, c ):
 
 
     # Extra operations for Living DNA format
-    if c == 'LivingDNA v1.0.2':
+    if company == 'LivingDNA v1.0.2':
         # Drop chromosomes that arent used
         df = df.drop( df[ df[ 'chromosome' ] == 'XY' ].index )
         df = df.drop( df[ df[ 'chromosome' ] == 'MT' ].index )
@@ -620,7 +637,7 @@ def formatDNAFile( df, c ):
         df.sort_values( [ 'chromosome', 'position' ], ascending=( True, True ), inplace=True )
 
     # Extra operations for SuperKit format
-    if c == 'SuperKit':
+    if company == 'SuperKit':
         # Concat dataframe with previously dropped chromosome 0
         df = pd.concat( [df, chromosomeZero] , sort=False, ignore_index=True)
 
@@ -629,17 +646,19 @@ def formatDNAFile( df, c ):
         # Sort frame based on custom sorting orders and position
         df.sort_values( [ 'chromosome', 'position' ], ascending=( True, True ), inplace=True )
 
+
+
     # 23andMe and Living DNA
-    if c == '23andMe v5' or c == 'LivingDNA v1.0.2':
+    if company == '23andMe v5' or company == 'LivingDNA v1.0.2':
         df.rename( columns = { 'rsid':'# rsid' }, inplace = True )
 
     # FamilyTreeDNA v3 and MyHeritage v1
-    elif c == 'FamilyTreeDNA v3' or c == 'MyHeritage v1':
+    elif company == 'FamilyTreeDNA v3' or company == 'MyHeritage v1':
         # Change column names according to MyHeritage v1 format
         df.rename( columns = { 'rsid':'RSID', 'chromosome':'CHROMOSOME', 'position':'POSITION', 'genotype':'RESULT' }, inplace = True )
 
     # AncestryDNA v2
-    elif c == 'AncestryDNA v2':
+    elif company == 'AncestryDNA v2':
         # Normalize chromosome order with custom chromosomeTable
         df[ 'chromosome' ].replace( to_replace=chromosomeTableAncestryOut, inplace=True )
 
@@ -668,6 +687,11 @@ def formatDNAFile( df, c ):
 
 
 ####################################################################################
+####################################################################################
+
+
+
+####################################################################################
 # MAIN LOOP
 ####################################################################################
 
@@ -689,31 +713,43 @@ if not rawDNAFiles:
 resultFiles = []
 chromosomeZero = pd.DataFrame()
 
-for f in rawDNAFiles:
+for file in rawDNAFiles:
     # Screening file to determine company
-    fileScreening = prescreenDNAFile( f )
+    fileScreening = prescreenDNAFile( file )
 
     # Get DNA company from file comment
-    company = determineDNACompany( fileScreening , f)
-#    print( company )
+    company = determineDNACompany( fileScreening , file)
 
     if company != 'unknown':
-        print( 'Processing file:')
-        print( f.replace( inputFileDir, '' ) )
-        print( 'Which contains data from ' + company )
-        
-        # Normalize and clean DNA file in preparation for concatenation
-        df = prepareDNAFile( f, company )
+        # Load the DNA file into pandas and get columns
+        df = loadDNAFile( file, company )
+        # Normalize the DNA file
+        df = normalizeDNAFile( df, company )
+        # Guess gender in kit
+        guessGender = guessGenderFromDataframe( df, company )
+        print( f"Kit tester seems to be {guessGender}")
 
-        # Handle FamilyTreeDNA v3 a bit differently
-        # delete all data in chromosome 0 (nocalls? bad data?)
+        # Normalize genotypes on X and Y (MT?) chromosomes where heterozygous calls are defined as nocalls '--' (as males only have one X and one Y), and the rest are changed to a single letter
+        if guessGender == 'Male':
+            print( f" {guessGender} Kit ")
+            rep = df[ 'genotype' ].replace( genotypeTableXYMales )
+            df[ 'genotype' ] = df[ 'genotype' ].mask( df[ 'chromosome' ].isin( [ 'X','Y', 'MT' ] ), rep )
+
+        # Workaround to keep Chromosome 0 (nocalls? bad data?)
         if company == 'FamilyTreeDNA v3':
             chromosomeZero = df.loc[ df[ 'chromosome' ] == '0' ]
             del chromosomeZero[ 'company' ]
 
         # Clean dataframe
-        df = cleanDNAFile( df, company )
-        
+        df = cleanDNAFile( df, company, guessGender )
+
+
+
+
+        print( 'Processing file:')
+        print( file.replace( inputFileDir, '' ) )
+        print( 'Which contains data from ' + company )
+
         # Append dataframe
         resultFiles.append( df )
 
@@ -723,7 +759,7 @@ for f in rawDNAFiles:
 
     # If file is unknown
     else:
-        print( 'File ' + f.replace( inputFileDir, '' ) + ' is unknown' )
+        print( 'File ' + file.replace( inputFileDir, '' ) + ' is unknown' )
         print()
 
 # Check if there are objects in DNASuperKit
