@@ -309,7 +309,7 @@ genotypeTableAncestry = {
 # Find all files in directory with
 # the desired file ending from 'fileEndings'
 
-def findDNAFiles( fileEndings ) -> List:
+def findDNAFiles( fileEndings: List ) -> List:
     # Get script directory
     scriptDir = os.path.dirname( os.path.realpath( __file__ ) )
     # Add inputFileDir to directory to get subdir
@@ -331,7 +331,7 @@ def findDNAFiles( fileEndings ) -> List:
 # Pre-screen file to determine DNA company
 #
 
-def prescreenDNAFile( file ):
+def prescreenDNAFile( inputDNAFile: str ) -> str:
 
     ##############################
     #  n = number of comment lines.
@@ -346,12 +346,12 @@ def prescreenDNAFile( file ):
     mystring = ' '
 
     # count lines in the file
-    with open( file, 'r') as fp:
+    with open( inputDNAFile, 'r') as fp:
         for n, line in enumerate(fp):
             pass
 
     # look at the first n lines
-    with open( file ) as myfile:
+    with open( inputDNAFile ) as myfile:
         head = [ next( myfile ) for x in range( n ) ]
 
     # put all lines in a string
@@ -399,7 +399,7 @@ def determineDNACompany( text: str, filename: str ) -> str:
 # Load DNA file into pandas dataframe
 #
 
-def loadDNAFile( file, company: str ) -> pd.DataFrame:
+def loadDNAFile( file: str, company: str ) -> pd.DataFrame:
 
     # Create a dictionary with the file reading options for each company
     company_options = {
@@ -500,9 +500,28 @@ def cleanDNAFile( df: pd.DataFrame, company: str, gender: str ) -> pd.DataFrame:
 ##########################################
 
 
+##########################################
+# Sort file based on custom chromosome order,
+# position and custom genotype order
+
+def sortDNAFile( df: pd.DataFrame ) -> pd.DataFrame:
+    # Custom sorting order on chromosome and company column. Modify at top of file.
+    df[ 'chromosome' ] = pd.Categorical( df[ 'chromosome' ], chromosomePriorityList )
+    df[ 'company' ] = pd.Categorical( df[ 'company' ], companyPriorityList )
+
+    # Sort dataframe based on custom sorting orders and position
+    df.sort_values( [ 'chromosome', 'position', 'company' ], ascending=( True, True, True ), inplace=True )
+
+    return df
+
+
+##########################################
+
 
 ####################################################################################
 ####################################################################################
+
+
 
 
 
@@ -533,6 +552,13 @@ def dropDuplicatesDNAFile( df: pd.DataFrame ) -> pd.DataFrame:
     # perform dropping
     df.loc[ m|~m2 ]
 
+
+
+## THE NEXT PART SHOULD HAVE TWO PATHS
+## 1, Do a majority vote if there are 3 or more on the same cell
+##    If all three are different, or a are less than 3. Drop according to priority list.
+
+
     # If genotype is different on the same position, then only keep the genotype from the company according to the order in companyPriorityList
     df.drop_duplicates( subset=[ 'chromosome','position' ], keep='first', inplace=True )
 
@@ -540,23 +566,6 @@ def dropDuplicatesDNAFile( df: pd.DataFrame ) -> pd.DataFrame:
 
 ##########################################
 
-
-##########################################
-# Sort file based on custom chromosome order,
-# position and custom genotype order
-
-#def sortDNAFile( df ):
-def sortDNAFile( df: pd.DataFrame ) -> pd.DataFrame:
-    # Custom sorting order on chromosome and company column. Modify at top of file.
-    df[ 'chromosome' ] = pd.Categorical( df[ 'chromosome' ], chromosomePriorityList )
-    df[ 'company' ] = pd.Categorical( df[ 'company' ], companyPriorityList )
-
-    # Sort frame based on custom sorting orders and position
-    df.sort_values( [ 'chromosome', 'position', 'company' ], ascending=( True, True, True ), inplace=True )
-
-    return df
-
-##########################################
 
 
 ##########################################
@@ -695,13 +704,12 @@ def formatDNAFile( df: pd.DataFrame, company: str ) -> pd.DataFrame:
 # MAIN LOOP
 ####################################################################################
 
-print()
-
 # Find files in dir with the correct file endings
 rawDNAFiles = findDNAFiles( fileEndings )
 
 # Check if there are any files in the directory
 if not rawDNAFiles:
+    print()
     print ("There is no files in the directory")
     exit()
 
@@ -712,8 +720,17 @@ if not rawDNAFiles:
 # empty array to put results in
 resultFiles = []
 chromosomeZero = pd.DataFrame()
+DNACount = 0
+
+
+##########################################
+# Look for files and process them
+
 
 for file in rawDNAFiles:
+
+#    print( type(file) )
+
     # Screening file to determine company
     fileScreening = prescreenDNAFile( file )
 
@@ -721,17 +738,19 @@ for file in rawDNAFiles:
     company = determineDNACompany( fileScreening , file)
 
     if company != 'unknown':
+
+        DNACount = DNACount + 1
+
         # Load the DNA file into pandas and get columns
         df = loadDNAFile( file, company )
         # Normalize the DNA file
         df = normalizeDNAFile( df, company )
         # Guess gender in kit
         guessGender = guessGenderFromDataframe( df, company )
-        print( f"Kit tester seems to be {guessGender}")
 
-        # Normalize genotypes on X and Y (MT?) chromosomes where heterozygous calls are defined as nocalls '--' (as males only have one X and one Y), and the rest are changed to a single letter
+        # Normalize genotypes on X and Y (MT?) chromosomes where heterozygous calls are defined as nocalls '--'
+        # (as males only have one X and one Y), and the rest are changed to a single letter
         if guessGender == 'Male':
-            print( f" {guessGender} Kit ")
             rep = df[ 'genotype' ].replace( genotypeTableXYMales )
             df[ 'genotype' ] = df[ 'genotype' ].mask( df[ 'chromosome' ].isin( [ 'X','Y', 'MT' ] ), rep )
 
@@ -743,24 +762,36 @@ for file in rawDNAFiles:
         # Clean dataframe
         df = cleanDNAFile( df, company, guessGender )
 
-
-
-
-        print( 'Processing file:')
-        print( file.replace( inputFileDir, '' ) )
-        print( 'Which contains data from ' + company )
-
-        # Append dataframe
+        # Concatenate DNA data
         resultFiles.append( df )
 
-        # Let user know processing is completed successfully
-        print( 'Done!' )
+        # Presenting results
+        print()
+        print( '######################################################################')
+        print( "#")
+        print( f"# Testcompany:            {company}" )
+        print( "#" )
+        print( f"# File:                   {file.replace( inputFileDir, '' )}")
+        print( f"# SNPs tested in kit:     {len(df)}")
+        print( f"# Assumed gender in kit:  {guessGender}" )
+        print( "#")
+        print( '######################################################################')
+        print()
+        print( f"Chromosomes: {df.chromosome.unique().tolist()}" )
         print()
 
     # If file is unknown
     else:
-        print( 'File ' + file.replace( inputFileDir, '' ) + ' is unknown' )
         print()
+        print( '######################################################################')
+        print( "#")
+        print( f"# Testcompany:            {company}" )
+        print( "#" )
+        print( f"# File:                   {file.replace( inputFileDir, '' )}")
+        print( "#")
+        print( '######################################################################')
+        print()
+
 
 # Check if there are objects in DNASuperKit
 # if not, then quit script
@@ -769,26 +800,41 @@ if not resultFiles:
 
     exit()
 
-########################
+
+##########################################
+##########################################
 
 
 ########################
 # Concatenate and remove duplicates
 
 print()
-print( 'Processing results' )
+print( '######################################################################' )
+print( "#" )
+print( "# Concatenating files, sorting list and dropping duplicates" )
+print( "#" )
+print( '######################################################################' )
+
+print()
+print( f"# Concatenating {DNACount} DNA files" )
 print()
 
 # Concatenate all DNA files into one list
 DNASuperKit = pd.concat(resultFiles, sort=False, ignore_index=True)
-
+print( "DONE!" )
+print()
 
 print()
-print( 'Sorting results' )
+print( "Sorting resulting dataframe" )
 print()
 
 # Sort DNA according to order provided in customization
 DNASuperKit = sortDNAFile( DNASuperKit )
+print( "DONE!" )
+print()
+
+
+
 
 
 print()
@@ -797,17 +843,19 @@ print()
 
 # Drop duplicates
 DNASuperKit = dropDuplicatesDNAFile( DNASuperKit )
+print( "DONE!" )
+print()
 
 
 # Information about the results
 print()
 print( 'Unique chromosomes:' )
-print( DNASuperKit.chromosome.unique() )
+print( DNASuperKit.chromosome.unique().tolist() )
 print()
 print( 'Unique genotypes:')
-print( DNASuperKit.genotype.unique() )
+print( DNASuperKit.genotype.unique().tolist() )
 print()
-print( 'Total count for each company:' )
+print( 'Total SNP count included in superkit for each company:' )
 for f in companyPriorityList:
     print( f + ': ' + DNASuperKit['company'].value_counts()[f].astype(str))
 print()
@@ -819,29 +867,41 @@ del DNASuperKit[ 'company' ]
 
 
 ########################
-#Format .csv to a specific company format
+#Format dataframe to a specific company format
 
 DNASuperKit = formatDNAFile( DNASuperKit, outputFormat )
 
-if outputFormat == 'SuperKit' or outputFormat == '23andMe v5' or outputFormat == 'LivingDNA v1.0.2' or outputFormat == 'AncestryDNA v2':
-    outputFileEnding = '.txt'
-    print( 'Correcting data to correspond with ' + outputFormat + ' format and saving to ' + outputFileEnding )
-    DNASuperKit.to_csv( outputFileDir + outputFileName + '-' + outputFormat + outputFileEnding, sep='\t', index=None )
+# Line terminators:
+# \n = LF (Linux), \r\n = CRLF (Windows)
+formats = {
+    '23andMe v5': { 'sep': '\t', 'encoding': 'ascii', 'lineterminator': '\r\n' },
+    'AncestryDNA v2': { 'sep': '\t', 'encoding': 'ascii', 'lineterminator': '\r\n' },
+    'FamilyTreeDNA v3': { 'sep': ',', 'encoding': 'ascii', 'lineterminator': '\n' },
+    'LivingDNA v1.0.2': { 'sep': '\t', 'encoding': 'ascii', 'lineterminator': '\n' },
+    'MyHeritage v1': { 'sep': ',', 'encoding': 'ascii', 'lineterminator': '\n', 'quoting': 2 },
+    'SuperKit': { 'sep': '\t', 'encoding': 'ascii', 'lineterminator': '\r\n' }
+}
 
-elif outputFormat == 'FamilyTreeDNA v3' or outputFormat == 'MyHeritage v1':
-    outputFileEnding = '.csv'
-    print( 'Correcting data to correspond with ' + outputFormat + ' format and saving to ' + outputFileEnding )
+if outputFormat not in formats:
+    raise ValueError(f"Unsupported format: {outputFormat}")
 
-    if outputFormat == 'MyHeritage v1':
-        DNASuperKit.to_csv( outputFileDir + outputFileName + '-' + outputFormat + outputFileEnding, index=None, quoting=2 )
+if outputFormat in ['AncestryDNA v2', 'LivingDNA v1.0.2', '23andMe v5', 'SuperKit']:
+    ext = 'txt'
+else:
+    ext = 'csv'
 
-    else:
-        DNASuperKit.to_csv( outputFileDir + outputFileName + '-' + outputFormat + outputFileEnding, index=None )
+tmpFileName = f"{outputFileDir}{outputFileName}-{outputFormat}.{ext}"
 
-# Success!   
+print(f'Correcting data to correspond with {outputFormat} format.')
+DNASuperKit.to_csv(tmpFileName, index=None, **formats[outputFormat])
+
+
+
 print()
 print( 'DNA SuperKit successfully created!' )
 print()
+
+
 
 ####################################################################################
 # EOF #

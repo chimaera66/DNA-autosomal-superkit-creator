@@ -36,7 +36,7 @@ fileEndings = (
 # Find all files in directory with
 # the desired file ending from 'fileEndings'
 
-def findDNAFiles( fileEndings ) -> List:
+def findDNAFiles( fileEndings: List ) -> List:
     # Get script directory
     scriptDir = os.path.dirname( os.path.realpath( __file__ ) )
     # Add inputFileDir to directory to get subdir
@@ -58,7 +58,7 @@ def findDNAFiles( fileEndings ) -> List:
 # Pre-screen file to determine DNA company
 #
 
-def prescreenDNAFile( inputDNAFile ):
+def prescreenDNAFile( inputDNAFile: str ) -> str:
 
     ##############################
     #  n = number of comment lines.
@@ -126,7 +126,7 @@ def determineDNACompany(text: str, filename: str) -> str:
 # Load DNA file into pandas dataframe
 #
 
-def loadDNAFile( file, company: str ) -> pd.DataFrame:
+def loadDNAFile( file: str, company: str ) -> pd.DataFrame:
 
     # Create a dictionary with the file reading options for each company
     company_options = {
