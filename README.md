@@ -89,6 +89,7 @@ It will present the following data:
 - [ ] Improve the genotype count per company produced in the end
 - [ ] Improve each ouput format to more closely be like the originals
 - [ ] Add algorithm to decide which duplicate is more correct by "majority count"
+- [ ] Add option to trim chromosome positions to fit within each companys SNP range for each chromosome
 
 ### DNA File Analyzer
 - [X] Add information about what SNP span on each chromosome each company tests
