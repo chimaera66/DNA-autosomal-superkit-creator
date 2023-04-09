@@ -37,7 +37,7 @@ The data are then saved to the `./output/` folder for you to use.
 4. If the kit is determined to be of male origin, then it will change heterozygous calls to nocalls.
 5. The file will be somewhat cleaned by removing genotypes larger than two alleles and move calls on position 0 to "junk" chromosome 0.
 6. Then it will concatenate the dna files and sort according a predetermined order.
-7. Lastly it will format the superkit to the desired format and save it to ./output/
+7. Lastly it will format the superkit to the desired format and save it to `./output/`
 
 
 
@@ -45,9 +45,9 @@ The data are then saved to the `./output/` folder for you to use.
 ## How to use create_superkit.py:
 This script will combine kits from compatible versions described above to a superkit
 
-1. Put your raw autosomal DNA files into the ./input/ folder and make sure they are unpacked (in .txt or .csv format)
+1. Put your raw autosomal DNA files into the `./input/` folder and make sure they are unpacked (in `.txt` or `.csv` format)
 
-2. Open create_superkit.py with a text editor and change your prefered options under "Customizations"
+2. Open `create_superkit.py` with a text editor and change your prefered options under `Customizations`
 Currently, the only things you can change are the following:
 
     * Output format
@@ -60,9 +60,9 @@ Currently, the only things you can change are the following:
             - LivingDNA v1.0.2 (since 10/2018)
 
     * Company priority
-        - Decides which company genome that are preferred if several companies has called the same position in the same chromosome (calls get priority over nocalls by default
+        - Decides which company genome that are preferred if several companies has called the same position in the same chromosome (calls get priority over nocalls)
 
-3. run python create_superkit.py and the program will parse the DNA files in the default directory ./input/ and merge them together to a "SuperKit"
+3. run python `create_superkit.py` and the program will parse the DNA files in the default directory `./input/` and merge them together to a "SuperKit"
 
 
 ## How to use analyse_dna_file.py:
@@ -74,9 +74,9 @@ It will present the following data:
 * Unique genotypes
 * SNP ranges
 
-1. Put your raw autosomal DNA files into the ./input/ folder and make sure they are unpacked (in .txt or .csv format)
+1. Put your raw autosomal DNA files into the `./input/` folder and make sure they are unpacked (in `.txt` or `.csv` format)
 
-2. run python analyse_dna_file.py and the program will parse the DNA files in the default directory ./input/ and merge them together to a "SuperKit"
+2. run python `analyse_dna_file.py` and the program will parse the DNA files in the default directory `./input/` and merge them together to a `SuperKit`
 
 
 ## TODO list
