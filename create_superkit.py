@@ -753,6 +753,8 @@ for file in rawDNAFiles:
 
         # Normalize genotypes on X and Y (MT?) chromosomes where heterozygous calls are defined as nocalls '--'
         # (as males only have one X and one Y), and the rest are changed to a single letter
+        #
+        # Add commandline to bypass this check to handle mutations?
         if guessGender == 'Male':
             rep = df[ 'genotype' ].replace( genotypeTableXYMales )
             df[ 'genotype' ] = df[ 'genotype' ].mask( df[ 'chromosome' ].isin( [ 'X','Y', 'MT' ] ), rep )
