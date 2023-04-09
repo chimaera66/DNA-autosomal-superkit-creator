@@ -15,7 +15,7 @@ The data are then saved to the `./output/` folder for you to use.
 
 
 
-## Currently supported companies (for both the creator and the analyser script):
+## Currently supported companies:
 * 23andMe v5 (since 08/2017)
 * Ancestry v2 (since 05/2016)
 * FamilyTreeDNA v3 (since 04/2019)
@@ -94,6 +94,3 @@ It will present the following data:
 - [X] Add information about what SNP span on each chromosome each company tests
 - [ ] Add support for the latest MyHeritage file format
 - [ ] Add support for the latest TellMeGen file format
-
-### Other
-- [X] Improve README!
