@@ -35,9 +35,9 @@ companyPriorityList = [ '23andMe v5',
                         ]
 
 # Output format
-#outputFormat = 'SuperKit'
+outputFormat = 'SuperKit'
 #outputFormat = '23andMe v5'
-outputFormat = 'AncestryDNA v2'
+#outputFormat = 'AncestryDNA v2'
 #outputFormat = 'FamilyTreeDNA v3'
 #outputFormat = 'MyHeritage v1'
 #outputFormat = 'LivingDNA v1.0.2'
