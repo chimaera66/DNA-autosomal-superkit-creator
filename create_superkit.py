@@ -36,8 +36,8 @@ companyPriorityList = [ '23andMe v5',
 
 # Output format
 #outputFormat = 'SuperKit'
-outputFormat = '23andMe v5'
-#outputFormat = 'AncestryDNA v2'
+#outputFormat = '23andMe v5'
+outputFormat = 'AncestryDNA v2'
 #outputFormat = 'FamilyTreeDNA v3'
 #outputFormat = 'MyHeritage v1'
 #outputFormat = 'LivingDNA v1.0.2'
@@ -219,7 +219,7 @@ noCallsHyphen = [ 'DD', 'II', 'DI', 'D', 'I' ]
 ##########################################
 # 23AndMe
 
-chromosomePriorityList23andMe = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', '13', '14', '15', '16', '17', '18', '19', '20', '21', '22', 'X', 'Y', 'MT' ]
+chromosomePriorityList23andMe = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', '13', '14', '15', '16', '17', '18', '19', '20', '21', '22', 'X', 'Y', 'MT' ]
 
 
 ##########################################
@@ -247,7 +247,7 @@ genotypeTableFamilyTreeDNA = {
 # MyHeritage
 
 # Sorting order for MyHeritage v1 chromosome column
-chromosomePriorityListMyHeritage = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', '13', '14', '15', '16', '17', '18', '19', '20', '21', '22', 'X', 'Y' ]
+chromosomePriorityListMyHeritage = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', '13', '14', '15', '16', '17', '18', '19', '20', '21', '22', 'X', 'Y' ]
 
 # MyHeritage v1 genotypes for Y, X, MT
 genotypeTableMyHeritage = {
@@ -275,7 +275,7 @@ chromosomePriorityListLivingDNA = ['0', '1', '2', '3', '4', '5', '6', '7', '8', 
 # AncestryDNA
 
 # Sorting order for ancestry chromosome column
-chromosomePriorityListAncestry =  [ '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', '13', '14', '15', '16', '17', '18', '19', '20', '21', '22', '23', '24', '26' ]
+chromosomePriorityListAncestry =  [ '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', '13', '14', '15', '16', '17', '18', '19', '20', '21', '22', '23', '24', '25', '26' ]
 
 # Table for normalizing chromosome names
 chromosomeTableAncestryIn = { '23': 'X',
@@ -616,6 +616,10 @@ def formatDNAFile( df: pd.DataFrame, company: str ) -> pd.DataFrame:
     # FamilyTreeDNA v3
     elif company == 'FamilyTreeDNA v3':
 
+######### ADD CHROMOSOME 0 #########
+        # Concat dataframe with previously dropped chromosome 0
+        df = pd.concat( [df, chromosomeZero] , sort=False, ignore_index=True)
+
 ######### DROP #########
         # Drop chromosomes that arent used
         df = df.drop( df[ df[ 'chromosome' ] == 'Y' ].index )
@@ -630,10 +634,6 @@ def formatDNAFile( df: pd.DataFrame, company: str ) -> pd.DataFrame:
             indexNames = df[ df[ 'genotype' ] == f ].index
             df.drop( indexNames, inplace = True )
 #        df = df[ ~df[ 'genotype' ].isin( noCallsHyphen ) ]
-
-######### ADD CHROMOSOME 0 #########
-        # Concat dataframe with previously dropped chromosome 0
-        df = pd.concat( [df, chromosomeZero] , sort=False, ignore_index=True)
 
 ######### SORTING #########
         # Custom sorting order on chromosome and company column.
