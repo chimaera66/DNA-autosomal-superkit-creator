@@ -62,7 +62,7 @@ Currently, the only things you can change are the following:
     * Company priority
         - Decides which company genome that are preferred if several companies has called the same position in the same chromosome (calls get priority over nocalls)
 
-3. run python `create_superkit.py` and the program will parse the DNA files in the default directory `./input/` and merge them together to a "SuperKit"
+3. run python `create_superkit.py` and the program will parse the DNA files in the default directory `./input/` and merge them together to a `SuperKit`
 
 
 ## How to use analyse_dna_file.py:
@@ -76,7 +76,7 @@ It will present the following data:
 
 1. Put your raw autosomal DNA files into the `./input/` folder and make sure they are unpacked (in `.txt` or `.csv` format)
 
-2. run python `analyse_dna_file.py` and the program will parse the DNA files in the default directory `./input/` and merge them together to a `SuperKit`
+2. run python `analyse_dna_file.py` and the program will parse the DNA files in the default directory `./input/`.
 
 
 ## TODO list
