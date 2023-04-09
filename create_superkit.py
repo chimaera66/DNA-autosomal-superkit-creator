@@ -35,8 +35,8 @@ companyPriorityList = [ '23andMe v5',
                         ]
 
 # Output format
-outputFormat = 'SuperKit'
-#outputFormat = '23andMe v5'
+#outputFormat = 'SuperKit'
+outputFormat = '23andMe v5'
 #outputFormat = 'AncestryDNA v2'
 #outputFormat = 'FamilyTreeDNA v3'
 #outputFormat = 'MyHeritage v1'
@@ -521,18 +521,6 @@ def sortDNAFile( df: pd.DataFrame ) -> pd.DataFrame:
 ##########################################
 
 
-####################################################################################
-####################################################################################
-
-
-
-
-
-
-
-
-
-
 ##########################################
 # Drop duplicates on genotype, keeping
 # only genotype according to priority list
@@ -570,127 +558,168 @@ def dropDuplicatesDNAFile( df: pd.DataFrame ) -> pd.DataFrame:
 ##########################################
 
 
-
 ##########################################
 # prepare database for company specific
 # output format
 
-#def formatDNAFile( df, company ):
 def formatDNAFile( df: pd.DataFrame, company: str ) -> pd.DataFrame:
 
-    # Extra operations for 23andMe format
+    # 23andMe v5
     if company == '23andMe v5':
+
+######### DROP #########
         # Drop chromosomes that arent used
+        df = df.drop( df[ df[ 'chromosome' ] == '0' ].index )
         df = df.drop( df[ df[ 'chromosome' ] == 'XY' ].index )
 
+######### SORTING #########
         # Custom sorting order on chromosome and company column.
         df[ 'chromosome' ] = pd.Categorical( df[ 'chromosome' ], chromosomePriorityList23andMe )
         # Sort frame based on custom sorting orders and position
         df.sort_values( [ 'chromosome', 'position' ], ascending=( True, True ), inplace=True )
 
-
-    # Extra operations for FamilyTreeDNA v3 format
-    if company == 'FamilyTreeDNA v3':
-        # Drop chromosomes that arent used
-        df = df.drop( df[ df[ 'chromosome' ] == 'Y' ].index )
-
-        #Replace genotypes for X, Y, MT( A = -A )
-        df[ 'genotype' ].replace( to_replace=genotypeTableFamilyTreeDNA, inplace=True )
-
-        # Drop nocalls according to noCallsHyphen
-        for f in noCallsHyphen:
-            indexNames = df[ df[ 'genotype' ] == f ].index
-            df.drop( indexNames, inplace = True )
-
-        # Concat dataframe with previously dropped chromosome 0
-        df = pd.concat( [df, chromosomeZero] , sort=False, ignore_index=True)
-
-        # Custom sorting order on chromosome and company column.
-        df[ 'chromosome' ] = pd.Categorical( df[ 'chromosome' ], chromosomePriorityListFamilyTreeDNA )
-        # Sort frame based on custom sorting orders and position
-        df.sort_values( [ 'chromosome', 'position' ], ascending=( True, True ), inplace=True )
-
-
-    # Extra operations for MyHeritage (Before 1 March, 2019) format
-    if company == 'MyHeritage v1':
-        # Drop chromosomes that arent used
-        df = df.drop( df[ df[ 'chromosome' ] == 'XY' ].index )
-        df = df.drop( df[ df[ 'chromosome' ] == 'MT' ].index )
-
-        #Replace genotypes for X, Y, MT( A = AA )
-        df[ 'genotype' ].replace( to_replace=genotypeTableMyHeritage, inplace=True )
-
-        # Drop nocalls according to noCallsHyphen
-        for f in noCallsHyphen:
-            indexNames = df[ df[ 'genotype' ] == f ].index
-            df.drop( indexNames, inplace = True )
-
-        # Custom sorting order on chromosome and company column.
-        df[ 'chromosome' ] = pd.Categorical( df[ 'chromosome' ], chromosomePriorityListMyHeritage )
-        # Sort frame based on custom sorting orders and position
-        df.sort_values( [ 'chromosome', 'position' ], ascending=( True, True ), inplace=True )
-
-
-    # Extra operations for Living DNA format
-    if company == 'LivingDNA v1.0.2':
-        # Drop chromosomes that arent used
-        df = df.drop( df[ df[ 'chromosome' ] == 'XY' ].index )
-        df = df.drop( df[ df[ 'chromosome' ] == 'MT' ].index )
-        df = df.drop( df[ df[ 'chromosome' ] == 'Y' ].index )
-        
-        # Drop nocalls according to noCalls
-        for f in noCalls:
-            indexNames = df[ df[ 'genotype' ] == f ].index
-            df.drop( indexNames, inplace = True )
-
-        # Custom sorting order on chromosome and company column.
-        df[ 'chromosome' ] = pd.Categorical( df[ 'chromosome' ], chromosomePriorityListLivingDNA )
-        # Sort frame based on custom sorting orders and position
-        df.sort_values( [ 'chromosome', 'position' ], ascending=( True, True ), inplace=True )
-
-    # Extra operations for SuperKit format
-    if company == 'SuperKit':
-        # Concat dataframe with previously dropped chromosome 0
-        df = pd.concat( [df, chromosomeZero] , sort=False, ignore_index=True)
-
-        # Custom sorting order on chromosome and company column.
-        df[ 'chromosome' ] = pd.Categorical( df[ 'chromosome' ], chromosomePriorityList )
-        # Sort frame based on custom sorting orders and position
-        df.sort_values( [ 'chromosome', 'position' ], ascending=( True, True ), inplace=True )
-
-
-
-    # 23andMe and Living DNA
-    if company == '23andMe v5' or company == 'LivingDNA v1.0.2':
+######### RENAME COLUMNS #########
+        # Rename columns
         df.rename( columns = { 'rsid':'# rsid' }, inplace = True )
 
-    # FamilyTreeDNA v3 and MyHeritage v1
-    elif company == 'FamilyTreeDNA v3' or company == 'MyHeritage v1':
-        # Change column names according to MyHeritage v1 format
-        df.rename( columns = { 'rsid':'RSID', 'chromosome':'CHROMOSOME', 'position':'POSITION', 'genotype':'RESULT' }, inplace = True )
+
 
     # AncestryDNA v2
     elif company == 'AncestryDNA v2':
+
+######### DROP #########
+        # Drop chromosomes that arent used
+        df = df.drop( df[ df[ 'chromosome' ] == '0' ].index )
+
+######### NORMALIZE #########
         # Normalize chromosome order with custom chromosomeTable
         df[ 'chromosome' ].replace( to_replace=chromosomeTableAncestryOut, inplace=True )
 
+######### SORTING #########
         # Custom sorting order on chromosome and company column. Modify at top of file.
         df[ 'chromosome' ] = pd.Categorical( df[ 'chromosome' ], chromosomePriorityListAncestry )
-
         # Sort frame based on custom sorting orders and position
         df.sort_values( [ 'chromosome', 'position', ], ascending=( True, True ), inplace=True )
 
+######### NOCALLS #########
         # Changed nocalls from -- to 00
         df[ 'genotype' ].replace( to_replace=genotypeTableAncestry, inplace=True )
 
+######### ALLELES #########
         # Split genotype into allele1 and allele2
         df[ 'allele1' ] = df[ 'genotype' ].str[ :1 ]
         df[ 'allele2' ] = df[ 'genotype' ].str[ -1: ]
         del df[ 'genotype' ]
 
-        # Not needed?
-        # Change column names according to AncestryDNA v2 format
-        #df.rename( columns = { 'rsid':'RSID', 'chromosome':'CHROMOSOME', 'position':'POSITION', 'genotype':'RESULT' }, inplace = True )
+
+
+    # FamilyTreeDNA v3
+    elif company == 'FamilyTreeDNA v3':
+
+######### DROP #########
+        # Drop chromosomes that arent used
+        df = df.drop( df[ df[ 'chromosome' ] == 'Y' ].index )
+
+######### NORMALIZE #########
+        #Replace genotypes for X, Y, MT( A = -A )
+        df[ 'genotype' ].replace( to_replace=genotypeTableFamilyTreeDNA, inplace=True )
+
+######### NOCALLS #########
+        # Drop nocalls according to noCallsHyphen
+        for f in noCallsHyphen:
+            indexNames = df[ df[ 'genotype' ] == f ].index
+            df.drop( indexNames, inplace = True )
+#        df = df[ ~df[ 'genotype' ].isin( noCallsHyphen ) ]
+
+######### ADD CHROMOSOME 0 #########
+        # Concat dataframe with previously dropped chromosome 0
+        df = pd.concat( [df, chromosomeZero] , sort=False, ignore_index=True)
+
+######### SORTING #########
+        # Custom sorting order on chromosome and company column.
+        df[ 'chromosome' ] = pd.Categorical( df[ 'chromosome' ], chromosomePriorityListFamilyTreeDNA )
+        # Sort frame based on custom sorting orders and position
+        df.sort_values( [ 'chromosome', 'position' ], ascending=( True, True ), inplace=True )
+
+######### RENAME COLUMNS #########
+        # Rename columns
+        df.rename( columns = { 'rsid':'RSID', 'chromosome':'CHROMOSOME', 'position':'POSITION', 'genotype':'RESULT' }, inplace = True )
+
+
+
+    # MyHeritage v1
+    elif company == 'MyHeritage v1':
+
+######### DROP #########
+        # Drop chromosomes that arent used
+        df = df.drop( df[ df[ 'chromosome' ] == '0' ].index )
+        df = df.drop( df[ df[ 'chromosome' ] == 'XY' ].index )
+        df = df.drop( df[ df[ 'chromosome' ] == 'MT' ].index )
+
+######### NORMALIZE #########
+        #Replace genotypes for X, Y, MT( A = AA )
+        df[ 'genotype' ].replace( to_replace=genotypeTableMyHeritage, inplace=True )
+
+######### NOCALLS #########
+        # Drop nocalls according to noCallsHyphen
+        for f in noCallsHyphen:
+            indexNames = df[ df[ 'genotype' ] == f ].index
+            df.drop( indexNames, inplace = True )
+#        df = df[ ~df[ 'genotype' ].isin( noCallsHyphen ) ]
+
+######### SORTING #########
+        # Custom sorting order on chromosome and company column.
+        df[ 'chromosome' ] = pd.Categorical( df[ 'chromosome' ], chromosomePriorityListMyHeritage )
+        # Sort frame based on custom sorting orders and position
+        df.sort_values( [ 'chromosome', 'position' ], ascending=( True, True ), inplace=True )
+
+######### RENAME COLUMNS #########
+        # Rename columns
+        df.rename( columns = { 'rsid':'RSID', 'chromosome':'CHROMOSOME', 'position':'POSITION', 'genotype':'RESULT' }, inplace = True )
+
+
+
+    # Living DNA v1.0.2
+    elif company == 'LivingDNA v1.0.2':
+
+######### DROP #########
+        # Drop chromosomes that arent used
+        df = df.drop( df[ df[ 'chromosome' ] == '0' ].index )
+        df = df.drop( df[ df[ 'chromosome' ] == 'XY' ].index )
+        df = df.drop( df[ df[ 'chromosome' ] == 'MT' ].index )
+        df = df.drop( df[ df[ 'chromosome' ] == 'Y' ].index )
+
+######### NOCALLS #########
+        # Drop nocalls according to noCalls
+        for f in noCalls:
+            indexNames = df[ df[ 'genotype' ] == f ].index
+            df.drop( indexNames, inplace = True )
+#        df = df[ ~df[ 'genotype' ].isin( noCalls ) ]
+
+######### SORTING #########
+        # Custom sorting order on chromosome and company column.
+        df[ 'chromosome' ] = pd.Categorical( df[ 'chromosome' ], chromosomePriorityListLivingDNA )
+        # Sort frame based on custom sorting orders and position
+        df.sort_values( [ 'chromosome', 'position' ], ascending=( True, True ), inplace=True )
+
+######### RENAME COLUMNS #########
+        # Rename columns
+        df.rename( columns = { 'rsid':'# rsid' }, inplace = True )
+
+
+
+    # SuperKit format
+    elif company == 'SuperKit':
+
+######### ADD CHROMOSOME 0 #########
+        # Concat dataframe with previously dropped chromosome 0
+        df = pd.concat( [df, chromosomeZero] , sort=False, ignore_index=True)
+
+######### SORTING #########
+        # Custom sorting order on chromosome and company column.
+        df[ 'chromosome' ] = pd.Categorical( df[ 'chromosome' ], chromosomePriorityList )
+        # Sort frame based on custom sorting orders and position
+        df.sort_values( [ 'chromosome', 'position' ], ascending=( True, True ), inplace=True )
 
 
     return df
