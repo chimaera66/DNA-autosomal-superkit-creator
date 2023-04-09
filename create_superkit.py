@@ -489,6 +489,9 @@ def cleanDNAFile( df: pd.DataFrame, company: str, gender: str ) -> pd.DataFrame:
     # IF position contains genotype larger than two alleles, replace with nocall '--' (clean dirty information from LivingDNA and more?)
     df.loc[ df[ 'genotype' ].str.len() > 2, 'genotype' ] = '--'
 
+    # If position are 0 on other chromosome than 0, assume wrong read from chip and move that row to "junk" chromosome 0
+    df.loc[(df['chromosome'] != '0') & (df['position'] == 0), 'chromosome'] = '0'
+
     # FamilyTreeDNA v3, additional step to keep chromosome 0
     if company == 'FamilyTreeDNA v3':
         # Drop chromosome 0 rows, likely nocalls or incomplete information
@@ -535,7 +538,6 @@ def sortDNAFile( df: pd.DataFrame ) -> pd.DataFrame:
 # only genotype according to priority list
 # in companyPriorityList
 
-#def dropDuplicatesDNAFile( df ):
 def dropDuplicatesDNAFile( df: pd.DataFrame ) -> pd.DataFrame:
 
     # First drop genotype duplicates in the same position
@@ -555,14 +557,15 @@ def dropDuplicatesDNAFile( df: pd.DataFrame ) -> pd.DataFrame:
 
 
 ## THE NEXT PART SHOULD HAVE TWO PATHS
-## 1, Do a majority vote if there are 3 or more on the same cell
-##    If all three are different, or a are less than 3. Drop according to priority list.
+## 1, Do a majority vote if there are 2 or more on the same chromosome/position
+##    If there is no concensus (1 genotype that are dominant), then drop according to priority list.
 
 
-    # If genotype is different on the same position, then only keep the genotype from the company according to the order in companyPriorityList
+    # If genotype is different on the same position, then only keep the genotype from the company according to the order in companyPriorityList (which got sorted earlier)
     df.drop_duplicates( subset=[ 'chromosome','position' ], keep='first', inplace=True )
 
     return df
+
 
 ##########################################
 
@@ -858,6 +861,8 @@ print()
 print( 'Total SNP count included in superkit for each company:' )
 for f in companyPriorityList:
     print( f + ': ' + DNASuperKit['company'].value_counts()[f].astype(str))
+
+print( f"Total SNPs in superkit: {len(DNASuperKit)}" )
 print()
 
 # Delete 'company' column
@@ -892,7 +897,7 @@ else:
 
 tmpFileName = f"{outputFileDir}{outputFileName}-{outputFormat}.{ext}"
 
-print(f'Correcting data to correspond with {outputFormat} format.')
+print( f'Correcting data to correspond with {outputFormat} format.' )
 DNASuperKit.to_csv(tmpFileName, index=None, **formats[outputFormat])
 
 
