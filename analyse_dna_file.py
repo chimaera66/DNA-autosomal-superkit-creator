@@ -347,7 +347,7 @@ for file in rawDNAFiles:
         unique_genotypes = filtered_df['genotype'].unique()
         if len(unique_genotypes) > 0:
             print()
-            print( "Chromosome MT (25)")
+            print( "Chromosome MT (26)")
             print( f"Unique genotypes: {unique_genotypes}" )
             snp_min = filtered_df['position'].min()
             snp_max = filtered_df['position'].max()
