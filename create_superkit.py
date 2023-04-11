@@ -7,6 +7,9 @@ from typing import List
 import pandas as pd
 import re                   # For determineDNACompany
 
+import argparse             # Command line argument parser
+import sys                  # sys.exit(1)
+
 
 ####################################################################################
 # VARIABLES
@@ -35,20 +38,62 @@ companyPriorityList = [ '23andMe v5',
                         ]
 
 # Output format
-outputFormat = 'SuperKit'
+#outputFormat = 'SuperKit'
 #outputFormat = '23andMe v5'
 #outputFormat = 'AncestryDNA v2'
-#outputFormat = 'FamilyTreeDNA v3'
-#outputFormat = 'MyHeritage v1'
+#utputFormat = 'FamilyTreeDNA v3'
 #outputFormat = 'LivingDNA v1.0.2'
+#outputFormat = 'MyHeritage v1'
 
+
+# Trim SNPs to be within output format range?
+trimSNP = False
 
 ####################################################################################
 ####################################################################################
 
 
 
-##########################################
+####################################################################################
+# COMMAND LINE ARGUMENT PARSER
+####################################################################################
+
+# Parser arguments
+parser = argparse.ArgumentParser( formatter_class=argparse.RawTextHelpFormatter )
+parser.add_argument('-o', '--outputFormat', type=str, required=False,
+                    help='''
+                    Sets the template for the resulting DNA file. Valid formats:
+                    SuperKit (Default)
+                    23andMe v5
+                    AncestryDNA v2
+                    FamilyTreeDNA v3
+                    LivingDNA v1.0.2
+                    MyHeritage v1
+                    ''')
+parser.add_argument('-t', '--trimSNP', action='store_true', help='Trims the SNPs to fit within the tested ranges of the different companys that the outputFormat tries to emulate', required=False)
+
+# Get arguments from command line
+args = parser.parse_args()
+
+# Save the arguments to variables
+outputFormat = args.outputFormat
+trimSNP = args.trimSNP
+
+# If outputFormat are not set, default to SuperKit
+if not outputFormat:
+    outputFormat = 'SuperKit'
+
+# Allowed outputFormats
+allowed_outputFormats = ['SuperKit', '23andMe v5', 'AncestryDNA v2', 'FamilyTreeDNA v3', 'LivingDNA v1.0.2', 'MyHeritage v1']
+
+# Check if outputFormat are valid, if not then exit
+if outputFormat and outputFormat not in allowed_outputFormats:
+    print(f'Invalid output format: {outputFormat}. Allowed formats are: {", ".join(allowed_outputFormats)}.')
+    sys.exit(1)
+
+####################################################################################
+####################################################################################
+
 
 
 ##########################################
@@ -727,6 +772,223 @@ def formatDNAFile( df: pd.DataFrame, company: str ) -> pd.DataFrame:
 ##########################################
 
 
+##########################################
+# prepare database for company specific
+# output format
+
+def trimSNPs( df: pd.DataFrame, company: str ) -> pd.DataFrame:
+
+    # Define trim mask
+    mask = None
+
+    # 23andMe v5
+    if company == '23andMe v5':
+        # Tested ranges
+        chromosome_ranges = {
+            '1': (69869, 249222527),
+            '2': (11944, 243041411),
+            '3': (66206, 197884212),
+            '4': (73071, 190937862),
+            '5': (10735, 180715140),
+            '6': (100114, 170904808),
+            '7': (43748, 159124173),
+            '8': (162363, 146300855),
+            '9': (116581, 141101939),
+            '10': (95844, 135473014),
+            '11': (128623, 134945120),
+            '12': (68276, 133838353),
+            '13': (19025153, 115106996),
+            '14': (19000060, 107283150),
+            '15': (20004966, 102462479),
+            '16': (68031, 90161959),
+            '17': (1389, 81162706),
+            '18': (11358, 78010620),
+            '19': (110925, 59097933),
+            '20': (61098, 62954925),
+            '21': (9418848, 48099610),
+            '22': (16055122, 51214796),
+
+            'X': (167699, 155234707),
+            'Y': (1726773, 58997068),
+            'MT': (10, 16545)
+        }
+        # Trim chromosomes according to list above
+        for chromosome, (start, end) in chromosome_ranges.items():
+            current_mask = (df['chromosome'] == chromosome) & (df['position'] >= start) & (df['position'] <= end)
+            if mask is None:
+                mask = current_mask
+            else:
+                mask = mask | current_mask
+
+
+    # AncestryDNA v2
+    elif company == 'AncestryDNA v2':
+        # Tested ranges
+        chromosome_ranges = {
+            '1': (752721, 249208772),
+            '2': (15672, 243068403),
+            '3': (61044, 197837967),
+            '4': (71566, 190985642),
+            '5': (38139, 180690937),
+            '6': (149636, 170919470),
+            '7': (42920, 159123700),
+            '8': (164984, 146292734),
+            '9': (46587, 141026318),
+            '10': (93244, 135475096),
+            '11': (193808, 134939292),
+            '12': (188285, 133810854),
+            '13': (19121950, 115091346),
+            '14': (19120274, 107282973),
+            '15': (20028058, 102398060),
+            '16': (101263, 90170495),
+            '17': (8547, 81047721),
+            '18': (13034, 78007784),
+            '19': (249357, 59097752),
+            '20': (63231, 62960292),
+            '21': (10862919, 48090629),
+            '22': (16869887, 51213613),
+
+            '23': (2703633, 154916845),
+            '24': (2655180, 58883690),
+            '25': (170770, 59330613),
+            '26': (523, 16391)
+        }
+        # Trim chromosomes according to list above
+        for chromosome, (start, end) in chromosome_ranges.items():
+            current_mask = (df['chromosome'] == chromosome) & (df['position'] >= start) & (df['position'] <= end)
+            if mask is None:
+                mask = current_mask
+            else:
+                mask = mask | current_mask
+
+
+    # FamilyTreeDNA v3
+    elif company == 'FamilyTreeDNA v3':
+        # Tested ranges
+        chromosome_ranges = {
+            '1': (72526, 249236761),
+            '2': (11944, 243178150),
+            '3': (66206, 197901799),
+            '4': (37263, 191014647),
+            '5': (14782, 180715140),
+            '6': (63979, 170919470),
+            '7': (43748, 159124173),
+            '8': (33142, 146300855),
+            '9': (46587, 141103966),
+            '10': (95844, 135490953),
+            '11': (124655, 134945120),
+            '12': (68276, 133820694),
+            '13': (19025153, 115103150),
+            '14': (19000060, 107283150),
+            '15': (20004966, 102516235),
+            '16': (89659, 90274695),
+            '17': (2220, 81125758),
+            '18': (11358, 78010620),
+            '19': (247265, 59097933),
+            '20': (63231, 62960292),
+            '21': (9432346, 48099610),
+            '22': (16057310, 51214796),
+
+            'XY': (153977, 155234707),
+            'MT': (56, 16482),
+            'X': (2699898, 154854338)
+        }
+        mask = (df['CHROMOSOME'] == '0')
+
+        # Trim chromosomes according to list above
+        for chromosome, (start, end) in chromosome_ranges.items():
+            current_mask = (df['CHROMOSOME'] == chromosome) & (df['POSITION'] >= start) & (df['POSITION'] <= end)
+            if mask is None:
+                mask = current_mask
+            else:
+                mask = mask | current_mask
+
+
+    # Living DNA v1.0.2
+    elif company == 'LivingDNA v1.0.2':
+        # Tested ranges
+        chromosome_ranges = {
+            '1': (752721, 249222527),
+            '2': (11944, 243044147),
+            '3': (63411, 197863379),
+            '4': (71566, 190904950),
+            '5': (14782, 180715140),
+            '6': (165391, 170919470),
+            '7': (43748, 159124173),
+            '8': (164984, 146292681),
+            '9': (126903, 141098720),
+            '10': (95844, 135434303),
+            '11': (200948, 134945120),
+            '12': (190980, 133777645),
+            '13': (19020095, 115103150),
+            '14': (19264875, 107282024),
+            '15': (20044342, 102397317),
+            '16': (89659, 90153346),
+            '17': (13905, 81096636),
+            '18': (43621, 78001282),
+            '19': (267039, 59097933),
+            '20': (61098, 62957652),
+            '21': (10971951, 48099610),
+            '22': (16061342, 51211383),
+
+            'X': (170193, 155230724)
+        }
+        # Trim chromosomes according to list above
+        for chromosome, (start, end) in chromosome_ranges.items():
+            current_mask = (df['chromosome'] == chromosome) & (df['position'] >= start) & (df['position'] <= end)
+            if mask is None:
+                mask = current_mask
+            else:
+                mask = mask | current_mask
+
+
+    # MyHeritage v1
+    elif company == 'MyHeritage v1':
+        # Tested ranges
+        chromosome_ranges = {
+            '1': (82154, 249218992),
+            '2': (18674, 243048760),
+            '3': (61495, 197838262),
+            '4': (71566, 190915650),
+            '5': (25328, 180693127),
+            '6': (203878, 170919470),
+            '7': (44935, 159119486),
+            '8': (164984, 146293414),
+            '9': (46587, 141066491),
+            '10': (98087, 135477883),
+            '11': (198510, 134934063),
+            '12': (191619, 133777645),
+            '13': (19058717, 115103529),
+            '14': (19255726, 107287663),
+            '15': (20071673, 102461162),
+            '16': (88165, 90163275),
+            '17': (8547, 81046413),
+            '18': (13034, 78015180),
+            '19': (260912, 59097160),
+            '20': (63244, 62912463),
+            '21': (10827533, 48100155),
+            '22': (16114244, 51211392),
+
+            'X': (1410495, 154916845),
+            'Y': (2655180, 59032197)
+        }
+        # Trim chromosomes according to list above
+        for chromosome, (start, end) in chromosome_ranges.items():
+            current_mask = (df['CHROMOSOME'] == chromosome) & (df['POSITION'] >= start) & (df['POSITION'] <= end)
+            if mask is None:
+                mask = current_mask
+            else:
+                mask = mask | current_mask
+
+
+    # Do actual trimming
+    if company != 'SuperKit':
+        df = df[ mask ]
+
+    return df
+
+##########################################
+
 ####################################################################################
 ####################################################################################
 
@@ -907,7 +1169,11 @@ del DNASuperKit[ 'company' ]
 
 DNASuperKit = formatDNAFile( DNASuperKit, outputFormat )
 
-# Line terminators:
+if trimSNP == True:
+    DNASuperKit = trimSNPs( DNASuperKit, outputFormat)
+
+
+# Line terminators: 
 # \n = LF (Linux), \r\n = CRLF (Windows)
 formats = {
     '23andMe v5': { 'sep': '\t', 'encoding': 'ascii', 'lineterminator': '\r\n' },

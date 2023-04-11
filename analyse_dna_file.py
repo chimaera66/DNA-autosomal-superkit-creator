@@ -262,6 +262,7 @@ for file in rawDNAFiles:
             print()
             print( "Chromosome 0")
             print( f"Unique genotypes: {unique_genotypes}")
+            print()
             snp_min = filtered_df['position'].min()
             snp_max = filtered_df['position'].max()
             snp_count = filtered_df['position'].count()
@@ -279,13 +280,17 @@ for file in rawDNAFiles:
         print()
         print( "Chromosomes 1 - 22" )
         print( f"Unique genotypes: {unique_genotypes}" )
+        print()
+        chromosome_count = 1
         for chromosome in range(1, 23):
             filtered_df = df[df['chromosome'] == str(chromosome)]
             snp_min = filtered_df['position'].min()
             snp_max = filtered_df['position'].max()
             snp_count = filtered_df['position'].count()
+            print( f"Chromosome {chromosome_count}")
             print( f"SNP range is between {snp_min} and {snp_max}" )
             print( f"Total tested SNPs: {snp_count}")
+            chromosome_count = chromosome_count + 1
         
 
         # Chromosome X (23) data
@@ -298,6 +303,7 @@ for file in rawDNAFiles:
             print()
             print( "Chromosome X (23)")
             print( f"Unique genotypes: {unique_genotypes}" )
+            print()
             snp_min = filtered_df['position'].min()
             snp_max = filtered_df['position'].max()
             snp_count = filtered_df['position'].count()
@@ -315,6 +321,7 @@ for file in rawDNAFiles:
             print()
             print( "Chromosome Y (24)")
             print( f"Unique genotypes: {unique_genotypes}" )
+            print()
             snp_min = filtered_df['position'].min()
             snp_max = filtered_df['position'].max()
             snp_count = filtered_df['position'].count()
@@ -332,6 +339,7 @@ for file in rawDNAFiles:
             print()
             print( "Chromosome XY (25)")
             print( f"Unique genotypes: {unique_genotypes}" )
+            print()
             snp_min = filtered_df['position'].min()
             snp_max = filtered_df['position'].max()
             snp_count = filtered_df['position'].count()
@@ -349,6 +357,7 @@ for file in rawDNAFiles:
             print()
             print( "Chromosome MT (26)")
             print( f"Unique genotypes: {unique_genotypes}" )
+            print()
             snp_min = filtered_df['position'].min()
             snp_max = filtered_df['position'].max()
             snp_count = filtered_df['position'].count()

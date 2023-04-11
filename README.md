@@ -50,19 +50,16 @@ This script will combine kits from compatible versions described above to a supe
 2. Open `create_superkit.py` with a text editor and change your prefered options under `Customizations`
 Currently, the only things you can change are the following:
 
-    * Output format
-        - Changes the format to fit the format used by one of these companies:
-            - Superkit (a kind of standardized format, close to 23andMe format)
-            - 23andMe v5 (since 08/2017)
-            - Ancestry v2 (since 05/2016)
-            - FamilyTreeDNA v3 (since 04/2019)
-            - MyHeritage v1 (before 03/2019)
-            - LivingDNA v1.0.2 (since 10/2018)
-
     * Company priority
         - Decides which company genome that are preferred if several companies has called the same position in the same chromosome (calls get priority over nocalls)
 
 3. run python `create_superkit.py` and the program will parse the DNA files in the default directory `./input/` and merge them together to a `SuperKit`
+
+4. Currently supported command line arguments are
+    * -o, --outputFormat: Sets the template for the formatting of the output file. Valid formats are: SuperKit, 23andMe v5, AncestryDNA v2, FamilyTreeDNA v3, LivingDNA v1.0.2 and MyHeritage v1. Defaults to SuperKit.
+    * -t, --trimSNP: Trims the SNPs to fit within the tested ranges of the different companys that the outputFormat tries to emulate. Defaults to false.
+
+
 
 
 ## How to use analyse_dna_file.py:
@@ -84,14 +81,14 @@ It will present the following data:
 - [ ] Add comments on top of superkit file
 - [ ] Add support for the latest MyHeritage file format
 - [ ] Add support for the latest TellMeGen file format
-- [ ] Add support for command line arguments?
 - [ ] Improve company detection "algorithm"
 - [ ] Improve the genotype count per company produced in the end
-- [ ] Improve each ouput format to more closely be like the originals
 - [ ] Add algorithm to decide which duplicate is more correct by "majority count"
-- [ ] Add option to trim chromosome positions to fit within each companys SNP range for each chromosome
+- [X] Add support for command line arguments
+- [X] Improve each ouput format to more closely be like the originals
+- [X] Add option to trim chromosome positions to fit within each companys SNP range for each chromosome
 
 ### DNA File Analyzer
-- [X] Add information about what SNP span on each chromosome each company tests
 - [ ] Add support for the latest MyHeritage file format
 - [ ] Add support for the latest TellMeGen file format
+- [X] Add information about what SNP span on each chromosome each company tests
