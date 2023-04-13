@@ -1345,6 +1345,8 @@ tmpFileName = f"{outputFileDir}{outputFileName}-{outputFormat}.{ext}"
 # Save to file
 print( f'Saving DNA Superkit to {outputFormat} format.' )
 DNASuperKit.to_csv(tmpFileName, index=None, **formats[outputFormat])
+print( "DONE!" )
+print()
 
 
 # Add comments to file
