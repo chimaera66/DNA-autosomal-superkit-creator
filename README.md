@@ -37,7 +37,7 @@ The data are then saved to the `./output/` folder for you to use.
 4. If the kit is determined to be of male origin, then it will change heterozygous calls to nocalls.
 5. The file will be somewhat cleaned by removing genotypes larger than two alleles and move calls on position 0 to "junk" chromosome 0.
 6. Then it will concatenate the dna files and sort according a predetermined order.
-7. Lastly it will format the superkit to the desired format and save it to `./output/`
+7. Lastly it will format the superkit to the desired format with correct top commments and save it to `./output/`
 
 
 
@@ -78,12 +78,11 @@ It will present the following data:
 
 ## TODO list
 ### Superkit Creator
-- [ ] Add comments on top of superkit file
+- [ ] Add algorithm to decide which duplicate is more correct by "majority count"
 - [ ] Add support for the latest MyHeritage file format
 - [ ] Add support for the latest TellMeGen file format
 - [ ] Improve company detection "algorithm"
-- [ ] Improve the genotype count per company produced in the end
-- [ ] Add algorithm to decide which duplicate is more correct by "majority count"
+- [X] Add comments on top of superkit file
 - [X] Add support for command line arguments
 - [X] Improve each ouput format to more closely be like the originals
 - [X] Add option to trim chromosome positions to fit within each companys SNP range for each chromosome
