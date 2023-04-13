@@ -36,7 +36,7 @@ The data are then saved to the `./output/` folder for you to use.
 3. The gender of the kit will also be guessed, since it changes how the script handles X/Y/MT chromosomes (males only have one X and Y chromosome and cannot have heterozygous calls on these chromosomes)
 4. If the kit is determined to be of male origin, then it will change heterozygous calls to nocalls.
 5. The file will be somewhat cleaned by removing genotypes larger than two alleles and move calls on position 0 to "junk" chromosome 0.
-6. Then it will concatenate the dna files and sort according a predetermined order.
+6. Then it will concatenate the dna files and sort according to a predetermined order.
 7. Lastly it will format the superkit to the desired format with correct top commments and save it to `./output/`
 
 
