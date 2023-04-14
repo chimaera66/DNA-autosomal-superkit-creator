@@ -47,8 +47,10 @@ companyPriorityList = [ '23andMe v5',
 #outputFormat = 'MyHeritage v1'
 
 
-# Trim SNPs to be within output format range?
+# Trim SNPs to be within output format range
 trimSNP = False
+# Set majority vote off as default
+majorityVote = False
 
 ####################################################################################
 ####################################################################################
@@ -71,7 +73,8 @@ parser.add_argument('-o', '--outputFormat', type=str, required=False,
                     LivingDNA v1.0.2
                     MyHeritage v1
                     ''')
-parser.add_argument('-t', '--trimSNP', action='store_true', help='Trims the SNPs to fit within the tested ranges of the different companys that the outputFormat tries to emulate', required=False)
+parser.add_argument('-mv', '--majorityVote', action='store_true', help='Drops duplicate genotype based on a majority vote. Considerably slower than regular keep first row drop', required=False)
+parser.add_argument('-t', '--trimSNP', action='store_true', help='Trims the SNPs to fit within the tested ranges of the different companys that the outputFormat tries to emulate.', required=False)
 
 # Get arguments from command line
 args = parser.parse_args()
@@ -79,6 +82,7 @@ args = parser.parse_args()
 # Save the arguments to variables
 outputFormat = args.outputFormat
 trimSNP = args.trimSNP
+majorityVote = args.majorityVote
 
 # If outputFormat are not set, default to SuperKit
 if not outputFormat:
@@ -574,29 +578,50 @@ def sortDNAFile( df: pd.DataFrame ) -> pd.DataFrame:
 
 def dropDuplicatesDNAFile( df: pd.DataFrame ) -> pd.DataFrame:
 
-    # First drop genotype duplicates in the same position
-    #df.drop_duplicates( subset=[ 'chromosome','position', 'genotype'], keep='first', inplace=True )
 
-    # Drop nocalls only if there are duplicate with calls
-    # is the result not a "--"?
-    m = df.loc[ :, 'genotype' ].ne( '--' )
-    # is there at least a non "--" in the group?
-    m2 = (m
-        .groupby( [ df[ 'chromosome' ], df[ 'position' ] ] )
-        .transform( 'max' )
-        )
-    # perform dropping
-    df.loc[ m|~m2 ]
+##### STEP 1 - Drop NoCalls only if there are duplicate rows with atleast one genotype that is not a nocall #####
+    print()
+    print( 'Drop -- if there is a non --' )
+    print()
+    # Create a boolean mask for rows where position is not a duplicate within each chromosome
+    mask = df.groupby(['chromosome', 'position']).genotype.transform('nunique') == 1
 
+    # Select rows where the mask is True or genotype != '--'
+    df = df[mask | df.genotype.ne('--')]
+    print( 'DONE!' )
+    print()
 
 
-## THE NEXT PART SHOULD HAVE TWO PATHS
-## 1, Do a majority vote if there are 2 or more on the same chromosome/position
-##    If there is no concensus (1 genotype that are dominant), then drop according to priority list.
 
+##### STEP 2 - Do a majority vote on the duplicates and choose the genotype that has the most of the same #####
+
+    if majorityVote == True:
+        print()
+        print( 'Drop based on majority vote' )
+        print()
+        # Group the data frame by chromosome and position columns and apply a lambda function to each group
+        df = df.groupby([df['chromosome'], 'position']).apply(
+            lambda x: 
+                # If the majority genotype count is greater than or equal to 50%, filter the group to keep only rows with the majority genotype and return the first row
+                x[x['genotype'] == x['genotype'].mode().iloc[0]].iloc[:1] if (x['genotype'] == x['genotype'].mode().iloc[0]).sum()/x.shape[0] >= 0.5 
+                # Otherwise, return the original group
+                else x
+            # Reset the index of the resulting data frame after grouping and filtering
+        ).reset_index(drop=True)
+        print( 'DONE!' )
+        print()
+
+
+
+##### STEP 3 - Drop duplicates and save only the first row. Which genotype that is first are determined by companyPriorityList #####
 
     # If genotype is different on the same position, then only keep the genotype from the company according to the order in companyPriorityList (which got sorted earlier)
-    df.drop_duplicates( subset=[ 'chromosome','position' ], keep='first', inplace=True )
+    print()
+    print( 'Keep first duplicate, drop the rest' )
+    print()
+    df = df.drop_duplicates(subset=['chromosome', 'position'], keep='first')
+    print( 'DONE!' )
+    print()
 
     return df
 
