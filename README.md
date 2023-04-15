@@ -4,13 +4,16 @@
 This is a autosomal DNA super kit creator, based on this video by [Family History Fanatics & Genealogists](https://www.youtube.com/watch?v=IJmAHNSODuw).
 More information can be found at [Do GEDmatch Superkits Give You More DNA Matches Than Non-Superkits?](https://www.familyhistoryfanatics.com/gedmatch-superkits)
 
-This program will merge your DNA raw datafiles from different companies to one "super kit".
+This script will merge your DNA raw datafiles from different companies to one "super kit".
 A super kit will supposedly increase overlap in matches and reduce false matches in DNA matching sites like [GEDMatch](https://www.gedmatch.com).
 
-This script does this by searching `./input/` for `.csv` or `.txt` files and then screen the files for information about what test company that produced the file.
+The script can also act like a converter, to convert from one format to another. Use command line parameters -t -o "DESIREDFORMAT".
+It is important to know that different companies tests different SNP range, and the script cannot create SNPs that doesn't alreade exist in your provided files, so it is possible that some part of the output formats SNP ranges are missing if you convert from another company that doesn't test these ranges.
+
+This script works by searching `./input/` for `.csv` or `.txt` files and then screen the files for information about what test company that produced the file.
 If the testing company is known, then the script cleans and standardizes and finally concatenates the data.
 It will then sort the data by chromosome, position and then testcompany.
-Lastly it will drop duplicates according to the priority list and format the data to the desired outputformat.
+Lastly it will drop duplicates in two or three steps (depending on if you choose majority vote or not), trim SNP ranges (if you choose that option in the command line argument) and format the data to the desired outputformat.
 The data are then saved to the `./output/` folder for you to use.
 
 
