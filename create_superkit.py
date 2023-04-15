@@ -101,9 +101,9 @@ if outputFormat and outputFormat not in allowed_outputFormats:
 
 
 
-##########################################
-# Normalization tables
-# 
+####################################################################################
+# DNA file information
+####################################################################################
 
 # 23andMe v5 chromosome numbering and order:    Living DNA v1.0.2 chromosome numbering and order:
 ## rsid	chromosome	position	genotype        # rsid	chromosome	position	genotype
@@ -172,7 +172,7 @@ if outputFormat and outputFormat not in allowed_outputFormats:
 #
 # ['00']
 
-#    Its normal. 23 is the X, 24 is Y, 25 is the PAR region, and 26 is mtDNA.
+#    23 is X, 24 is Y, 25 is the PAR/XY region, and 26 is mtDNA.
 
 #    If the Ancestry.com data file says a SNP is from chromosome 23, it's actually from the X chromosome.
 #    If it indicates chromosome 24, it's from the portion of the Y chromosome that is not part of the pseudoautosomal region.
@@ -188,6 +188,18 @@ if outputFormat and outputFormat not in allowed_outputFormats:
 # Alleles = paired
 # Nocalls = --
 
+# Normalized allele naming convention
+# ['DD' 'II' 'DI']
+# ['D' 'I']
+# ['AA' 'CC' 'GG' 'TT' 'CT' 'AG']
+# ['AC' 'GT' 'CG' 'AT']
+# ['A' 'C' 'G' 'T']
+# ['--']
+
+
+####################################################################################
+####################################################################################
+
 
 ####################################################################################
 # Normalization tables
@@ -196,13 +208,6 @@ if outputFormat and outputFormat not in allowed_outputFormats:
 # Sorting order for chromosome column
 chromosomePriorityList = [ '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', '13', '14', '15', '16', '17', '18', '19', '20', '21', '22', 'X', 'Y', 'XY', 'MT' ]
 
-# Normalized allele naming convention
-# ['DD' 'II' 'DI']
-# ['D' 'I']
-# ['AA' 'CC' 'GG' 'TT' 'CT' 'AG']
-# ['AC' 'GT' 'CG' 'AT']
-# ['A' 'C' 'G' 'T']
-# ['--']
 
 # Table for normalizing genotypes
 genotypeTable = {
@@ -221,6 +226,7 @@ genotypeTable = {
     '-A': 'A',
     '-T': 'T'
 }
+
 
 # Table for normalizing genotype on X and Y chromosome (Males)
 genotypeTableXYMales = {
@@ -241,24 +247,13 @@ genotypeTableXYMales = {
 }
 
 
-####################################################################################
-####################################################################################
-
-
-
-# Table for normalizing genotype on X Y MT
-#genotypeTableXYMT = {
-#    'GG': 'G',
-#    'CC': 'C',
-#    'AA': 'A',
-#    'TT': 'T'
-#}
-
 # Nocall list
 noCalls = [ 'DD', 'II', 'DI', 'D', 'I', '--' ]
 noCallsHyphen = [ 'DD', 'II', 'DI', 'D', 'I' ]
 
-##########################################
+
+####################################################################################
+####################################################################################
 
 
 ####################################################################################
@@ -267,7 +262,7 @@ noCallsHyphen = [ 'DD', 'II', 'DI', 'D', 'I' ]
 
 
 ##########################################
-# 23AndMe
+# 23AndMe v5
 
 chromosomePriorityList23andMe = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', '13', '14', '15', '16', '17', '18', '19', '20', '21', '22', 'X', 'Y', 'MT' ]
 
@@ -276,7 +271,7 @@ chromosomePriorityList23andMe = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9
 
 
 ##########################################
-# FamilyTreeDNA
+# FamilyTreeDNA v3
 
 # Sorting order for FamilyTreeDNA chromosome column
 chromosomePriorityListFamilyTreeDNA = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', '13', '14', '15', '16', '17', '18', '19', '20', '21', '22', 'XY', 'MT', 'X' ]
@@ -294,7 +289,7 @@ genotypeTableFamilyTreeDNA = {
 
 
 ##########################################
-# MyHeritage
+# MyHeritage v1
 
 # Sorting order for MyHeritage v1 chromosome column
 chromosomePriorityListMyHeritage = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', '13', '14', '15', '16', '17', '18', '19', '20', '21', '22', 'X', 'Y' ]
@@ -312,7 +307,7 @@ genotypeTableMyHeritage = {
 
 
 ##########################################
-# LivingDNA
+# LivingDNA v1.0.2
 
 # Sorting order for LivingDNA chromosome column
 chromosomePriorityListLivingDNA = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', '13', '14', '15', '16', '17', '18', '19', '20', '21', '22', 'X' ]
@@ -322,7 +317,7 @@ chromosomePriorityListLivingDNA = ['0', '1', '2', '3', '4', '5', '6', '7', '8', 
 
 
 ##########################################
-# AncestryDNA
+# AncestryDNA v2
 
 # Sorting order for ancestry chromosome column
 chromosomePriorityListAncestry =  [ '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', '13', '14', '15', '16', '17', '18', '19', '20', '21', '22', '23', '24', '25', '26' ]
@@ -372,6 +367,8 @@ def findDNAFiles( fileEndings: List ) -> List:
     for f in fileList:
         if f.lower().endswith( fileEndings ):
             result.append( inputFileDir + f )
+
+
     return result
 
 ##########################################
@@ -385,11 +382,12 @@ def prescreenDNAFile( inputDNAFile: str ) -> str:
 
     ##############################
     #  n = number of comment lines.
-    #       23andMe v5 = 19
+    #       23andMe v5        = 19
+    #       AncestryDNA v2    = 18
+    #       FamilyTreeDNA v3  = 0
     #       Living DNA v1.0.2 = 11
-    #       MyHeritage v1 = 6
-    #       FamilyTreeDNA v3 = 0
-    #       AncestryDNA v2 = 18
+    #       MyHeritage v1     = 6
+
 
     #n = 0
     n = 1
@@ -408,6 +406,7 @@ def prescreenDNAFile( inputDNAFile: str ) -> str:
     for x in head:
        mystring += ' ' + x
 
+
     return mystring
 
 ##########################################
@@ -418,8 +417,10 @@ def prescreenDNAFile( inputDNAFile: str ) -> str:
 # company the file originates from
 #
 
+#### NEEDS IMPROVMENT ####
 def determineDNACompany( text: str, filename: str ) -> str:
 
+    # List of company and patterns
     company_patterns = {
         '23andMe v5': r'_v5_Full_',
         'LivingDNA v1.0.2': r'# living dna customer genotype data download file version: 1\.0\.2',
@@ -428,17 +429,24 @@ def determineDNACompany( text: str, filename: str ) -> str:
         'AncestryDNA v2': r'ancestrydna'
     }
 
+    # Convert to lowercase to make it easier
     filename = filename.lower()
     text = text.lower()
 
+    # Search for pattern in file
     for company, pattern in company_patterns.items():
         if re.search(pattern, filename) or re.search(pattern, text):
+            # Return company according to list depending on textpattern
             return company
 
+    # search for pattern in filename
     # 23andMe v5
     if '_v5_full_' in filename.lower():
+        #Return 23andMe V5
         return '23andMe v5'
 
+
+    # If it cannot find a pattern, return unknown
     return 'unknown'
 
 
@@ -466,6 +474,7 @@ def loadDNAFile( file: str, company: str ) -> pd.DataFrame:
     
     # Load input file into pandas using the company-specific options
     df = pd.read_csv(file, **company_options[company])
+
 
     return df
 
@@ -523,7 +532,8 @@ def guessGenderFromDataframe( df: pd.DataFrame, company: str ) -> str:
         gender = 'Male'
     else:
         gender = 'Female'
-        
+
+
     return gender
 
 
@@ -547,6 +557,7 @@ def cleanDNAFile( df: pd.DataFrame, company: str, gender: str ) -> pd.DataFrame:
         # Drop chromosome 0 rows, likely nocalls or incomplete information
         df = df.drop( df[ df[ 'chromosome' ] == '0' ].index )
 
+
     return df
 
 
@@ -564,6 +575,7 @@ def sortDNAFile( df: pd.DataFrame ) -> pd.DataFrame:
 
     # Sort dataframe based on custom sorting orders and position
     df.sort_values( [ 'chromosome', 'position', 'company' ], ascending=( True, True, True ), inplace=True )
+
 
     return df
 
@@ -622,6 +634,7 @@ def dropDuplicatesDNAFile( df: pd.DataFrame ) -> pd.DataFrame:
     df = df.drop_duplicates(subset=['chromosome', 'position'], keep='first')
     print( 'DONE!' )
     print()
+
 
     return df
 
@@ -1011,6 +1024,7 @@ def trimSNPs( df: pd.DataFrame, company: str ) -> pd.DataFrame:
     if company != 'SuperKit':
         df = df[ mask ]
 
+
     return df
 
 ##########################################
@@ -1134,6 +1148,7 @@ def addCommentsToFile( tmpFileName: str, outputFormat: str):
         # Write the new data followed by the original contents
         with open(tmpFileName, "w", newline="\n") as f:
             f.write(data + existing_data)
+
 
     return
 
