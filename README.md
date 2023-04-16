@@ -59,7 +59,7 @@ Currently, the only things you can change are the following:
 3. run python `create_superkit.py` and the program will parse the DNA files in the default directory `./input/` and merge them together to a `SuperKit`
 
 4. Currently supported command line arguments are
-    * -o, --outputFormat: Sets the template for the formatting of the output file. Valid formats are: SuperKit, 23andMe v5, AncestryDNA v2, FamilyTreeDNA v3, LivingDNA v1.0.2 and MyHeritage v1. Defaults to SuperKit.
+    * -o, --outputFormat: Sets the template for the formatting of the output file. Valid formats are: SuperKit, "23andMe v5", "AncestryDNA v2", "FamilyTreeDNA v3", "LivingDNA v1.0.2" and "MyHeritage v1". Defaults to SuperKit.
     * -t, --trimSNP: Trims the SNPs to fit within the tested ranges of the different companys that the outputFormat tries to emulate. Defaults to false.
     * -mv, --majorityVote: Drops genotype based on a majority vote. If there are two AA and one CC on the same position, then one AA is kept and the other rows drops. This is considerably slower than the normal keep first row, but it should be more accurate. Defaults to false.
 
@@ -82,10 +82,11 @@ It will present the following data:
 
 ## TODO list
 ### Superkit Creator
-- [X] Add algorithm to decide which duplicate is more correct by "majority count"
 - [ ] Add support for the latest MyHeritage file format
 - [ ] Add support for the latest TellMeGen file format
 - [ ] Improve company detection "algorithm"
+- [X] Add code to replace rsid to fit the desired output formats rsid on each chromosome and position (for accuracy)
+- [X] Add algorithm to decide which duplicate is more correct by "majority count"
 - [X] Add comments on top of superkit file
 - [X] Add support for command line arguments
 - [X] Improve each ouput format to more closely be like the originals

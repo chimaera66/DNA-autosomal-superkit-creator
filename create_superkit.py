@@ -643,6 +643,33 @@ def dropDuplicatesDNAFile( df: pd.DataFrame ) -> pd.DataFrame:
 
 
 ##########################################
+# Restore original RSID names to the
+# DNA Superkit file, based on outputFormat
+
+def restoreRSIDtoDNAFile( df: pd.DataFrame, outputFormat: str ) -> pd.DataFrame:
+
+    # Load the data file
+    df_replace = pd.read_csv( './data/' + outputFormat + '.df', dtype=str, sep='\t' )
+
+    # Set the index of both dataframes to (chromosome, position)
+    df.set_index( ['chromosome', 'position'], inplace=True )
+    df_replace.set_index( ['chromosome', 'position'], inplace=True )
+
+    # Update values in the original dataframe with values from the replacement dataframe
+    df.update( df_replace )
+
+    # Reset the index of the dataframe to default integer index
+    df.reset_index( inplace=True )
+
+    # Reorder columns to original format
+    df = df.reindex(columns=['rsid', 'chromosome', 'position', 'genotype'])
+
+    return df
+
+##########################################
+
+
+##########################################
 # prepare database for company specific
 # output format
 
@@ -1206,6 +1233,19 @@ for file in rawDNAFiles:
         # Guess gender in kit
         guessGender = guessGenderFromDataframe( df, company )
 
+
+
+        ################################################################
+        ##### SAVE RSID, CHROMOSOME AND POSITION to ./data/ folder #####
+#        df_rsid = df.copy()
+#        df_rsid = df_rsid.drop_duplicates(subset=['chromosome', 'position'], keep='first')
+#        df_rsid.drop(columns=['company', 'genotype'], inplace=True)
+#        df_rsid.to_csv('./data/' + company + '.df', index=None, sep='\t', encoding='ascii', lineterminator='\r\n')
+        ################################################################
+        ################################################################
+
+
+
         # Normalize genotypes on X and Y (MT?) chromosomes where heterozygous calls are defined as nocalls '--'
         # (as males only have one X and one Y), and the rest are changed to a single letter
         #
@@ -1335,6 +1375,19 @@ print( "#" )
 print( "# Formatting, trimming and saving data" )
 print( "#" )
 print( '######################################################################' )
+
+
+if outputFormat != 'SuperKit':
+    print()
+    print( f'Restoring {outputFormat} RSID to DNA file to' )
+    print()
+
+    # Restore original RSID according to outputFormat
+    DNASuperKit = restoreRSIDtoDNAFile( DNASuperKit, outputFormat)
+
+    print( "DONE!" )
+    print()
+
 
 print()
 print( f'Formatting DNA file to {outputFormat} format' )
