@@ -40,15 +40,6 @@ companyPriorityList = [ '23andMe v5',
                         'MyHeritage v1',
                         ]
 
-# Output format
-#outputFormat = 'SuperKit'
-#outputFormat = '23andMe v5'
-#outputFormat = 'AncestryDNA v2'
-#utputFormat = 'FamilyTreeDNA v3'
-#outputFormat = 'LivingDNA v1.0.2'
-#outputFormat = 'MyHeritage v1'
-
-
 # Trim SNPs to be within output format range
 trimSNP = False
 # Set majority vote off as default
@@ -75,7 +66,7 @@ parser.add_argument('-o', '--outputFormat', type=str, required=False,
                     LivingDNA v1.0.2
                     MyHeritage v1
                     ''')
-parser.add_argument('-mv', '--majorityVote', action='store_true', help='Drops duplicate genotype based on a majority vote. Considerably slower than regular keep first row drop', required=False)
+parser.add_argument('-mv', '--majorityVote', action='store_true', help='Drops duplicate genotype based on a majority vote. Considerably slower than regular keep first row drop. Only resonable if you want to merge 3 kits or more.', required=False)
 parser.add_argument('-t', '--trimSNP', action='store_true', help='Trims the SNPs to fit within the tested ranges of the different companys that the outputFormat tries to emulate.', required=False)
 
 # Get arguments from command line
