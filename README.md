@@ -88,14 +88,8 @@ It will present the following data:
 - [ ] Add support for the latest TellMeGen file format
 - [ ] Improve company detection "algorithm"
 - [ ] Add correct filenames for the superkits?
-- [X] Add code to replace rsid to fit the desired output formats rsid on each chromosome and position (for accuracy)
-- [X] Add algorithm to decide which duplicate is more correct by "majority count"
-- [X] Add comments on top of superkit file
-- [X] Add support for command line arguments
-- [X] Improve each ouput format to more closely be like the originals
-- [X] Add option to trim chromosome positions to fit within each companys SNP range for each chromosome
+
 
 ### DNA File Analyzer
 - [ ] Add support for the latest MyHeritage file format
 - [ ] Add support for the latest TellMeGen file format
-- [X] Add information about what SNP span on each chromosome each company tests
