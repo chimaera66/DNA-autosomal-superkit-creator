@@ -42,7 +42,7 @@ The data are then saved to the `./output/` folder for you to use.
 6. Then it will concatenate the dna files and sort according to a predetermined order.
 7. Lastly it will format the superkit to the desired format with correct top commments and save it to `./output/`
 
-* At the moment, MyHeritage does not support the resulting superkit, not in any output format
+* At the moment, MyHeritage does not accept the resulting superkit, not in any output format
 
 
 
