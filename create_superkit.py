@@ -9,6 +9,7 @@ import re                   # For determineDNACompany
 
 import argparse             # Command line argument parser
 import sys                  # sys.exit(1)
+import time
 import datetime             # Get time
 
 import random
@@ -586,7 +587,7 @@ def dropDuplicatesDNAFile( df: pd.DataFrame ) -> pd.DataFrame:
 
 ##### STEP 1 - Drop NoCalls only if there are duplicate rows with atleast one genotype that is not a nocall #####
     print()
-    print( 'Drop -- if there is a non --' )
+    print( 'Drop nocall if there is a non nocall genotype on duplicate position' )
     print()
     # Create a boolean mask for rows where position is not a duplicate within each chromosome
     mask = df.groupby(['chromosome', 'position']).genotype.transform('nunique') == 1
@@ -1187,6 +1188,9 @@ def addCommentsToFile( tmpFileName: str, outputFormat: str):
 # MAIN LOOP
 ####################################################################################
 
+# Get the start time
+start_time = time.time()
+
 # Find files in dir with the correct file endings
 rawDNAFiles = findDNAFiles( fileEndings )
 
@@ -1347,7 +1351,6 @@ print()
 # Kit statistics
 superkitUniqueChromosomes = DNASuperKit.chromosome.unique().tolist()
 superkitUniqueGenotypes = DNASuperKit.genotype.unique().tolist()
-superkitLength = len(DNASuperKit)
 
 
 # Count SNPs per included per company
@@ -1386,6 +1389,8 @@ if outputFormat != 'SuperKit':
     print( "DONE!" )
     print()
 
+# Nr of SNPs in kit
+superkitLength = len(DNASuperKit)
 
 print()
 print( f'Formatting DNA file to {outputFormat} format' )
@@ -1452,8 +1457,15 @@ if outputFormat == '23andMe v5' or outputFormat == 'AncestryDNA v2' or  outputFo
     print()
 
 
+# Get the end time
+end_time = time.time()
+# Calculate the elapsed time
+elapsed_time = end_time - start_time
+
+
 print()
 print( 'DNA SuperKit successfully created!' )
+print( f'time elapsed since start of script: {elapsed_time} seconds')
 print()
 
 
