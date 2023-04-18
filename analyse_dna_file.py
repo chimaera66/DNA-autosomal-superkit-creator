@@ -63,10 +63,13 @@ def prescreenDNAFile( inputDNAFile: str ) -> str:
     ##############################
     #  n = number of comment lines.
     #       23andMe v5 = 19
+    #       AncestryDNA v2 = 18
+    #       FamilyTreeDNA v3 = 0
     #       Living DNA v1.0.2 = 11
     #       MyHeritage v1 = 6
-    #       FamilyTreeDNA v3 = 0
-    #       AncestryDNA v2 = 18
+    #       MyHeritage v2 = 12
+
+
 
     #n = 0
     n = 1
@@ -98,11 +101,12 @@ def prescreenDNAFile( inputDNAFile: str ) -> str:
 def determineDNACompany(text: str, filename: str) -> str:
 
     company_patterns = {
-        '23andMe v5': r'_v5_Full_',
+        '23andMe v5': r'_v5_full_',
+        'AncestryDNA v2': r'ancestrydna',
         'LivingDNA v1.0.2': r'# living dna customer genotype data download file version: 1\.0\.2',
+        'MyHeritage v2': r'##format=mhv1\.0',
         'MyHeritage v1': r'# myheritage dna raw data\.',
-        'FamilyTreeDNA v3': r'rsid,chromosome,position,result',
-        'AncestryDNA v2': r'ancestrydna'
+        'FamilyTreeDNA v3': r'rsid,chromosome,position,result'
     }
 
     filename = filename.lower()
@@ -112,9 +116,9 @@ def determineDNACompany(text: str, filename: str) -> str:
         if re.search(pattern, filename) or re.search(pattern, text):
             return company
 
-    # 23andMe v5
-    if '_v5_full_' in filename.lower():
-        return '23andMe v5'
+#    # 23andMe v5
+#    if '_v5_full_' in filename.lower():
+#        return '23andMe v5'
 
     return 'unknown'
 
@@ -131,10 +135,11 @@ def loadDNAFile( file: str, company: str ) -> pd.DataFrame:
     # Create a dictionary with the file reading options for each company
     company_options = {
         '23andMe v5': {'dtype': str, 'sep': '\t', 'comment': '#', 'index_col': False, 'header': None, 'engine': 'python'},
+        'AncestryDNA v2': {'dtype': str, 'sep': '\t', 'comment': '#'},
+        'FamilyTreeDNA v3': {'dtype': str, 'comment': '#'},
         'LivingDNA v1.0.2': {'dtype': str, 'sep': '\t', 'comment': '#', 'index_col': False, 'header': None, 'engine': 'python'},
         'MyHeritage v1': {'dtype': str, 'comment': '#'},
-        'FamilyTreeDNA v3': {'dtype': str, 'comment': '#'},
-        'AncestryDNA v2': {'dtype': str, 'sep': '\t', 'comment': '#'}
+        'MyHeritage v2': {'dtype': str, 'comment': '#'}
     }
     
     # Check if the company name is valid
