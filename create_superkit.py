@@ -47,6 +47,11 @@ trimSNP = False
 # Set majority vote off as default
 majorityVote = False
 
+# Kit statistics
+superkitUniqueChromosomes = []
+superkitUniqueGenotypes = []
+
+
 ####################################################################################
 ####################################################################################
 
@@ -303,10 +308,10 @@ chromosomePriorityListFamilyTreeDNA = ['0', '1', '2', '3', '4', '5', '6', '7', '
 
 # FamilyTreeDNA genotypes for Y, X, MT
 genotypeTableFamilyTreeDNA = {
-    'G': '-G',
-    'C': '-C',
-    'A': '-A',
-    'T': '-T'
+    'G': 'GG',
+    'C': 'CC',
+    'A': 'AA',
+    'T': 'TT'
 }
 
 
@@ -334,7 +339,9 @@ genotypeTableMyHeritage = {
     'G': 'GG',
     'C': 'CC',
     'A': 'AA',
-    'T': 'TT'
+    'T': 'TT',
+    'D': 'DD',
+    'I': 'II'
 }
 
 
@@ -798,11 +805,12 @@ def formatDNAFile( df: pd.DataFrame, company: str ) -> pd.DataFrame:
         df[ 'genotype' ].replace( to_replace=genotypeTableMyHeritage, inplace=True )
 
 ######### NOCALLS #########
+        if company == 'MyHeritage v1':
         # Drop nocalls according to noCallsHyphen
-        for f in noCallsHyphen:
-            indexNames = df[ df[ 'genotype' ] == f ].index
-            df.drop( indexNames, inplace = True )
-#        df = df[ ~df[ 'genotype' ].isin( noCallsHyphen ) ]
+            for f in noCallsHyphen:
+                indexNames = df[ df[ 'genotype' ] == f ].index
+                df.drop( indexNames, inplace = True )
+#            df = df[ ~df[ 'genotype' ].isin( noCallsHyphen ) ]
 
 ######### SORTING #########
         # Custom sorting order on chromosome and company column.
@@ -1446,11 +1454,6 @@ print( "DONE!" )
 print()
 
 
-# Kit statistics
-superkitUniqueChromosomes = DNASuperKit.chromosome.unique().tolist()
-superkitUniqueGenotypes = DNASuperKit.genotype.unique().tolist()
-
-
 # Count SNPs per included per company
 companySNPCounts = []
 
@@ -1592,6 +1595,21 @@ print( '######################################################################')
 print()
 print( f'Total SNP per company: {companySNPCounts}')
 
+
+if outputFormat == 'AncestryDNA v2':
+    superkitUniqueChromosomes = DNASuperKit.chromosome.unique().tolist()
+    # Merge allele1 and allele2 to genotype column
+    DNASuperKit[ 'genotype' ] = DNASuperKit[ 'allele1' ] + DNASuperKit[ 'allele2' ]
+    DNASuperKit = DNASuperKit.drop( [ 'allele1', 'allele2' ], axis=1 )
+    superkitUniqueGenotypes = DNASuperKit.genotype.unique().tolist()
+
+elif outputFormat == 'FamilyTreeDNA v3' or outputFormat == 'MyHeritage v1' or outputFormat == 'MyHeritage v2':
+    superkitUniqueChromosomes = DNASuperKit.CHROMOSOME.unique().tolist()
+    superkitUniqueGenotypes = DNASuperKit.RESULT.unique().tolist()
+
+else:
+    superkitUniqueChromosomes = DNASuperKit.chromosome.unique().tolist()
+    superkitUniqueGenotypes = DNASuperKit.genotype.unique().tolist()
 
 # Information about the results
 print()
