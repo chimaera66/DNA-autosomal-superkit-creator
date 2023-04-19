@@ -23,6 +23,7 @@ The data are then saved to the `./output/` folder for you to use.
 * Ancestry v2 (since 05/2016)
 * FamilyTreeDNA v3 (since 04/2019)
 * MyHeritage v1 (before 03/2019)
+* MyHeritage v2 (after 03/2019)
 * LivingDNA v1.0.2 (since 10/2018)
 
 
@@ -61,7 +62,7 @@ Currently, the only things you can change are the following:
 3. run python `create_superkit.py` and the program will parse the DNA files in the default directory `./input/` and merge them together to a `SuperKit`
 
 4. Currently supported command line arguments are
-    * -o, --outputFormat: Sets the template for the formatting of the output file. Valid formats are: SuperKit, "23andMe v5", "AncestryDNA v2", "FamilyTreeDNA v3", "LivingDNA v1.0.2" and "MyHeritage v1". Defaults to SuperKit.
+    * -o, --outputFormat: Sets the template for the formatting of the output file. Valid formats are: SuperKit, "23andMe v5", "AncestryDNA v2", "FamilyTreeDNA v3", "LivingDNA v1.0.2", "MyHeritage v1" and "MyHeritage v2". Defaults to SuperKit.
     * -t, --trimSNP: Trims the SNPs to fit within the tested ranges of the different companys that the outputFormat tries to emulate. Defaults to false.
     * -mv, --majorityVote: Drops genotype based on a majority vote. If there are two AA and one CC on the same position, then one AA is kept and the other rows drops. This is considerably slower than the normal keep first row, but it should be more accurate. Mostly meaningful when merging three kits or more. Defaults to false.
 
@@ -84,12 +85,12 @@ It will present the following data:
 
 ## TODO list
 ### Superkit Creator
-- [ ] Add support for the latest MyHeritage file format
+- [X] Add support for the latest MyHeritage file format
 - [ ] Add support for the latest TellMeGen file format
 - [ ] Improve company detection "algorithm"
 - [ ] Add correct filenames for the superkits?
 
 
 ### DNA File Analyzer
-- [ ] Add support for the latest MyHeritage file format
+- [X] Add support for the latest MyHeritage file format
 - [ ] Add support for the latest TellMeGen file format
