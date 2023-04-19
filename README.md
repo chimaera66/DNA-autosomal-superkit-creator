@@ -18,7 +18,7 @@ The data are then saved to the `./output/` folder for you to use.
 
 
 
-## Currently supported companies:
+## Currently supported companies and versions:
 * 23andMe v5 (since 08/2017)
 * Ancestry v2 (since 05/2016)
 * FamilyTreeDNA v3 (since 04/2019)
@@ -85,12 +85,13 @@ It will present the following data:
 
 ## TODO list
 ### Superkit Creator
-- [X] Add support for the latest MyHeritage file format
+- [ ] Add option to output the same nr of SNPs with the exact RSID for each company
 - [ ] Add support for the latest TellMeGen file format
 - [ ] Improve company detection "algorithm"
-- [ ] Add correct filenames for the superkits?
+- [ ] Add correct filenames for the superkits
+- [X] Add support for the latest MyHeritage file format
 
 
 ### DNA File Analyzer
-- [X] Add support for the latest MyHeritage file format
 - [ ] Add support for the latest TellMeGen file format
+- [X] Add support for the latest MyHeritage file format
