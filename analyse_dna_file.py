@@ -100,6 +100,7 @@ def prescreenDNAFile( inputDNAFile: str ) -> str:
 
 def determineDNACompany(text: str, filename: str) -> str:
 
+    # List of company and patterns
     company_patterns = {
         '23andMe v5': r'_v5_full_',
         'AncestryDNA v2': r'ancestrydna',
@@ -109,9 +110,11 @@ def determineDNACompany(text: str, filename: str) -> str:
         'FamilyTreeDNA v3': r'rsid,chromosome,position,result'
     }
 
+    # Convert to lowercase to make it easier
     filename = filename.lower()
     text = text.lower()
 
+    # Search for pattern in file
     for company, pattern in company_patterns.items():
         if re.search(pattern, filename) or re.search(pattern, text):
             return company
