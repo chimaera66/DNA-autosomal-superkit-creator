@@ -249,19 +249,26 @@ for file in rawDNAFiles:
         guessGender = guessGenderFromDataframe( df, company )
 
         # Get a count of nocalls
+        # These companies have 00 as nocalls
         if company == 'AncestryDNA v2':
             Nocall_count = df['genotype'].value_counts()['00']
+        # There is no noccalls in these companys kits
         elif company == 'LivingDNA v1.0.2':
             Nocall_count = 0
+        # The rest of the companies use -- as nocalls
         else:
             Nocall_count = df['genotype'].value_counts()['--']
-#        if "LivingDNA v1.0.2" not in company:
+        # Calculate percentage of nocalls
         Nocalls_Percentage = round( Nocall_count / len(df) * 100, 2 )
 
         # Get nr of duplicate positions
+        # group the rows based on 'chromosome' and 'position'
         duplicate_count_group = df.groupby(['chromosome', 'position'])
+        # filter the groups that have more than one row (i.e., duplicates)
         duplicates_count_filter = duplicate_count_group.filter(lambda x: len(x) > 1)
+        # concatenate the filtered groups into a new dataframe, count rows and divide by two (to get the nr of real duplicates)
         duplicates_count = int( len( pd.concat([duplicates_count_filter]) ) / 2 )
+        # Calculate percentage of duplicates
         duplicates_percentage = round( duplicates_count / len(df) * 100, 2 )
 
         # Presenting results
@@ -390,6 +397,24 @@ for file in rawDNAFiles:
             snp_count = filtered_df['position'].count()
             print( f"SNP range is between {snp_min} and {snp_max}" )
             print( f"Total tested SNPs: {snp_count}")
+
+
+        # Analysing nr of occurances of each genotype on chromosomes x, Y and MT (to measure errors)
+        if company =='AncestryDNA v2':
+            # filter rows with chromosomes X, Y, and MT
+            df_unique_genotype_filter = df[df['chromosome'].isin(['23', '24', '26'])]
+        else:
+            # filter rows with chromosomes X, Y, and MT
+            df_unique_genotype_filter = df[df['chromosome'].isin(['X', 'Y', 'MT'])]
+
+        # get unique genotypes and count their occurrences
+        genotype_counts = df_unique_genotype_filter.groupby('genotype').size()
+
+
+        print()
+        print( f'Unique genotypes and their occurance on X, Y and MT')
+        print(genotype_counts)
+        print()
 
 
         print()
