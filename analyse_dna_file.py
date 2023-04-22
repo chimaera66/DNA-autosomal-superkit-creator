@@ -248,19 +248,38 @@ for file in rawDNAFiles:
         # Guess gender in kit
         guessGender = guessGenderFromDataframe( df, company )
 
+        # Get a count of nocalls
+        if company == 'AncestryDNA v2':
+            Nocall_count = df['genotype'].value_counts()['00']
+        elif company == 'LivingDNA v1.0.2':
+            Nocall_count = 0
+        else:
+            Nocall_count = df['genotype'].value_counts()['--']
+#        if "LivingDNA v1.0.2" not in company:
+        Nocalls_Percentage = round( Nocall_count / len(df) * 100, 2 )
+
+        # Get nr of duplicate positions
+        duplicate_count_group = df.groupby(['chromosome', 'position'])
+        duplicates_count_filter = duplicate_count_group.filter(lambda x: len(x) > 1)
+        duplicates_count = int( len( pd.concat([duplicates_count_filter]) ) / 2 )
+        duplicates_percentage = round( duplicates_count / len(df) * 100, 2 )
+
         # Presenting results
         print()
-        print( '######################################################################')
-        print( f"#")
-        print( f"# Testcompany:            {company}" )
-        print( f"#" )
-        print( f"# File:                   {file.replace( inputFileDir, '' )}")
-        print( f"# SNPs tested in kit:     {len(df)}")
-        print( f"# Assumed gender in kit:  {guessGender}" )
-        print( f"#")
-        print( '######################################################################')
+        print( '#' * 70)
+        print( f'#')
+        print( f'# Testcompany:                {company}' )
+        print( f'#' )
+        print( f'# File:                       {file.replace( inputFileDir, "" )}' )
+        print( f'# Assumed gender in kit:      {guessGender}' )
+        print( '#')
+        print( f'# SNPs tested in kit:         {len(df)}' )
+        print( f'# Number of nocalls in kit:   {Nocall_count} / {Nocalls_Percentage}%' )
+        print( f'# Duplicate positions in kit: {duplicates_count} / {duplicates_percentage}%' )
+        print( f'#')
+        print( '#' * 70)
         print()
-        print( f"Chromosomes: {df.chromosome.unique().tolist()}" )
+        print( f'Chromosomes: {df.chromosome.unique().tolist()}' )
 
 
         # Chromosome 0 data
