@@ -263,13 +263,13 @@ for file in rawDNAFiles:
 
         # Get nr of duplicate positions
         # group the rows based on 'chromosome' and 'position'
-        duplicate_count_group = df.groupby(['chromosome', 'position'])
+        duplicate_count_group = df[df['chromosome'] != '0'].groupby(['chromosome', 'position'])
         # filter the groups that have more than one row (i.e., duplicates)
         duplicates_count_filter = duplicate_count_group.filter(lambda x: len(x) > 1)
         # concatenate the filtered groups into a new dataframe, count rows and divide by two (to get the nr of real duplicates)
         duplicates_count = int( len( pd.concat([duplicates_count_filter]) ) / 2 )
         # Calculate percentage of duplicates
-        duplicates_percentage = round( duplicates_count / len(df) * 100, 2 )
+        duplicates_percentage = round( duplicates_count / len( df[df['chromosome'] != '0'] ) * 100, 2 )
 
         # Presenting results
         print()
@@ -287,6 +287,7 @@ for file in rawDNAFiles:
         print( '#' * 70)
         print()
         print( f'Chromosomes: {df.chromosome.unique().tolist()}' )
+        print( f'Genotypes: {df.genotype.unique().tolist()}' )
 
 
         # Chromosome 0 data
