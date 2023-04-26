@@ -1512,7 +1512,7 @@ print( f'# Total nr of SNPs:       {superkitLength}')
 print( '#')
 print( '######################################################################')
 print()
-print( f'Total SNP per company: {companySNPCounts}')
+print( f'Total SNP used per company: {companySNPCounts}')
 
 
 if outputFormat == 'AncestryDNA v2':
