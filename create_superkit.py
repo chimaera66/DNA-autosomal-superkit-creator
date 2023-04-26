@@ -302,6 +302,17 @@ genotypeTable = {
     '-T': 'T'
 }
 
+genotypeTableMajorityVote = {
+    'CA': 'AC',
+    'TG': 'GT',
+    'GC': 'CG',
+    'TA': 'AT',
+    'TC': 'CT',
+    'GA': 'AG',
+
+    'ID': 'DI',
+}
+
 
 # Table for normalizing genotype on X and Y chromosome (Males)
 genotypeTableXYMales = {
@@ -629,7 +640,6 @@ def normalizeDNAFile( df: pd.DataFrame, company: str ) -> pd.DataFrame:
     df[ 'chromosome' ] = df[ 'chromosome' ].replace( to_replace=chromosomeTableAncestryIn )
 
     ##### CHANGE WHAT GENOTYPES THAT GET NORMALIZED? CA AC DOESNT NEED NORMALIZING? CHANGED LATER? #####
-    ##### THIS CREATES PROBLEMS WITH MAJORITY VOTE THOUGH #####
     # Normalize genotype with custom genotypeTable
     df[ 'genotype' ] = df[ 'genotype' ].replace( to_replace=genotypeTable )
 
@@ -771,6 +781,10 @@ def dropDuplicatesDNAFile( df: pd.DataFrame ) -> pd.DataFrame:
         print()
         print( 'Drop based on majority vote' )
         print()
+
+        # Normalize genotype to be able to compare and count majority easier
+        df[ 'genotype' ] = df[ 'genotype' ].replace( to_replace=genotypeTableMajorityVote )
+
         # Group the data frame by chromosome and position columns and apply a lambda function to each group
         df = df.groupby([df['chromosome'], 'position']).apply(
             lambda x: 
