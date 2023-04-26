@@ -66,6 +66,8 @@ Currently, the only things you can change are the following:
     * -cf, --convertFormat: Converts DNA file to desired output format specified in --outputFormat. Drops positions not in the chosen format. Not valid with SuperKit format.
     * -mv, --majorityVote: Drops genotype based on a majority vote. If there are two AA and one CC on the same position, then one AA is kept and the other rows drops. This is considerably slower than the normal keep first row, but it should be more accurate. Mostly meaningful when merging three kits or more. Defaults to false.
 
+    * The difference between outputFormat and convertFormat is that outputFormat will just create a new DNA file in the format of the specified company, with all non duplicate rows. convertFormat will do the same, but keep in the SNP ranges of the format to get a theoretically more accurate DNA file.
+
 
 
 

@@ -16,52 +16,13 @@ import random
 
 
 ####################################################################################
-# VARIABLES
+# COMMAND LINE ARGUMENT PARSER
 ####################################################################################
 
-# Input/output file directory
-inputFileDir = './input/'
-outputFileDir = './output/'
-
-# Input filetypes
-fileEndings = (
-    'txt',
-    'csv'
-)
-
-# Output File name and file ending
-outputFileName = 'DNASuperKit'
-outputFileEnding = '.csv'
-
-# Sorting order for company column
-companyPriorityList = [ '23andMe v5',
-                        'AncestryDNA v2',
-                        'FamilyTreeDNA v3',
-                        'MyHeritage v2',
-                        'LivingDNA v1.0.2',
-                        'MyHeritage v1',
-                        ]
-
-# Trim SNPs to be within output format range
-#trimSNP = False
 # Convert to format
 convertFormat = False
 # Set majority vote off as default
 majorityVote = False
-
-# Kit statistics
-superkitUniqueChromosomes = []
-superkitUniqueGenotypes = []
-
-
-####################################################################################
-####################################################################################
-
-
-
-####################################################################################
-# COMMAND LINE ARGUMENT PARSER
-####################################################################################
 
 # Parser arguments
 parser = argparse.ArgumentParser( formatter_class=argparse.RawTextHelpFormatter )
@@ -102,6 +63,117 @@ if outputFormat and outputFormat not in allowed_outputFormats:
 ####################################################################################
 ####################################################################################
 
+
+####################################################################################
+# VARIABLES
+####################################################################################
+
+# Input/output file directory
+inputFileDir = './input/'
+outputFileDir = './output/'
+
+# Input filetypes
+fileEndings = (
+    'txt',
+    'csv'
+)
+
+# Output File name and file ending
+outputFileName = 'DNASuperKit'
+outputFileEnding = '.csv'
+
+
+##### CHANGE DEPENDING ON OUTPUTFORMAT? #####
+# Sorting order for company column
+# Define the company priority lists
+company_priority_lists = {
+    '23andMe v5': ['23andMe v5', 'AncestryDNA v2', 'FamilyTreeDNA v3', 'MyHeritage v2', 'LivingDNA v1.0.2', 'MyHeritage v1'],
+    'AncestryDNA v2': ['AncestryDNA v2', '23andMe v5', 'FamilyTreeDNA v3', 'MyHeritage v2', 'LivingDNA v1.0.2', 'MyHeritage v1'],
+    'FamilyTreeDNA v3': ['FamilyTreeDNA v3', '23andMe v5', 'AncestryDNA v2', 'MyHeritage v2', 'LivingDNA v1.0.2', 'MyHeritage v1'],
+    'LivingDNA v1.0.2': ['LivingDNA v1.0.2', '23andMe v5', 'AncestryDNA v2', 'FamilyTreeDNA v3', 'MyHeritage v2', 'MyHeritage v1'],
+    'MyHeritage v1': ['MyHeritage v1', '23andMe v5', 'AncestryDNA v2', 'FamilyTreeDNA v3', 'MyHeritage v2', 'LivingDNA v1.0.2'],
+    'MyHeritage v2': ['MyHeritage v2', '23andMe v5', 'AncestryDNA v2', 'FamilyTreeDNA v3', 'LivingDNA v1.0.2', 'MyHeritage v1']
+}
+
+# Get the company priority list based on the output format
+companyPriorityList = company_priority_lists.get(outputFormat, ['23andMe v5', 'AncestryDNA v2', 'FamilyTreeDNA v3', 'MyHeritage v2', 'LivingDNA v1.0.2', 'MyHeritage v1'])
+
+#companyPriorityList = [ '23andMe v5',
+#                        'AncestryDNA v2',
+#                        'FamilyTreeDNA v3',
+#                        'MyHeritage v2',
+#                        'LivingDNA v1.0.2',
+#                        'MyHeritage v1'
+#                        ]
+
+
+
+
+#if outputFormat == '23andMe v5':
+#    companyPriorityList = [ '23andMe v5',
+#                            'AncestryDNA v2',
+#                            'FamilyTreeDNA v3',
+#                            'MyHeritage v2',
+#                            'LivingDNA v1.0.2',
+#                            'MyHeritage v1'
+#                            ]
+#elif outputFormat == 'AncestryDNA v2':
+#    companyPriorityList = [ 'AncestryDNA v2',
+#                            '23andMe v5',
+#                            'FamilyTreeDNA v3',
+#                            'MyHeritage v2',
+#                            'LivingDNA v1.0.2',
+#                            'MyHeritage v1'
+#                            ]
+#elif outputFormat == 'FamilyTreeDNA v3':
+#    companyPriorityList = [ 'FamilyTreeDNA v3',
+#                            '23andMe v5',
+#                            'AncestryDNA v2',
+#                            'MyHeritage v2',
+#                            'LivingDNA v1.0.2',
+#                            'MyHeritage v1'
+#                            ]
+#elif outputFormat == 'MyHeritage v2':
+#    companyPriorityList = [ 'MyHeritage v2',
+#                            '23andMe v5',
+#                            'AncestryDNA v2',
+#                            'FamilyTreeDNA v3',
+#                            'LivingDNA v1.0.2',
+#                            'MyHeritage v1'
+#                            ]
+#elif outputFormat == 'LivingDNA v1.0.2':
+#    companyPriorityList = [ 'LivingDNA v1.0.2',
+#                            '23andMe v5',
+#                            'AncestryDNA v2',
+#                            'FamilyTreeDNA v3',
+#                            'MyHeritage v2',
+#                            'MyHeritage v1'
+#                            ]
+#elif outputFormat == 'MyHeritage v1':
+#    companyPriorityList = [ 'MyHeritage v1',
+#                            '23andMe v5',
+#                            'AncestryDNA v2',
+#                            'FamilyTreeDNA v3',
+#                            'MyHeritage v2',
+#                            'LivingDNA v1.0.2'
+#                            ]
+#else:
+#    companyPriorityList = [ '23andMe v5',
+#                        'AncestryDNA v2',
+#                        'FamilyTreeDNA v3',
+#                        'MyHeritage v2',
+#                        'LivingDNA v1.0.2',
+#                        'MyHeritage v1',
+#                        ]
+
+
+# Kit statistics
+superkitUniqueChromosomes = []
+superkitUniqueGenotypes = []
+
+
+####################################################################################
+####################################################################################
 
 
 ####################################################################################
@@ -215,14 +287,14 @@ chromosomePriorityList = [ '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10
 # Table for normalizing genotypes
 genotypeTable = {
     '00': '--',
-    'CA': 'AC',
-    'TG': 'GT',
-    'GC': 'CG',
-    'TA': 'AT',
-    'TC': 'CT',
-    'GA': 'AG',
+#    'CA': 'AC',
+#    'TG': 'GT',
+#    'GC': 'CG',
+#    'TA': 'AT',
+#    'TC': 'CT',
+#    'GA': 'AG',
 
-    'ID': 'DI',
+#    'ID': 'DI',
 
     '-G': 'G',
     '-C': 'C',
@@ -269,6 +341,21 @@ noCallsHyphen = [ 'DD', 'II', 'DI', 'D', 'I' ]
 
 chromosomePriorityList23andMe = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', '13', '14', '15', '16', '17', '18', '19', '20', '21', '22', 'X', 'Y', 'MT' ]
 
+# Table for normalizing genotypes
+genotypeTable23andMe = {
+    '00': '--',
+
+    'CA': 'AC',
+    'TG': 'GT',
+    'GC': 'CG',
+    'TA': 'AT',
+    'TC': 'CT',
+    'GA': 'AG',
+
+    'ID': 'DI',
+
+}
+
 
 ##########################################
 
@@ -312,12 +399,15 @@ genotypeTableAncestry = {
 # Sorting order for FamilyTreeDNA chromosome column
 chromosomePriorityListFamilyTreeDNA = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', '13', '14', '15', '16', '17', '18', '19', '20', '21', '22', 'XY', 'MT', 'X' ]
 
-# FamilyTreeDNA genotypes for Y, X, MT
+# FamilyTreeDNA genotypes
 genotypeTableFamilyTreeDNA = {
     'G': 'GG',
     'C': 'CC',
     'A': 'AA',
     'T': 'TT',
+
+    'TC': 'CT',
+    'TG': 'GT',
 
     # Change nocalls to -- instead of dropping
     'D': '--',
@@ -630,14 +720,46 @@ def dropDuplicatesDNAFile( df: pd.DataFrame ) -> pd.DataFrame:
 
 
 ##### STEP 1 - Drop NoCalls only if there are duplicate rows with atleast one genotype that is not a nocall #####
+
     print()
     print( 'Drop nocall if there is a non nocall genotype on duplicate position' )
     print()
+
+### --
     # Create a boolean mask for rows where position is not a duplicate within each chromosome
     mask = df.groupby(['chromosome', 'position']).genotype.transform('nunique') == 1
 
     # Select rows where the mask is True or genotype != '--'
     df = df[mask | df.genotype.ne('--')]
+
+### DD
+    # Create a boolean mask for rows where position is not a duplicate within each chromosome
+    mask = df.groupby(['chromosome', 'position']).genotype.transform('nunique') == 1
+
+    # Select rows where the mask is True or genotype != '--'
+    df = df[mask | df.genotype.ne('DD')]
+
+### DI
+    # Create a boolean mask for rows where position is not a duplicate within each chromosome
+    mask = df.groupby(['chromosome', 'position']).genotype.transform('nunique') == 1
+
+    # Select rows where the mask is True or genotype != '--'
+    df = df[mask | df.genotype.ne('DI')]
+
+### ID
+    # Create a boolean mask for rows where position is not a duplicate within each chromosome
+    mask = df.groupby(['chromosome', 'position']).genotype.transform('nunique') == 1
+
+    # Select rows where the mask is True or genotype != '--'
+    df = df[mask | df.genotype.ne('ID')]
+
+### II
+    # Create a boolean mask for rows where position is not a duplicate within each chromosome
+    mask = df.groupby(['chromosome', 'position']).genotype.transform('nunique') == 1
+
+    # Select rows where the mask is True or genotype != '--'
+    df = df[mask | df.genotype.ne('II')]
+
     print( 'DONE!' )
     print()
 
@@ -725,6 +847,10 @@ def formatDNAFile( df: pd.DataFrame, company: str ) -> pd.DataFrame:
         df = df.drop( df[ df[ 'chromosome' ] == '0' ].index )
         df = df.drop( df[ df[ 'chromosome' ] == 'XY' ].index )
 
+######### NORMALIZE #########
+       # Replace genotypes
+        df[ 'genotype' ].replace( to_replace=genotypeTable23andMe, inplace=True )
+
 ######### SORTING #########
         # Custom sorting order on chromosome and company column.
         df[ 'chromosome' ] = pd.Categorical( df[ 'chromosome' ], chromosomePriorityList23andMe )
@@ -776,7 +902,7 @@ def formatDNAFile( df: pd.DataFrame, company: str ) -> pd.DataFrame:
         df = df.drop( df[ df[ 'chromosome' ] == 'Y' ].index )
 
 ######### NORMALIZE #########
-        #Replace genotypes for X, Y, MT( A = -A )
+        # Replace genotypes
         df[ 'genotype' ].replace( to_replace=genotypeTableFamilyTreeDNA, inplace=True )
 
 ######### SORTING #########
@@ -836,14 +962,6 @@ def formatDNAFile( df: pd.DataFrame, company: str ) -> pd.DataFrame:
         elif company == 'MyHeritage v2':
                 df[ 'genotype' ].replace( to_replace=genotypeTableMyHeritagev2, inplace=True )
 
-
-######### NOCALLS #########
-#        if company == 'MyHeritage v1':
-#        # Drop nocalls according to noCallsHyphen
-#            for f in noCallsHyphen:
-#                indexNames = df[ df[ 'genotype' ] == f ].index
-#                df.drop( indexNames, inplace = True )
-#            df = df[ ~df[ 'genotype' ].isin( noCallsHyphen ) ]
 
 ######### SORTING #########
         # Custom sorting order on chromosome and company column.
@@ -1005,8 +1123,16 @@ def addCommentsToFile( tmpFileName: str, outputFormat: str):
 
 
     elif outputFormat == 'MyHeritage v1':
+        # Get current time
+        now = datetime.datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S UTC')
         # Top comment
         data = (
+            "# MyHeritage DNA raw data.\n"
+            f"# This file was generated on {now}\n"
+            "# For each SNP, we provide the identifier, chromosome number, base pair position and genotype.The genotype is reported on the forward (+) strand with respect to the human reference build 37.\n"
+            "# THIS INFORMATION IS FOR YOUR PERSONAL USE AND IS INTENDED FOR GENEALOGICAL RESEARCH\n"
+            "# ONLY. IT IS NOT INTENDED FOR MEDICAL OR HEALTH PURPOSES. PLEASE BE AWARE THAT THE\n"
+            "# DOWNLOADED DATA WILL NO LONGER BE PROTECTED BY OUR SECURITY MEASURES.\n"
             "RSID,CHROMOSOME,POSITION,RESULT\n"
         )
 
@@ -1015,13 +1141,13 @@ def addCommentsToFile( tmpFileName: str, outputFormat: str):
             existing_data = f.read()
 
         # Write the new data followed by the original contents
-        with open(tmpFileName, "w", newline="\r\n") as f:
+        #with open(tmpFileName, "w", newline="\r\n") as f:
+        with open(tmpFileName, "w", newline="\n") as f:
             f.write(data + existing_data)
 
 
     elif outputFormat == 'MyHeritage v2':
         # Get current time
-#        now = datetime.datetime.utcnow().strftime('%m/%d/%Y %H:%M:%S UTC')
         now = datetime.datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S UTC')
 
         # Top comment
