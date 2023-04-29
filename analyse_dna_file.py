@@ -103,11 +103,13 @@ def determineDNACompany(text: str, filename: str) -> str:
     # List of company and patterns
     company_patterns = {
         '23andMe v5': r'_v5_full_',
-        'AncestryDNA v2': r'ancestrydna',
+#        'AncestryDNA v2': r'ancestrydna',
+        'AncestryDNA v2': r'ancestrydna array version: v2\.0',
         'LivingDNA v1.0.2': r'# living dna customer genotype data download file version: 1\.0\.2',
         'MyHeritage v2': r'##format=mhv1\.0',
         'MyHeritage v1': r'# myheritage dna raw data\.',
-        'FamilyTreeDNA v3': r'rsid,chromosome,position,result'
+        'FamilyTreeDNA v3': r'rsid,chromosome,position,result',
+        'tellmeGen v4': r'# rsid	chromosome	position	genotype'
     }
 
     # Convert to lowercase to make it easier
@@ -119,9 +121,6 @@ def determineDNACompany(text: str, filename: str) -> str:
         if re.search(pattern, filename) or re.search(pattern, text):
             return company
 
-#    # 23andMe v5
-#    if '_v5_full_' in filename.lower():
-#        return '23andMe v5'
 
     return 'unknown'
 
@@ -142,7 +141,8 @@ def loadDNAFile( file: str, company: str ) -> pd.DataFrame:
         'FamilyTreeDNA v3': {'dtype': str, 'comment': '#'},
         'LivingDNA v1.0.2': {'dtype': str, 'sep': '\t', 'comment': '#', 'index_col': False, 'header': None, 'engine': 'python'},
         'MyHeritage v1': {'dtype': str, 'comment': '#'},
-        'MyHeritage v2': {'dtype': str, 'comment': '#'}
+        'MyHeritage v2': {'dtype': str, 'comment': '#'},
+        'tellmeGen v4': {'dtype': str, 'sep': '\t', 'comment': '#', 'index_col': False, 'header': None, 'engine': 'python'},
     }
     
     # Check if the company name is valid
