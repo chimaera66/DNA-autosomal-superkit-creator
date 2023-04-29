@@ -19,12 +19,18 @@ The data are then saved to the `./output/` folder for you to use.
 
 
 ## Currently supported companies and versions:
-* 23andMe v5 (since 08/2017)
-* Ancestry v2 (since 05/2016)
-* FamilyTreeDNA v3 (since 04/2019)
-* MyHeritage v1 (before 03/2019)
-* MyHeritage v2 (after 03/2019)
-* LivingDNA v1.0.2 (since 10/2018)
+
+- core Illumina Global Screen Array (GSA) chip
+    * 23andMe v5 (since 08/2017)
+    * MyHeritage v2 (after 03/2019)
+
+- unknown (for me) chip
+    * Ancestry v2 (since 05/2016)
+    * FamilyTreeDNA v3 (since 04/2019)
+    * MyHeritage v1 (before 03/2019)
+
+- Affymetrix chip
+    * LivingDNA v1.0.2 (since 10/2018)
 
 
 
@@ -93,4 +99,4 @@ It will present the following data:
 
 
 ### DNA File Analyzer
-- [ ] Add support for the latest TellMeGen file format
+- [X] Add support for the latest TellMeGen file format
