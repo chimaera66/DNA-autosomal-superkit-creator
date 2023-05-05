@@ -702,7 +702,6 @@ def dropDuplicatesDNAFile( df: pd.DataFrame ) -> pd.DataFrame:
     print( 'Drop nocall if there is a non nocall genotype on duplicate position' )
     print()
 
-### --
     # Create a boolean mask for rows where position is not a duplicate within each chromosome
     mask = df.groupby(['chromosome', 'position']).genotype.transform('nunique') == 1
 
@@ -806,7 +805,7 @@ def formatDNAFile( df: pd.DataFrame, company: str ) -> pd.DataFrame:
         df[ 'genotype' ].replace( to_replace=genotypeTable23andMe, inplace=True )
 
 ######### SORTING #########
-        # Custom sorting order on chromosome and company column.
+        # Custom sorting order on chromosome column.
         df[ 'chromosome' ] = pd.Categorical( df[ 'chromosome' ], chromosomePriorityList23andMe )
         # Sort frame based on custom sorting orders and position
         df.sort_values( [ 'chromosome', 'position' ], ascending=( True, True ), inplace=True )
@@ -831,7 +830,7 @@ def formatDNAFile( df: pd.DataFrame, company: str ) -> pd.DataFrame:
         df[ 'genotype' ].replace( to_replace=genotypeTableAncestry, inplace=True )
 
 ######### SORTING #########
-        # Custom sorting order on chromosome and company column. Modify at top of file.
+        # Custom sorting order on chromosome column.
         df[ 'chromosome' ] = pd.Categorical( df[ 'chromosome' ], chromosomePriorityListAncestry )
         # Sort frame based on custom sorting orders and position
         df.sort_values( [ 'chromosome', 'position', ], ascending=( True, True ), inplace=True )
@@ -860,7 +859,7 @@ def formatDNAFile( df: pd.DataFrame, company: str ) -> pd.DataFrame:
         df[ 'genotype' ].replace( to_replace=genotypeTableFamilyTreeDNA, inplace=True )
 
 ######### SORTING #########
-        # Custom sorting order on chromosome and company column.
+        # Custom sorting order on chromosome column.
         df[ 'chromosome' ] = pd.Categorical( df[ 'chromosome' ], chromosomePriorityListFamilyTreeDNA )
         # Sort frame based on custom sorting orders and position
         df.sort_values( [ 'chromosome', 'position' ], ascending=( True, True ), inplace=True )
@@ -888,7 +887,7 @@ def formatDNAFile( df: pd.DataFrame, company: str ) -> pd.DataFrame:
             df.drop( indexNames, inplace = True )
 
 ######### SORTING #########
-        # Custom sorting order on chromosome and company column.
+        # Custom sorting order on chromosome column.
         df[ 'chromosome' ] = pd.Categorical( df[ 'chromosome' ], chromosomePriorityListLivingDNA )
         # Sort frame based on custom sorting orders and position
         df.sort_values( [ 'chromosome', 'position' ], ascending=( True, True ), inplace=True )
@@ -917,7 +916,7 @@ def formatDNAFile( df: pd.DataFrame, company: str ) -> pd.DataFrame:
                 df[ 'genotype' ].replace( to_replace=genotypeTableMyHeritagev2, inplace=True )
 
 ######### SORTING #########
-        # Custom sorting order on chromosome and position column.
+        # Custom sorting order on chromosome column.
         df[ 'chromosome' ] = pd.Categorical( df[ 'chromosome' ], chromosomePriorityListMyHeritage )
         # Sort frame based on custom sorting orders and position
         df.sort_values( [ 'chromosome', 'position' ], ascending=( True, True ), inplace=True )
@@ -944,18 +943,10 @@ def formatDNAFile( df: pd.DataFrame, company: str ) -> pd.DataFrame:
         df[ 'genotype' ].replace( to_replace=genotypeTabletellmeGenv4, inplace=True )
 
 ######### SORTING #########
-        # Custom sorting order on chromosome and company column.
-#        df[ 'chromosome' ] = pd.Categorical( df[ 'chromosome' ], chromosomePriorityListtellmeGenv4 )
-
-        #~~~~~~~~ THIS NEEDS TO CHANGE TO REFLECT tellmeGen v4 WEIRD POSITION ORDER ~~~~~~~~
-        # Sort frame based on custom sorting orders and position
-#        df.sort_values( [ 'chromosome', 'position' ], ascending=( True, True ), inplace=True )
-
         # Custom sorting order on chromosome column.
         df[ 'chromosome' ] = pd.Categorical( df[ 'chromosome' ], chromosomePriorityListtellmeGenv4 )
 
         # sort DataFrame based on custom sorting orders and position in lexicographic order
-#        df_sorted = df.sort_values(by=['chromosome', 'position'], key=lambda x: x.astype(str))
         df = df.sort_values(by=['chromosome', 'position'], key=lambda x: x.astype(str))
 
 ######### RENAME COLUMNS #########
@@ -1226,7 +1217,7 @@ for file in rawDNAFiles:
         # (as males only have one X and one Y), and the rest are changed to a single letter
         #
         # Add commandline to bypass this check to handle mutations?
-        ##### HANDLE DI calls? #####
+        ##### HANDLE D/I calls? #####
         if guessGender == 'Male':
             rep = df[ 'genotype' ].replace( genotypeTableXYMales )
             df[ 'genotype' ] = df[ 'genotype' ].mask( df[ 'chromosome' ].isin( [ 'X','Y', 'MT' ] ), rep )
