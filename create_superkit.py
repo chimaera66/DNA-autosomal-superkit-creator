@@ -38,7 +38,7 @@ parser.add_argument('-o', '--outputFormat', type=str, required=False,
                     MyHeritage v2
                     tellmeGen v4
                     ''')
-parser.add_argument('-cf', '--convertFormat', action='store_true', help='Converts DNA file to desired output format specified in --outputFormat. Drops positions not in the chosen format. Not valid with SuperKit format.', required=False)
+parser.add_argument('-cf', '--convertFormat', action='store_true', help='Converts DNA file to a more accurate output format. Keeps only rsid and positions that are true to the original format and adds comments. Not valid with SuperKit format.', required=False)
 parser.add_argument('-mv', '--majorityVote', action='store_true', help='Drops duplicate genotype based on a majority vote. Considerably slower than regular keep first row drop. Only resonable if you want to merge 3 kits or more.', required=False)
 
 # Get arguments from command line
@@ -246,8 +246,8 @@ genotypeTable = {
 genotypeTableMajorityVote = {
     'CA': 'AC',
     'TG': 'GT',
-    'GC': 'CG',
-    'TA': 'AT',
+    'CG': 'GC', # Ancestry format
+    'AT': 'TA', # Ancestry format
     'TC': 'CT',
     'GA': 'AG',
 
@@ -722,7 +722,15 @@ def dropDuplicatesDNAFile( df: pd.DataFrame ) -> pd.DataFrame:
         print()
 
         # Normalize genotype to be able to compare and count majority easier
-        df[ 'genotype' ] = df[ 'genotype' ].replace( to_replace=genotypeTableMajorityVote )
+        df_copy = df.copy()
+        df_copy.loc[:, 'genotype'] = df['genotype'].replace(to_replace=genotypeTableMajorityVote)
+        df = df_copy
+
+#        df[ 'genotype' ] = df[ 'genotype' ].replace( to_replace=genotypeTableMajorityVote )
+
+#        df[ 'genotype' ].replace( to_replace=genotypeTableFamilyTreeDNA, inplace=True )
+#        df[ 'genotype' ].replace( to_replace=genotypeTableMajorityVote, inplace=True )
+#        df.loc[ :, 'genotype' ] = df[ 'genotype' ].replace( to_replace=genotypeTableMajorityVote )
 
         # Group the data frame by chromosome and position columns and apply a lambda function to each group
         df = df.groupby([df['chromosome'], 'position']).apply(
@@ -1110,7 +1118,7 @@ def addCommentsToFile( tmpFileName: str, outputFormat: str):
             "# THIS INFORMATION IS FOR YOUR PERSONAL USE AND IS INTENDED FOR GENEALOGICAL RESEARCH\n"
             "# ONLY. IT IS NOT INTENDED FOR MEDICAL OR HEALTH PURPOSES. PLEASE BE AWARE THAT THE\n"
             "# DOWNLOADED DATA WILL NO LONGER BE PROTECTED BY OUR SECURITY MEASURES.\n"
-            "RSID,CHROMOSOME,POSITION,RESULT\n"
+#            "RSID,CHROMOSOME,POSITION,RESULT\n"
         )
 
         # Read the existing contents of the file
@@ -1141,7 +1149,7 @@ def addCommentsToFile( tmpFileName: str, outputFormat: str):
             "# THIS INFORMATION IS FOR YOUR PERSONAL USE AND IS INTENDED FOR GENEALOGICAL RESEARCH\n"
             "# ONLY. IT IS NOT INTENDED FOR MEDICAL OR HEALTH PURPOSES. PLEASE BE AWARE THAT THE\n"
             "# DOWNLOADED DATA WILL NO LONGER BE PROTECTED BY OUR SECURITY MEASURES.\n"
-            "RSID,CHROMOSOME,POSITION,RESULT\n"
+#            "RSID,CHROMOSOME,POSITION,RESULT\n"
         )
 
         # Read the existing contents of the file
@@ -1406,40 +1414,47 @@ print( "DONE!" )
 print()
 
 
-# Add comments to file
-companiesWithCommentsToAdd = ['23andMe v5',
-                              'AncestryDNA v2',
-                              'LivingDNA v1.0.2',
-                              'MyHeritage v1',
-                              'MyHeritage v2']
+# Special case for MyHeritage
+if outputFormat == 'MyHeritage v1' or outputFormat == 'MyHeritage v2':
+    test = 0
 
-# Add comment if outputformat is in above list
-if outputFormat in companiesWithCommentsToAdd:
+    data = ( "RSID,CHROMOSOME,POSITION,RESULT\n")
 
-    print()
-    print( f'Adding comments to top of file according to {outputFormat} format' )
-    print()
+    # Read the existing contents of the file
+    with open(tmpFileName, "r") as f:
+        existing_data = f.read()
 
-    # Adding comment
-    addCommentsToFile( tmpFileName, outputFormat )
-    print( "DONE!" )
-    print()
+    # Write the new data followed by the original contents
+    with open(tmpFileName, "w", newline="\n") as f:
+        f.write(data + existing_data)
 
 
-# Get the end time
-end_time = time.time()
-# Calculate the elapsed time
-elapsed_time = end_time - start_time
+# Only add comments if converting to true format ()
+if convertFormat == True:
+    # Add comments to file
+    companiesWithCommentsToAdd = [
+                                '23andMe v5',
+                                'AncestryDNA v2',
+                                'LivingDNA v1.0.2',
+                                'MyHeritage v1',
+                                'MyHeritage v2'
+                                ]
+
+    # Add comment if outputformat is in above list
+    if outputFormat in companiesWithCommentsToAdd:
+
+        print()
+        print( f'Adding comments to top of file according to {outputFormat} format' )
+        print()
+
+        # Adding comment
+        addCommentsToFile( tmpFileName, outputFormat )
+        print( "DONE!" )
+        print()
 
 
-print()
-print( 'DNA SuperKit successfully created!' )
-print( f'time elapsed since start of script: {elapsed_time} seconds')
-print()
-
-
-print()
 # Presenting results
+print()
 print()
 print( '######################################################################')
 print( '#')
@@ -1470,6 +1485,7 @@ else:
     superkitUniqueChromosomes = DNASuperKit.chromosome.unique().tolist()
     superkitUniqueGenotypes = DNASuperKit.genotype.unique().tolist()
 
+
 # Information about the results
 print()
 print( f'Chromosome List: {superkitUniqueChromosomes}')
@@ -1477,6 +1493,17 @@ print()
 print( f'Genotype List: {superkitUniqueGenotypes}')
 print()
 
+
+# Time elapsed
+# Get the end time
+end_time = time.time()
+# Calculate the elapsed time
+elapsed_time = end_time - start_time
+
+print()
+print( 'DNA SuperKit successfully created!' )
+print( f'time elapsed since start of script: {elapsed_time} seconds')
+print()
 
 
 ####################################################################################

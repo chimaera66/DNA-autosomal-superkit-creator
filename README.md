@@ -48,7 +48,8 @@ The data are then saved to the `./output/` folder for you to use.
 4. If the kit is determined to be of male origin, then it will change heterozygous calls to nocalls.
 5. The file will be somewhat cleaned by removing genotypes larger than two alleles and move calls on position 0 to "junk" chromosome 0.
 6. Then it will concatenate the dna files and sort according to a predetermined order.
-7. Lastly it will format the superkit to the desired format with correct top commments and save it to `./output/`
+7. If --convertFormat argument was given, it will only keep positions and rsid that are true to the original format.
+8. Lastly it will format the superkit to the desired format (with correct top commments if argument --convertFormat was given) and save it to `./output/`
 
 * At the moment, MyHeritage does not accept the resulting superkit, not in any output format
 
@@ -70,7 +71,7 @@ Currently, the only things you can change are the following:
 
 4. Currently supported command line arguments are
     * -o, --outputFormat: Sets the template for the formatting of the output file. Valid formats are: SuperKit, "23andMe v5", "AncestryDNA v2", "FamilyTreeDNA v3", "LivingDNA v1.0.2", "MyHeritage v1" and "MyHeritage v2". Defaults to SuperKit.
-    * -cf, --convertFormat: Converts DNA file to desired output format specified in --outputFormat. Drops positions not in the chosen format. Not valid with SuperKit format.
+    * -cf, --convertFormat: Converts DNA file to desired output format specified in --outputFormat. Drops positions not in the chosen format and adds comments of top of file (if they exist in original format). Not valid with SuperKit format.
     * -mv, --majorityVote: Drops genotype based on a majority vote. If there are two AA and one CC on the same position, then one AA is kept and the other rows drops. This is considerably slower than the normal keep first row, but it should be more accurate. Mostly meaningful when merging three kits or more. Defaults to false.
 
     * The difference between outputFormat and convertFormat is that outputFormat will just create a new DNA file in the format of the specified company, with all non duplicate rows. convertFormat will do the same, but keep in the SNP ranges of the format to get a theoretically more accurate DNA file.
