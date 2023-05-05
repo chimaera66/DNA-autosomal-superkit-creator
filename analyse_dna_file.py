@@ -98,6 +98,8 @@ def findDNAFiles( fileEndings: List ) -> List:
     for f in fileList:
         if f.lower().endswith( fileEndings ):
             result.append( inputFileDir + f )
+
+
     return result
 
 ##########################################
@@ -136,6 +138,7 @@ def prescreenDNAFile( inputDNAFile: str ) -> str:
     # put all lines in a string
     for x in head:
        mystring += ' ' + x
+
 
     return mystring
 
@@ -201,6 +204,7 @@ def loadDNAFile( file: str, company: str ) -> pd.DataFrame:
     # Load input file into pandas using the company-specific options
     df = pd.read_csv(file, **company_options[company])
 
+
     return df
 
 
@@ -224,6 +228,7 @@ def normalizeDNAFile( df: pd.DataFrame, company: str ) -> pd.DataFrame:
 
     df['chromosome'] = df['chromosome'].astype(str)
     df['position'] = df['position'].astype(int)
+
 
     return df
 
@@ -251,7 +256,8 @@ def guessGenderFromDataframe( df: pd.DataFrame, company: str ) -> str:
         gender = 'Male'
     else:
         gender = 'Female'
-        
+
+
     return gender
 
 
@@ -269,6 +275,7 @@ def saveDNAStructureToFile( df: pd.DataFrame, company: str ):
 
     df_rsid.drop(columns=['genotype'], inplace=True)
     df_rsid.to_csv('./data/' + company + '.df', index=None, sep='\t', encoding='ascii', lineterminator='\r\n')
+
 
     return
 
@@ -297,6 +304,7 @@ def saveDNAFileDuplicates( df: pd.DataFrame, company: str ):
     # Save to file
     duplicates_df.to_csv('./data/' + company + '-duplicates' + '.df', index=None, sep='\t', encoding='ascii', lineterminator='\r\n')
 
+
     return
 
 ####################################################################################
@@ -307,18 +315,6 @@ def saveDNAFileDuplicates( df: pd.DataFrame, company: str ):
 ####################################################################################
 # MAIN LOOP
 ####################################################################################
-
-
-
-
-
-
-####################### ADD FUNCTIONS TO SAVE DNA FILE STRUCTURE AND DUPLICATES ######################
-
-
-
-
-
 
 print()
 
@@ -387,9 +383,9 @@ for file in rawDNAFiles:
         duplicates_percentage = round( duplicates_count / len( df[df['chromosome'] != '0'] ) * 100, 2 )
   
 
-        # This will return a pandas series with the count of each unique value in the "genotype" column
+        # This will return a series with the count of each unique value in the genotype column
         genotype_counts_all = df["genotype"].value_counts()
-#        # Now we can filter the counts for the genotypes we are interested in, i.e., those in the genotypeList
+        # Now we can filter the counts for the genotypes in the genotypeList
         filtered_counts_all = genotype_counts_all[genotype_counts_all.index.isin(genotypeList)]
 
 

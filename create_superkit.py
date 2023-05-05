@@ -36,6 +36,7 @@ parser.add_argument('-o', '--outputFormat', type=str, required=False,
                     LivingDNA v1.0.2
                     MyHeritage v1
                     MyHeritage v2
+                    tellmeGen v4
                     ''')
 parser.add_argument('-cf', '--convertFormat', action='store_true', help='Converts DNA file to desired output format specified in --outputFormat. Drops positions not in the chosen format. Not valid with SuperKit format.', required=False)
 parser.add_argument('-mv', '--majorityVote', action='store_true', help='Drops duplicate genotype based on a majority vote. Considerably slower than regular keep first row drop. Only resonable if you want to merge 3 kits or more.', required=False)
@@ -53,7 +54,7 @@ if not outputFormat:
     outputFormat = 'SuperKit'
 
 # Allowed outputFormats
-allowed_outputFormats = ['SuperKit', '23andMe v5', 'AncestryDNA v2', 'FamilyTreeDNA v3', 'LivingDNA v1.0.2', 'MyHeritage v1', 'MyHeritage v2']
+allowed_outputFormats = ['SuperKit', '23andMe v5', 'AncestryDNA v2', 'FamilyTreeDNA v3', 'LivingDNA v1.0.2', 'MyHeritage v1', 'MyHeritage v2', 'tellmeGen v4']
 
 # Check if outputFormat are valid, if not then exit
 if outputFormat and outputFormat not in allowed_outputFormats:
@@ -87,84 +88,24 @@ outputFileEnding = '.csv'
 # Sorting order for company column
 # Define the company priority lists
 company_priority_lists = {
-    '23andMe v5': ['23andMe v5', 'AncestryDNA v2', 'FamilyTreeDNA v3', 'MyHeritage v2', 'LivingDNA v1.0.2', 'MyHeritage v1'],
-    'AncestryDNA v2': ['AncestryDNA v2', '23andMe v5', 'FamilyTreeDNA v3', 'MyHeritage v2', 'LivingDNA v1.0.2', 'MyHeritage v1'],
-    'FamilyTreeDNA v3': ['FamilyTreeDNA v3', '23andMe v5', 'AncestryDNA v2', 'MyHeritage v2', 'LivingDNA v1.0.2', 'MyHeritage v1'],
-    'LivingDNA v1.0.2': ['LivingDNA v1.0.2', '23andMe v5', 'AncestryDNA v2', 'FamilyTreeDNA v3', 'MyHeritage v2', 'MyHeritage v1'],
-    'MyHeritage v1': ['MyHeritage v1', '23andMe v5', 'AncestryDNA v2', 'FamilyTreeDNA v3', 'MyHeritage v2', 'LivingDNA v1.0.2'],
-    'MyHeritage v2': ['MyHeritage v2', '23andMe v5', 'AncestryDNA v2', 'FamilyTreeDNA v3', 'LivingDNA v1.0.2', 'MyHeritage v1']
+    '23andMe v5': ['23andMe v5', 'AncestryDNA v2', 'FamilyTreeDNA v3', 'MyHeritage v2', 'LivingDNA v1.0.2', 'tellmeGen v4', 'MyHeritage v1'],
+    'AncestryDNA v2': ['AncestryDNA v2', '23andMe v5', 'FamilyTreeDNA v3', 'MyHeritage v2', 'LivingDNA v1.0.2', 'tellmeGen v4', 'MyHeritage v1'],
+    'FamilyTreeDNA v3': ['FamilyTreeDNA v3', '23andMe v5', 'AncestryDNA v2', 'MyHeritage v2', 'LivingDNA v1.0.2', 'tellmeGen v4', 'MyHeritage v1'],
+    'LivingDNA v1.0.2': ['LivingDNA v1.0.2', '23andMe v5', 'AncestryDNA v2', 'FamilyTreeDNA v3', 'MyHeritage v2', 'tellmeGen v4', 'MyHeritage v1'],
+    'MyHeritage v1': ['MyHeritage v1', '23andMe v5', 'AncestryDNA v2', 'FamilyTreeDNA v3', 'MyHeritage v2', 'LivingDNA v1.0.2', 'tellmeGen v4'],
+    'MyHeritage v2': ['MyHeritage v2', '23andMe v5', 'AncestryDNA v2', 'FamilyTreeDNA v3', 'LivingDNA v1.0.2', 'tellmeGen v4', 'MyHeritage v1'],
+    'tellmeGen v4': ['tellmeGen v4', '23andMe v5', 'AncestryDNA v2', 'FamilyTreeDNA v3', 'MyHeritage v2', 'LivingDNA v1.0.2', 'MyHeritage v1']
 }
 
 # Get the company priority list based on the output format
-companyPriorityList = company_priority_lists.get(outputFormat, ['23andMe v5', 'AncestryDNA v2', 'FamilyTreeDNA v3', 'MyHeritage v2', 'LivingDNA v1.0.2', 'MyHeritage v1'])
-
-#companyPriorityList = [ '23andMe v5',
-#                        'AncestryDNA v2',
-#                        'FamilyTreeDNA v3',
-#                        'MyHeritage v2',
-#                        'LivingDNA v1.0.2',
-#                        'MyHeritage v1'
-#                        ]
-
-
-
-
-#if outputFormat == '23andMe v5':
-#    companyPriorityList = [ '23andMe v5',
-#                            'AncestryDNA v2',
-#                            'FamilyTreeDNA v3',
-#                            'MyHeritage v2',
-#                            'LivingDNA v1.0.2',
-#                            'MyHeritage v1'
-#                            ]
-#elif outputFormat == 'AncestryDNA v2':
-#    companyPriorityList = [ 'AncestryDNA v2',
-#                            '23andMe v5',
-#                            'FamilyTreeDNA v3',
-#                            'MyHeritage v2',
-#                            'LivingDNA v1.0.2',
-#                            'MyHeritage v1'
-#                            ]
-#elif outputFormat == 'FamilyTreeDNA v3':
-#    companyPriorityList = [ 'FamilyTreeDNA v3',
-#                            '23andMe v5',
-#                            'AncestryDNA v2',
-#                            'MyHeritage v2',
-#                            'LivingDNA v1.0.2',
-#                            'MyHeritage v1'
-#                            ]
-#elif outputFormat == 'MyHeritage v2':
-#    companyPriorityList = [ 'MyHeritage v2',
-#                            '23andMe v5',
-#                            'AncestryDNA v2',
-#                            'FamilyTreeDNA v3',
-#                            'LivingDNA v1.0.2',
-#                            'MyHeritage v1'
-#                            ]
-#elif outputFormat == 'LivingDNA v1.0.2':
-#    companyPriorityList = [ 'LivingDNA v1.0.2',
-#                            '23andMe v5',
-#                            'AncestryDNA v2',
-#                            'FamilyTreeDNA v3',
-#                            'MyHeritage v2',
-#                            'MyHeritage v1'
-#                            ]
-#elif outputFormat == 'MyHeritage v1':
-#    companyPriorityList = [ 'MyHeritage v1',
-#                            '23andMe v5',
-#                            'AncestryDNA v2',
-#                            'FamilyTreeDNA v3',
-#                            'MyHeritage v2',
-#                            'LivingDNA v1.0.2'
-#                            ]
-#else:
-#    companyPriorityList = [ '23andMe v5',
-#                        'AncestryDNA v2',
-#                        'FamilyTreeDNA v3',
-#                        'MyHeritage v2',
-#                        'LivingDNA v1.0.2',
-#                        'MyHeritage v1',
-#                        ]
+companyPriorityList = company_priority_lists.get(outputFormat, ['23andMe v5',
+                                                                'AncestryDNA v2',
+                                                                'FamilyTreeDNA v3',
+                                                                'MyHeritage v2',
+                                                                'LivingDNA v1.0.2',
+                                                                'tellmeGen v4',
+                                                                'MyHeritage v1'
+                                                                ])
 
 
 # Kit statistics
@@ -333,9 +274,9 @@ genotypeTableXYMales = {
 }
 
 
-# Nocall list
-noCalls = [ 'DD', 'II', 'DI', 'D', 'I', '--' ]
-noCallsHyphen = [ 'DD', 'II', 'DI', 'D', 'I' ]
+# List of no calls, deletions and insertions genotypes
+noCallDelIns = [ 'DD', 'II', 'DI', 'D', 'I', '--' ]
+#noCallsHyphen = [ 'DD', 'II', 'DI', 'D', 'I' ]
 
 
 ####################################################################################
@@ -485,6 +426,31 @@ genotypeTableMyHeritagev2 = {
 ##########################################
 
 
+##########################################
+# tellmeGen v4
+
+# Sorting order for tellmeGen v4 chromosome column
+chromosomePriorityListtellmeGenv4 = ['0', '1', '10', '11', '12', '13', '14', '15', '16', '17', '18', '19', '2', '20', '21', '22', '3', '4', '5', '6', '7', '8', '9', 'MT', 'X', 'XY', 'Y']
+
+# MyHeritage v1 genotypes 
+genotypeTabletellmeGenv4 = {
+    'G': 'GG',
+    'C': 'CC',
+    'A': 'AA',
+    'T': 'TT',
+
+    'CA': 'AC',
+    'CT': 'TC',
+    'GA': 'AG',
+    'GT': 'TG',
+
+    'D': 'DD',
+    'I': 'II'
+}
+
+##########################################
+
+
 ####################################################################################
 # FUNCTIONS
 ####################################################################################
@@ -527,9 +493,9 @@ def prescreenDNAFile( inputDNAFile: str ) -> str:
     #       Living DNA v1.0.2 = 11
     #       MyHeritage v1     = 6
     #       MyHeritage v2     = 12
+    #       tellmeGen v4      = 0
 
 
-    #n = 0
     n = 1
     mystring = ' '
 
@@ -563,11 +529,12 @@ def determineDNACompany( text: str, filename: str ) -> str:
     # List of company and patterns
     company_patterns = {
         '23andMe v5': r'_v5_full_',
-        'AncestryDNA v2': r'ancestrydna',
+        'AncestryDNA v2': r'ancestrydna array version: v2\.0',
         'LivingDNA v1.0.2': r'# living dna customer genotype data download file version: 1\.0\.2',
         'MyHeritage v2': r'##format=mhv1\.0',
         'MyHeritage v1': r'# myheritage dna raw data\.',
-        'FamilyTreeDNA v3': r'rsid,chromosome,position,result'
+        'FamilyTreeDNA v3': r'rsid,chromosome,position,result',
+        'tellmeGen v4': r'# rsid	chromosome	position	genotype'
     }
 
     # Convert to lowercase to make it easier
@@ -601,7 +568,8 @@ def loadDNAFile( file: str, company: str ) -> pd.DataFrame:
         'FamilyTreeDNA v3': {'dtype': str, 'comment': '#'},
         'LivingDNA v1.0.2': {'dtype': str, 'sep': '\t', 'comment': '#', 'index_col': False, 'header': None, 'engine': 'python'},
         'MyHeritage v1': {'dtype': str, 'comment': '#'},
-        'MyHeritage v2': {'dtype': str, 'comment': '#'}
+        'MyHeritage v2': {'dtype': str, 'comment': '#'},
+        'tellmeGen v4': {'dtype': str, 'sep': '\t', 'comment': '#', 'index_col': False, 'header': None, 'engine': 'python'},
     }
     
     # Check if the company name is valid
@@ -639,7 +607,6 @@ def normalizeDNAFile( df: pd.DataFrame, company: str ) -> pd.DataFrame:
     # Normalize chromosome order with custom chromosomeTable
     df[ 'chromosome' ] = df[ 'chromosome' ].replace( to_replace=chromosomeTableAncestryIn )
 
-    ##### CHANGE WHAT GENOTYPES THAT GET NORMALIZED? CA AC DOESNT NEED NORMALIZING? CHANGED LATER? #####
     # Normalize genotype with custom genotypeTable
     df[ 'genotype' ] = df[ 'genotype' ].replace( to_replace=genotypeTable )
 
@@ -742,33 +709,6 @@ def dropDuplicatesDNAFile( df: pd.DataFrame ) -> pd.DataFrame:
     # Select rows where the mask is True or genotype != '--'
     df = df[mask | df.genotype.ne('--')]
 
-### DD
-    # Create a boolean mask for rows where position is not a duplicate within each chromosome
-    mask = df.groupby(['chromosome', 'position']).genotype.transform('nunique') == 1
-
-    # Select rows where the mask is True or genotype != '--'
-    df = df[mask | df.genotype.ne('DD')]
-
-### DI
-    # Create a boolean mask for rows where position is not a duplicate within each chromosome
-    mask = df.groupby(['chromosome', 'position']).genotype.transform('nunique') == 1
-
-    # Select rows where the mask is True or genotype != '--'
-    df = df[mask | df.genotype.ne('DI')]
-
-### ID
-    # Create a boolean mask for rows where position is not a duplicate within each chromosome
-    mask = df.groupby(['chromosome', 'position']).genotype.transform('nunique') == 1
-
-    # Select rows where the mask is True or genotype != '--'
-    df = df[mask | df.genotype.ne('ID')]
-
-### II
-    # Create a boolean mask for rows where position is not a duplicate within each chromosome
-    mask = df.groupby(['chromosome', 'position']).genotype.transform('nunique') == 1
-
-    # Select rows where the mask is True or genotype != '--'
-    df = df[mask | df.genotype.ne('II')]
 
     print( 'DONE!' )
     print()
@@ -792,7 +732,7 @@ def dropDuplicatesDNAFile( df: pd.DataFrame ) -> pd.DataFrame:
                 x[x['genotype'] == x['genotype'].mode().iloc[0]].iloc[:1] if (x['genotype'] == x['genotype'].mode().iloc[0]).sum()/x.shape[0] >= 0.5 
                 # Otherwise, return the original group
                 else x
-            # Reset the index of the resulting data frame after grouping and filtering
+        # Reset the index of the resulting data frame after grouping and filtering
         ).reset_index(drop=True)
         print( 'DONE!' )
         print()
@@ -942,8 +882,8 @@ def formatDNAFile( df: pd.DataFrame, company: str ) -> pd.DataFrame:
         df = df.drop( df[ df[ 'chromosome' ] == 'Y' ].index )
 
 ######### NOCALLS #########
-        # Drop nocalls according to noCalls
-        for f in noCalls:
+        # Drop nocalls according to noCallDelIns
+        for f in noCallDelIns:
             indexNames = df[ df[ 'genotype' ] == f ].index
             df.drop( indexNames, inplace = True )
 
@@ -976,9 +916,8 @@ def formatDNAFile( df: pd.DataFrame, company: str ) -> pd.DataFrame:
         elif company == 'MyHeritage v2':
                 df[ 'genotype' ].replace( to_replace=genotypeTableMyHeritagev2, inplace=True )
 
-
 ######### SORTING #########
-        # Custom sorting order on chromosome and company column.
+        # Custom sorting order on chromosome and position column.
         df[ 'chromosome' ] = pd.Categorical( df[ 'chromosome' ], chromosomePriorityListMyHeritage )
         # Sort frame based on custom sorting orders and position
         df.sort_values( [ 'chromosome', 'position' ], ascending=( True, True ), inplace=True )
@@ -989,6 +928,39 @@ def formatDNAFile( df: pd.DataFrame, company: str ) -> pd.DataFrame:
 ######### RENAME COLUMNS #########
         # Rename columns
         df.rename( columns = { 'rsid':'RSID', 'chromosome':'CHROMOSOME', 'position':'POSITION', 'genotype':'RESULT' }, inplace = True )
+
+
+
+    # tellmeGen v4
+    elif company == 'tellmeGen v4':
+        test = True
+
+######### DROP UNUSED CHROMOSOMES #########
+        # Drop chromosomes that arent used
+        df = df.drop( df[ df[ 'chromosome' ] == '0' ].index )
+
+######### NORMALIZE #########
+        # Replace genotypes
+        df[ 'genotype' ].replace( to_replace=genotypeTabletellmeGenv4, inplace=True )
+
+######### SORTING #########
+        # Custom sorting order on chromosome and company column.
+#        df[ 'chromosome' ] = pd.Categorical( df[ 'chromosome' ], chromosomePriorityListtellmeGenv4 )
+
+        #~~~~~~~~ THIS NEEDS TO CHANGE TO REFLECT tellmeGen v4 WEIRD POSITION ORDER ~~~~~~~~
+        # Sort frame based on custom sorting orders and position
+#        df.sort_values( [ 'chromosome', 'position' ], ascending=( True, True ), inplace=True )
+
+        # Custom sorting order on chromosome column.
+        df[ 'chromosome' ] = pd.Categorical( df[ 'chromosome' ], chromosomePriorityListtellmeGenv4 )
+
+        # sort DataFrame based on custom sorting orders and position in lexicographic order
+#        df_sorted = df.sort_values(by=['chromosome', 'position'], key=lambda x: x.astype(str))
+        df = df.sort_values(by=['chromosome', 'position'], key=lambda x: x.astype(str))
+
+######### RENAME COLUMNS #########
+        # Rename columns
+        df.rename( columns = { 'rsid':'# rsid' }, inplace = True )
 
 
 
@@ -1250,30 +1222,6 @@ for file in rawDNAFiles:
         guessGender = guessGenderFromDataframe( df, company )
 
 
-
-        ################################################################
-        ##### SAVE RSID, CHROMOSOME AND POSITION to ./data/ folder #####
-#        df_rsid = df_rsid.drop_duplicates(subset=['chromosome', 'position'], keep='first')
-#        df_rsid.drop(columns=['company', 'genotype'], inplace=True)
-#        df_rsid.to_csv('./data/' + company + '.df', index=None, sep='\t', encoding='ascii', lineterminator='\r\n')
-#        df_rsid.to_csv('./data/' + company + '-full' + '.df', index=None, sep='\t', encoding='ascii', lineterminator='\r\n')
-
-        # SAVE DUPLICATES
-        # group the rows based on 'chromosome' and 'position'
-#        groups = df.groupby(['chromosome', 'position'])
-        # filter the groups that have more than one row (i.e., duplicates)
-#        duplicates = groups.filter(lambda x: len(x) > 1)
-        # concatenate the filtered groups into a new dataframe
-#        duplicates_df = pd.concat([duplicates])
-        # Save
-#        duplicates_df.to_csv('./data/' + company + '-duplicates' + '.df', index=None, sep='\t', encoding='ascii', lineterminator='\r\n')
-
-
-        ################################################################
-        ################################################################
-
-
-
         # Normalize genotypes on X and Y (MT?) chromosomes where heterozygous calls are defined as nocalls '--'
         # (as males only have one X and one Y), and the rest are changed to a single letter
         #
@@ -1442,6 +1390,7 @@ formats = {
     'LivingDNA v1.0.2': { 'sep': '\t', 'encoding': 'ascii', 'lineterminator': '\n' },
     'MyHeritage v1': { 'header': False, 'sep': ',', 'encoding': 'ascii', 'lineterminator': '\n', 'quoting': 2 },
     'MyHeritage v2': { 'header': False, 'sep': ',', 'encoding': 'ascii', 'lineterminator': '\n', 'quoting': 2 },
+    'tellmeGen v4': { 'sep': '\t', 'encoding': 'ascii', 'lineterminator': '\n' },
     'SuperKit': { 'sep': '\t', 'encoding': 'ascii', 'lineterminator': '\r\n' }
 }
 

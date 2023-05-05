@@ -24,10 +24,11 @@ The data are then saved to the `./output/` folder for you to use.
     * 23andMe v5 (since 08/2017)
     * MyHeritage v2 (after 03/2019)
 
-- unknown (for me) chip
+- unknown chip
     * Ancestry v2 (since 05/2016)
     * FamilyTreeDNA v3 (since 04/2019)
     * MyHeritage v1 (before 03/2019)
+    * tellmeGen v4 (since ?)
 
 - Affymetrix chip
     * LivingDNA v1.0.2 (since 10/2018)
@@ -93,7 +94,7 @@ It will present the following data:
 
 ## TODO list
 ### Superkit Creator
-- [ ] Add support for the latest TellMeGen file format
+- [X] Add support for the latest TellMeGen file format
 - [ ] Improve company detection "algorithm"
 - [ ] Add correct filenames for the superkits
 
