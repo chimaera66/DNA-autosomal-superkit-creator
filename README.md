@@ -38,6 +38,7 @@ The data are then saved to the `./output/` folder for you to use.
 ## Requirements:
 * Python
 * Pandas
+* chardet (only for analyse_dna_file.py)
 
 
 
@@ -49,7 +50,7 @@ The data are then saved to the `./output/` folder for you to use.
 5. The file will be somewhat cleaned by removing genotypes larger than two alleles and move calls on position 0 to "junk" chromosome 0.
 6. Then it will concatenate the dna files and sort according to a predetermined order.
 7. If --convertFormat argument was given, it will only keep positions and rsid that are true to the original format.
-8. Lastly it will format the superkit to the desired format (with correct top commments if argument --convertFormat was given) and save it to `./output/`
+8. Lastly it will format the superkit to the desired format (with correct top commments and filename if argument --convertFormat was given) and save it to `./output/`
 
 * At the moment, MyHeritage does not accept the resulting superkit, not in any output format
 
@@ -82,11 +83,18 @@ Currently, the only things you can change are the following:
 ## How to use analyse_dna_file.py:
 This script will analyse kits from compatible versions described above.
 It will present the following data:
+* File name
+* File encoding
+* File line terminator
+
+* Assumed gender
+
 * Total SNPs
-* Assumed gender of kit
 * Unique chromosomes
 * Unique genotypes
 * SNP ranges
+
+* A total of each and every genotype
 
 1. Put your raw autosomal DNA files into the `./input/` folder and make sure they are unpacked (in `.txt` or `.csv` format)
 
@@ -96,8 +104,8 @@ It will present the following data:
 ## TODO list
 ### Superkit Creator
 - [X] Add support for the latest TellMeGen file format
+- [ ] Add correct filenames for the superkits (Lacking tellmeGen)
 - [ ] Improve company detection "algorithm"
-- [ ] Add correct filenames for the superkits
 
 
 ### DNA File Analyzer

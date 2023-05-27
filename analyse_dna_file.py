@@ -2,12 +2,15 @@
 # Analyze DNA files
 #
 
+import pandas as pd
+import chardet               # For detecting file encoding
+
 import os                   # For findDNAFiles
 from typing import List
-import pandas as pd
 import re                   # For determineDNACompany
-
 import argparse             # Command line argument parser
+
+
 
 ####################################################################################
 # COMMAND LINE ARGUMENT PARSER
@@ -99,6 +102,7 @@ def findDNAFiles( fileEndings: List ) -> List:
         if f.lower().endswith( fileEndings ):
             result.append( inputFileDir + f )
 
+#    print( f"{result}" )
 
     return result
 
@@ -119,8 +123,6 @@ def prescreenDNAFile( inputDNAFile: str ) -> str:
     #       Living DNA v1.0.2 = 11
     #       MyHeritage v1 = 6
     #       MyHeritage v2 = 12
-
-
 
     #n = 0
     n = 1
@@ -229,6 +231,8 @@ def normalizeDNAFile( df: pd.DataFrame, company: str ) -> pd.DataFrame:
     df['chromosome'] = df['chromosome'].astype(str)
     df['position'] = df['position'].astype(int)
 
+    # Add company column to kit
+    df[ 'company' ] = company
 
     return df
 
@@ -311,6 +315,62 @@ def saveDNAFileDuplicates( df: pd.DataFrame, company: str ):
 ####################################################################################
 
 
+##########################################
+# Function to check which file termination the file has
+#
+
+def getLineTerminator( filePath: str ) -> str:
+
+    # Open file
+    with open(filePath, 'rb') as file:
+        data = file.read()
+    
+    # Windows line terminator
+    if b'\r\n' in data:
+        return 'CRLF \\r\\n (Windows)'
+    
+    # Unix/Linux line terminator
+    elif b'\n' in data:
+        return 'LF \\n (Unix/Linux) '
+    
+    # Mac line terminator
+    elif b'\r' in data:
+        return 'CR \\r (Mac)'
+    
+    # Unknown line terminator
+    else:
+        return None
+
+
+####################################################################################
+####################################################################################
+
+
+##########################################
+# Function to check what file encoding the file has
+#
+
+def getFileEncoding( filePath: str ) -> str:
+#    with open(filePath, 'rb') as file:
+#        rawData = file.read()
+#        encoding = codecs.detect(rawData)['encoding']
+        
+#        return encoding
+#    with codecs.open(filePath, 'r', encoding='utf-8', errors='strict') as file:
+#        encoding = file.encoding
+        
+#        return encoding
+    with open( filePath, 'rb' ) as file:
+        rawData = file.read()
+        result = chardet.detect(rawData)
+        encoding = result['encoding']
+        confidence = result['confidence']
+        
+        return encoding, confidence
+
+####################################################################################
+####################################################################################
+
 
 ####################################################################################
 # MAIN LOOP
@@ -338,6 +398,8 @@ for file in rawDNAFiles:
     # Screening file to determine company
     fileScreening = prescreenDNAFile( file )
 
+#    print( f"{file}" )
+
     # Get DNA company from file comment
     company = determineDNACompany( fileScreening , file)
 
@@ -358,6 +420,15 @@ for file in rawDNAFiles:
         if saveDuplicates == True:
             saveDNAFileDuplicates( df, company )
 
+        # Check File Encoding
+        fileEncoding, fileEncodingConfidence = getFileEncoding( file )
+
+#        print( f"{fileEncoding}, {fileEncodingConfidence}" )
+
+        # Check Line Terminator
+        lineTerminator = getLineTerminator( file )
+
+#        print( f"{lineTerminator}" )
 
         # Get a count of nocalls
         # These companies have 00 as nocalls
@@ -396,6 +467,9 @@ for file in rawDNAFiles:
         print( f'# Testcompany:                {company}' )
         print( f'#' )
         print( f'# File:                       {file.replace( inputFileDir, "" )}' )
+        print( f'# File encoding:              {fileEncoding}' )
+        print( f'# Line terminator:            {lineTerminator}' )
+        print( f'#' )
         print( f'# Assumed gender in kit:      {guessGender}' )
         print( '#')
         print( f'# SNPs tested in kit:         {len(df)}' )
