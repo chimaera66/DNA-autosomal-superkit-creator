@@ -1407,6 +1407,53 @@ else:
 tmpFileName = f"{outputFileDir}{outputFileName}-{outputFormat}.{ext}"
 
 
+
+##### CHANGE SO IF ARG --convertFormat, THEN USE ORIGINAL FILENAME #####
+
+if convertFormat == True:
+
+    # Get current time
+    current_time = datetime.datetime.utcnow()
+
+    if outputFormat == '23andMe v5':
+        # Set correct datetime format
+        time_format = '%Y%m%d%H%M%S'
+        time_string = current_time.strftime(time_format)
+        # Set filename
+        tmpFileName = f"{outputFileDir}SuperKit-genome_Super_Kit_v5_Full_{time_string}"
+
+    elif outputFormat == 'AncestryDNA v2':
+        # Set filename
+        tmpFileName = f"{outputFileDir}SuperKit-AncestryDNA"
+
+    elif outputFormat == 'FamilyTreeDNA v3':
+        # Set correct datetime format
+        time_format = '%Y%m%d'
+        time_string = current_time.strftime(time_format)
+        # Set filename
+        tmpFileName = f"{outputFileDir}SuperKit-37_S_Kit_Chrom_Autoso_{time_string}"
+
+    elif outputFormat == 'LivingDNA v1.0.2':
+        # Set filename
+        tmpFileName = f"{outputFileDir}SuperKit-autosomal"
+
+    elif outputFormat == 'MyHeritage v1':
+        # Set filename
+        tmpFileName = f"{outputFileDir}SuperKit-MyHeritage_raw_dna_data"
+
+    elif outputFormat == 'MyHeritage v2':
+        # Set filename
+        tmpFileName = f"{outputFileDir}SuperKit-MyHeritage_raw_dna_data"
+
+    elif outputFormat == 'tellmeGen v4':
+        #test = 7
+        ##### NEED TO FIND tellmeGen FILE PATTERN #####
+        # Set filename
+        tmpFileName = f"{outputFileDir}SuperKit-{outputFormat}"
+
+    tmpFileName = f"{tmpFileName}.{ext}"
+
+
 # Save to file
 print( f'Saving DNA Superkit to {outputFormat} format.' )
 DNASuperKit.to_csv(tmpFileName, index=None, **formats[outputFormat])
