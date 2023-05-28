@@ -351,22 +351,37 @@ def getLineTerminator( filePath: str ) -> str:
 #
 
 def getFileEncoding( filePath: str ) -> str:
-#    with open(filePath, 'rb') as file:
-#        rawData = file.read()
-#        encoding = codecs.detect(rawData)['encoding']
-        
-#        return encoding
-#    with codecs.open(filePath, 'r', encoding='utf-8', errors='strict') as file:
-#        encoding = file.encoding
-        
-#        return encoding
     with open( filePath, 'rb' ) as file:
         rawData = file.read()
+
+        # use chardet to detect encoding
         result = chardet.detect(rawData)
+
+        # saving encoding
         encoding = result['encoding']
+
+        # saving confidence (not really needed)
         confidence = result['confidence']
         
         return encoding, confidence
+
+####################################################################################
+####################################################################################
+
+
+##########################################
+# Function to compare two dataframes and count nr of common rows
+#
+
+def compareDataframes(df1, df2):
+    # Merge dataframes on chromosome and position
+    mergedDf = df1.merge(df2, on=['chromosome', 'position'], how='inner', suffixes=['_df1', '_df2'])
+    mergedDf = mergedDf.drop_duplicates(subset=['chromosome', 'position'])
+    
+    # Count the number of rows where chromosome and position match
+    matchCount = len(mergedDf)
+    
+    return matchCount
 
 ####################################################################################
 ####################################################################################
@@ -391,14 +406,17 @@ if not rawDNAFiles:
 # Prepare DNA files
 
 # empty array to put results in
-resultFiles = []
+dataframeList = []
+companyList = []
 chromosomeZero = pd.DataFrame()
 
 for file in rawDNAFiles:
+
+    # Display current file
+    print( f'Analysing file: {file.replace( inputFileDir, "" )}' )
+
     # Screening file to determine company
     fileScreening = prescreenDNAFile( file )
-
-#    print( f"{file}" )
 
     # Get DNA company from file comment
     company = determineDNACompany( fileScreening , file)
@@ -411,6 +429,15 @@ for file in rawDNAFiles:
         # Guess gender in kit
         guessGender = guessGenderFromDataframe( df, company )
 
+        # Add dataframes to list
+        dataframeList.append( df )
+        # Add companies to list
+        companyList.append( company )
+
+
+    ########################
+    # Save file structure and duplicates to file
+    # for debugging reasons. Use command line arguments
 
         # Save DNA file structure as a .df template to ./data/ folder
         if saveStructure == True:
@@ -420,15 +447,15 @@ for file in rawDNAFiles:
         if saveDuplicates == True:
             saveDNAFileDuplicates( df, company )
 
+
+    ########################
+    # Get data and statistics from DNA files
+
         # Check File Encoding
         fileEncoding, fileEncodingConfidence = getFileEncoding( file )
 
-#        print( f"{fileEncoding}, {fileEncodingConfidence}" )
-
         # Check Line Terminator
         lineTerminator = getLineTerminator( file )
-
-#        print( f"{lineTerminator}" )
 
         # Get a count of nocalls
         # These companies have 00 as nocalls
@@ -460,14 +487,20 @@ for file in rawDNAFiles:
         filtered_counts_all = genotype_counts_all[genotype_counts_all.index.isin(genotypeList)]
 
 
+    ########################
+    # Print DNA file statistics
+
+        # number of #
+        fenceNr = 70
+
         # Presenting results
         print()
-        print( '#' * 70)
+        print( '#' * fenceNr)
         print( f'#')
         print( f'# Testcompany:                {company}' )
         print( f'#' )
-        print( f'# File:                       {file.replace( inputFileDir, "" )}' )
-        print( f'# File encoding:              {fileEncoding}' )
+        print( f'# Filename:                   {file.replace( inputFileDir, "" )}' )
+        print( f'# File encoding:              {fileEncoding}, ({fileEncodingConfidence})' )
         print( f'# Line terminator:            {lineTerminator}' )
         print( f'#' )
         print( f'# Assumed gender in kit:      {guessGender}' )
@@ -476,7 +509,7 @@ for file in rawDNAFiles:
         print( f'# Number of nocalls in kit:   {Nocall_count} / {Nocalls_Percentage}%' )
         print( f'# Duplicate positions in kit: {duplicates_count} / {duplicates_percentage}%' )
         print( f'#')
-        print( '#' * 70)
+        print( '#' * fenceNr)
         print()
         print( f'Chromosomes: {df.chromosome.unique().tolist()}' )
         print( f'Genotypes: {df.genotype.unique().tolist()}' )
@@ -616,7 +649,7 @@ for file in rawDNAFiles:
 
         print()
         # Let user know processing is completed successfully
-        print( 'Done analyzing the file: ' + file.replace( inputFileDir, '' ) )
+        print( 'Done analyzing file: ' + file.replace( inputFileDir, '' ) )
         print()
         print()
         print()
@@ -626,6 +659,44 @@ for file in rawDNAFiles:
         print()
         print( 'File ' + file.replace( inputFileDir, '' ) + ' is unknown' )
         print()
+
+
+########################
+# Compare overlapping SNPs
+
+print( '#' * fenceNr )
+print( '#')
+print( '# Compare nr of SNPs that overlaps between companies' )
+print()
+
+# Get nr of companies analysed
+countCompanies = len(companyList)
+companyIndex = 0
+print( f'Nr of DNA files: {countCompanies}' )
+print()
+
+
+# Compare SNPs between companies
+for c in companyList:
+
+    # Print current company and set index for dataframes to 0
+    print( f'Nr {companyIndex}: {companyList[companyIndex]} overlap:' )
+    dataFrameIndex = 0
+
+    # Compare each dataframe in the dataframeList, not comparing companies to themselves
+    for d in dataframeList:
+        if companyIndex != dataFrameIndex:
+            matchingCount = compareDataframes( dataframeList[companyIndex], d )
+            print( f'{companyList[companyIndex]} and {companyList[dataFrameIndex]}: {matchingCount} SNPs' )
+
+        dataFrameIndex = dataFrameIndex + 1
+    
+    companyIndex = companyIndex + 1
+    print()
+
+print( '#' * fenceNr )
+print()
+
 
 
 ####################################################################################
