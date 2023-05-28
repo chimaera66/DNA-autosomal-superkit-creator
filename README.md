@@ -94,6 +94,8 @@ It will present the following data:
 * Unique genotypes
 * SNP ranges
 
+* Comparison of overlap between the analysed companies
+
 * A total of each and every genotype
 
 1. Put your raw autosomal DNA files into the `./input/` folder and make sure they are unpacked (in `.txt` or `.csv` format)
@@ -103,10 +105,9 @@ It will present the following data:
 
 ## TODO list
 ### Superkit Creator
-- [X] Add support for the latest TellMeGen file format
+
 - [ ] Add correct filenames for the superkits (Lacking tellmeGen)
 - [ ] Improve company detection "algorithm"
 
 
 ### DNA File Analyzer
-- [X] Add support for the latest TellMeGen file format

@@ -374,14 +374,34 @@ def getFileEncoding( filePath: str ) -> str:
 #
 
 def compareDataframes(df1, df2):
+
+    # Replace ancestrys chromosome numbering with standard to enable dropping
+    # 23 is X, 24 is Y, 25 is the PAR/XY region, and 26 is mtDNA.
+    chromosome_mapping = { '23': 'X', '24': 'Y', '25': 'XY', '26': 'MT' }
+    df1['chromosome'] = df1['chromosome'].replace(chromosome_mapping)
+    df2['chromosome'] = df2['chromosome'].replace(chromosome_mapping)
+
     # Merge dataframes on chromosome and position
     mergedDf = df1.merge(df2, on=['chromosome', 'position'], how='inner', suffixes=['_df1', '_df2'])
     mergedDf = mergedDf.drop_duplicates(subset=['chromosome', 'position'])
+
+    # Drop chromosomes not used in autosomal dna testing
+    chromosomes_to_drop = ['XY', 'MT', 'Y', 'X']
+    mergedDfAutosomal = mergedDf[~mergedDf['chromosome'].isin(chromosomes_to_drop)]
+
+    # Count the number of rows where chromosome and position match
+    matchCountAutosomal = len( mergedDfAutosomal )
+
+
+    # Drop all chromosomes except X
+    chromosomes_to_drop = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', '13', '14', '15', '16', '17', '18', '19', '20', '21', '22', 'XY', 'MT', 'Y']
+    mergedDfX = mergedDf[~mergedDf['chromosome'].isin(chromosomes_to_drop)]
     
     # Count the number of rows where chromosome and position match
-    matchCount = len(mergedDf)
+    matchCountX = len( mergedDfX )
+
     
-    return matchCount
+    return matchCountAutosomal, matchCountX
 
 ####################################################################################
 ####################################################################################
@@ -532,6 +552,11 @@ for file in rawDNAFiles:
             snp_count = filtered_df['position'].count()
             print( f"SNP range is between {snp_min} and {snp_max}" )
             print( f"Total tested SNPs: {snp_count}")
+            # Unique genotypes
+            genotypeCount = filtered_df.groupby('genotype').size()
+            print( f'Unique genotypes and their occurance' )
+            print( genotypeCount )
+            print()
 
 
         # Chromosome 1-22 data
@@ -554,8 +579,16 @@ for file in rawDNAFiles:
             print( f"Chromosome {chromosome_count}")
             print( f"SNP range is between {snp_min} and {snp_max}" )
             print( f"Total tested SNPs: {snp_count}")
+
+            # Unique genotypes
+            genotypeCount = filtered_df.groupby('genotype').size()
+            print( f'Unique genotypes and their occurance' )
+            print( genotypeCount )
+
             chromosome_count = chromosome_count + 1
-        
+
+            print()
+
 
         # Chromosome X (23) data
         if company == 'AncestryDNA v2':
@@ -573,7 +606,14 @@ for file in rawDNAFiles:
             snp_count = filtered_df['position'].count()
             print( f"SNP range is between {snp_min} and {snp_max}" )
             print( f"Total tested SNPs: {snp_count}")
-        
+
+            # Unique genotypes
+            genotypeCount = filtered_df.groupby('genotype').size()
+            print( f'Unique genotypes and their occurance' )
+            print( genotypeCount )
+
+            print()
+
 
         # Chromosome Y (24) data
         if company == 'AncestryDNA v2':
@@ -591,7 +631,14 @@ for file in rawDNAFiles:
             snp_count = filtered_df['position'].count()
             print( f"SNP range is between {snp_min} and {snp_max}" )
             print( f"Total tested SNPs: {snp_count}")
-        
+
+            # Unique genotypes
+            genotypeCount = filtered_df.groupby('genotype').size()
+            print( f'Unique genotypes and their occurance' )
+            print( genotypeCount )
+
+            print()
+
 
         # Chromosome XY (25) data
         if company == 'AncestryDNA v2':
@@ -609,13 +656,21 @@ for file in rawDNAFiles:
             snp_count = filtered_df['position'].count()
             print( f"SNP range is between {snp_min} and {snp_max}" )
             print( f"Total tested SNPs: {snp_count}")
-        
+
+            # Unique genotypes
+            genotypeCount = filtered_df.groupby('genotype').size()
+            print( f'Unique genotypes and their occurance' )
+            print( genotypeCount )
+
+            print()
+
 
         # Chromosome MT (26) data
         if company == 'AncestryDNA v2':
             filtered_df = df[df['chromosome'] == '26']
         else:
             filtered_df = df[df['chromosome'] == 'MT']
+
         unique_genotypes = filtered_df['genotype'].unique()
         if len(unique_genotypes) > 0:
             print()
@@ -628,23 +683,12 @@ for file in rawDNAFiles:
             print( f"SNP range is between {snp_min} and {snp_max}" )
             print( f"Total tested SNPs: {snp_count}")
 
+            # Unique genotypes
+            genotypeCount = filtered_df.groupby('genotype').size()
+            print( f'Unique genotypes and their occurance' )
+            print( genotypeCount )
 
-        # Analysing nr of occurances of each genotype on chromosomes x, Y and MT (to measure errors)
-        if company =='AncestryDNA v2':
-            # filter rows with chromosomes X, Y, and MT
-            df_unique_genotype_filter = df[df['chromosome'].isin(['23', '24', '26'])]
-        else:
-            # filter rows with chromosomes X, Y, and MT
-            df_unique_genotype_filter = df[df['chromosome'].isin(['X', 'Y', 'MT'])]
-
-        # get unique genotypes and count their occurrences
-        genotype_counts_XYMT = df_unique_genotype_filter.groupby('genotype').size()
-
-
-        print()
-        print( f'Unique genotypes and their occurance on X, Y and MT')
-        print(genotype_counts_XYMT)
-        print()
+            print()
 
 
         print()
@@ -664,38 +708,41 @@ for file in rawDNAFiles:
 ########################
 # Compare overlapping SNPs
 
-print( '#' * fenceNr )
-print( '#')
-print( '# Compare nr of SNPs that overlaps between companies' )
-print()
-
-# Get nr of companies analysed
 countCompanies = len(companyList)
 companyIndex = 0
-print( f'Nr of DNA files: {countCompanies}' )
-print()
 
-
-# Compare SNPs between companies
-for c in companyList:
-
-    # Print current company and set index for dataframes to 0
-    print( f'Nr {companyIndex}: {companyList[companyIndex]} overlap:' )
-    dataFrameIndex = 0
-
-    # Compare each dataframe in the dataframeList, not comparing companies to themselves
-    for d in dataframeList:
-        if companyIndex != dataFrameIndex:
-            matchingCount = compareDataframes( dataframeList[companyIndex], d )
-            print( f'{companyList[companyIndex]} and {companyList[dataFrameIndex]}: {matchingCount} SNPs' )
-
-        dataFrameIndex = dataFrameIndex + 1
-    
-    companyIndex = companyIndex + 1
+if countCompanies > 1:
+    print( '#' * fenceNr )
+    print( '#')
+    print( '# Compare nr of SNPs that overlaps between companies' )
     print()
 
-print( '#' * fenceNr )
-print()
+    # Get nr of companies analysed
+    print( f'Nr of DNA files: {countCompanies}' )
+    print()
+
+
+    # Compare SNPs between companies
+    for c in companyList:
+
+        # Print current company and set index for dataframes to 0
+        print( f'Nr {companyIndex}: {companyList[companyIndex]} overlap:' )
+        dataFrameIndex = 0
+
+        # Compare each dataframe in the dataframeList, not comparing companies to themselves
+        for d in dataframeList:
+            if companyIndex != dataFrameIndex:
+                matchingCount, matchingCountX = compareDataframes( dataframeList[companyIndex], d )
+                matchingCountAll = matchingCount + matchingCountX
+                print( f'{companyList[companyIndex]} and {companyList[dataFrameIndex]}: 1-22 {matchingCount} SNPs, X {matchingCountX} SNPs. Sum: {matchingCountAll}' )
+
+            dataFrameIndex = dataFrameIndex + 1
+        
+        companyIndex = companyIndex + 1
+        print()
+
+    print( '#' * fenceNr )
+    print()
 
 
 
