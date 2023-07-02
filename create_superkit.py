@@ -21,7 +21,7 @@ import random
 
 # Convert to format
 convertFormat = False
-# Set majority vote off as default t
+# Set majority vote off as default
 majorityVote = False
 
 # Parser arguments
