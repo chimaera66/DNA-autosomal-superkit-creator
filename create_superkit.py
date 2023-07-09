@@ -1420,36 +1420,36 @@ if convertFormat == True:
         time_format = '%Y%m%d%H%M%S'
         time_string = current_time.strftime(time_format)
         # Set filename
-        tmpFileName = f"{outputFileDir}SuperKit-genome_Super_Kit_v5_Full_{time_string}"
+        tmpFileName = f"{outputFileDir}DNASuperKit-genome_Super_Kit_v5_Full_{time_string}"
 
     elif outputFormat == 'AncestryDNA v2':
         # Set filename
-        tmpFileName = f"{outputFileDir}SuperKit-AncestryDNA"
+        tmpFileName = f"{outputFileDir}DNASuperKit-AncestryDNA"
 
     elif outputFormat == 'FamilyTreeDNA v3':
         # Set correct datetime format
         time_format = '%Y%m%d'
         time_string = current_time.strftime(time_format)
         # Set filename
-        tmpFileName = f"{outputFileDir}SuperKit-37_S_Kit_Chrom_Autoso_{time_string}"
+        tmpFileName = f"{outputFileDir}DNASuperKit-37_S_Kit_Chrom_Autoso_{time_string}"
 
     elif outputFormat == 'LivingDNA v1.0.2':
         # Set filename
-        tmpFileName = f"{outputFileDir}SuperKit-autosomal"
+        tmpFileName = f"{outputFileDir}DNASuperKit-autosomal"
 
     elif outputFormat == 'MyHeritage v1':
         # Set filename
-        tmpFileName = f"{outputFileDir}SuperKit-MyHeritage_raw_dna_data"
+        tmpFileName = f"{outputFileDir}DNASuperKit-MyHeritage_raw_dna_data"
 
     elif outputFormat == 'MyHeritage v2':
         # Set filename
-        tmpFileName = f"{outputFileDir}SuperKit-MyHeritage_raw_dna_data"
+        tmpFileName = f"{outputFileDir}DNASuperKit-MyHeritage_raw_dna_data"
 
     elif outputFormat == 'tellmeGen v4':
         #test = 7
         ##### NEED TO FIND tellmeGen FILE PATTERN #####
         # Set filename
-        tmpFileName = f"{outputFileDir}SuperKit-{outputFormat}"
+        tmpFileName = f"{outputFileDir}DNASuperKit-{outputFormat}"
 
     tmpFileName = f"{tmpFileName}.{ext}"
 

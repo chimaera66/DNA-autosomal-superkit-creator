@@ -52,7 +52,7 @@ The data are then saved to the `./output/` folder for you to use.
 7. If --convertFormat argument was given, it will only keep positions and rsid that are true to the original format.
 8. Lastly it will format the superkit to the desired format (with correct top commments and filename if argument --convertFormat was given) and save it to `./output/`
 
-* At the moment, MyHeritage does not accept the resulting superkit, not in any output format
+* MyHeritage will accept DNA kits that are converted with -cf / --convertFormat to Ancestry v2 or FamilöyTreeDNA v3 (these are confirmed working)
 
 
 
